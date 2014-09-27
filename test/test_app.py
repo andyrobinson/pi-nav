@@ -4,6 +4,7 @@ setup_test()
 import unittest
 from unittest.mock import Mock
 import datetime
+
 from main import App
 
 class TestApp(unittest.TestCase):
@@ -13,6 +14,6 @@ class TestApp(unittest.TestCase):
 
 		app = App(mock_logger)
 
-		mock_logger.info.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
+		mock_logger.message.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
 
 
