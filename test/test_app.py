@@ -1,5 +1,6 @@
 from setup_test import setup_test
 setup_test()
+from stub_timedcallback import StubTimedCallback
 
 import unittest
 from unittest.mock import Mock
@@ -8,12 +9,42 @@ import datetime
 from main import App
 
 class TestApp(unittest.TestCase):
-	def test_should_log_welcome_message_on_init(self):
-		now = datetime.datetime.now()
-		mock_logger = Mock()
+    def test_should_log_welcome_message(self):
+        now = datetime.datetime.now()
+        mock_logger = Mock()
+        mock_gps = Mock(lat=0,long=0)
 
-		app = App(mock_logger)
+        App(mock_logger, mock_gps, StubTimedCallback()).track(300)
 
-		mock_logger.message.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
+        mock_logger.message.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
 
+    def test_should_not_log_current_position_before_timer_fires(self):
+        mock_logger = Mock()
+        stub_callback = StubTimedCallback()
 
+        App(mock_logger, Mock(), stub_callback).track(300)
+    
+        self.assertEqual(mock_logger.info.call_count,0)
+
+    def test_should_pass_interval_to_callback_timer(self):
+        stub_callback = StubTimedCallback()
+
+        App(Mock(), Mock(), stub_callback).track(300)
+
+        self.assertEqual(stub_callback.seconds,300)
+
+    def test_should_log_current_position_using_callback_every_time_callback_fires(self):
+        latitude = 57.4
+        longitude = -4.1
+
+        mock_logger = Mock()
+        mock_gps = Mock(lat=latitude,long=longitude)
+        stub_callback = StubTimedCallback()
+
+        App(mock_logger, mock_gps, stub_callback).track(300)    
+    
+        stub_callback.signal_time_elapsed()
+        stub_callback.signal_time_elapsed()
+        stub_callback.signal_time_elapsed()
+        mock_logger.info.assert_called_with('{:+f},{:+f}'.format(latitude,longitude))
+        self.assertEqual(mock_logger.info.call_count,3)
