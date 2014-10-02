@@ -6,7 +6,7 @@ class Logger():
 		self.out = out
 		
 	def info(self,message):
-		self.out.write(datetime.now().strftime("%Y-%m-%d %H:%M ") + message)
+		self.message(datetime.now().strftime("%Y-%m-%d %H:%M ") + message)
 		
 	def message(self,message):
-		self.out.write(message)
+		self.out.write(message + '\n')
