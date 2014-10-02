@@ -18,14 +18,6 @@ class TestApp(unittest.TestCase):
 
         mock_logger.message.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
 
-    def test_should_not_log_current_position_before_timer_fires(self):
-        mock_logger = Mock()
-        stub_callback = StubTimedCallback()
-
-        App(mock_logger, Mock(), stub_callback).track(300)
-    
-        self.assertEqual(mock_logger.info.call_count,0)
-
     def test_should_pass_interval_to_callback_timer(self):
         stub_callback = StubTimedCallback()
 
@@ -48,3 +40,9 @@ class TestApp(unittest.TestCase):
         stub_callback.signal_time_elapsed()
         mock_logger.info.assert_called_with('{:+f},{:+f}'.format(latitude,longitude))
         self.assertEqual(mock_logger.info.call_count,3)
+
+    def test_log_method_should_return_true_to_ensure_logging_continues(self):
+        mock_gps = Mock(lat=0,long=0)
+        app=App(Mock(), Mock(), Mock())    
+
+        self.assertTrue(app.log_position(mock_gps))
