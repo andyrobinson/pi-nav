@@ -36,8 +36,6 @@ class TestDistanceCalculator(unittest.TestCase):
         self.assertLess(percentage_diff(12560,distance_between(Capetown,NewYork)),0.1)
         self.assertLess(percentage_diff(11680,distance_between(Santiago,Chorlton)),0.1)
 
-        print(distance_between(Santiago,Chorlton))
-
     def test_should_calculate_percentage_difference(self):
         self.assertEqual(percentage_diff(10,9),10)
         self.assertEqual(percentage_diff(20,21),5)

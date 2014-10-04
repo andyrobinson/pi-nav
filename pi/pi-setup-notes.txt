@@ -1,0 +1,42 @@
+Notes on setting up Pi
+
+To enable the GPS on GPIO serial port
+======================================
+$ sudo apt-get install gpsd gpsd-clients python-gps
+
+
+Change 	/boot/cmdline.txt
+=========================
+from:
+dwc_otg.lpm_enable=0console=ttyAMA0,115200kgdboc=ttyAMA0,115200console=tty1root=/dev/mmcblk0p2rootfstype=ext4elevator=deadlinerootwait
+
+to:
+dwc_otg.lpm_enable=0console=tty1root=/dev/mmcblk0p2rootfstype=ext4elevator=deadlinerootwait
+
+Change /etc/inittab
+===================
+
+#Spawn a getty on Raspberry Pi serial line
+T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+to:
+
+#Spawn a getty on Raspberry Pi serial line
+#T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+Reboot pi
+=========
+
+Run GPSD
+========
+
+    $ sudo killall gpsd
+    $ sudo gpsd /dev/ttyAMA0 -F /var/run/gpsd.sock
+
+    $ cgps -s
+
+Install python 3.4
+===================
+
+
+
