@@ -3,7 +3,7 @@ setup_test()
 
 from datetime import datetime
 import unittest
-from unittest.mock import Mock
+from mock import Mock
 
 from timed_callback import TimedCallback
    

@@ -3,7 +3,7 @@ setup_test()
 
 import unittest
 from datetime import datetime 
-from unittest.mock import Mock
+from mock import Mock
 from io import StringIO
 
 from console_logger import Logger
