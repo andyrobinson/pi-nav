@@ -3,7 +3,7 @@ import sys
 import subprocess
 from src import *
 
-COMMANDS = ['test','track']
+COMMANDS = ['test','track','integration']
 DEFAULT_COMMAND = 'test'
 
 if __name__ == '__main__':
@@ -14,6 +14,9 @@ if __name__ == '__main__':
 
     if command == 'test':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','test'])
+
+    if command == 'integration':
+        subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','integration_test'])
 
     if command == 'track':
         main.App(console_logger.Logger(),fake_gps.FakeGPS(),timed_callback.TimedCallback()).track(10)
