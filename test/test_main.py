@@ -7,12 +7,13 @@ from mock import Mock
 import datetime
 
 from main import App
+from position import Position
 
 class TestApp(unittest.TestCase):
     def test_should_log_welcome_message(self):
         now = datetime.datetime.now()
         mock_logger = Mock()
-        mock_gps = Mock(lat=0,long=0)
+        mock_gps = Mock(position=Position(0,0))
 
         App(mock_logger, mock_gps, StubTimedCallback()).track(300)
 
@@ -30,7 +31,7 @@ class TestApp(unittest.TestCase):
         longitude = -4.1
 
         mock_logger = Mock()
-        mock_gps = Mock(lat=latitude,long=longitude)
+        mock_gps = Mock(position=Position(latitude,longitude))
         stub_callback = StubTimedCallback()
 
         App(mock_logger, mock_gps, stub_callback).track(300)    
@@ -42,7 +43,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(mock_logger.info.call_count,3)
 
     def test_log_method_should_return_true_to_ensure_logging_continues(self):
-        mock_gps = Mock(lat=0,long=0)
+        mock_gps = Mock(position=Position(0,0))
         app=App(Mock(), Mock(), Mock())    
 
         self.assertTrue(app.log_position(mock_gps))
