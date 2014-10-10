@@ -4,7 +4,7 @@ setup_test()
 import unittest
 from datetime import datetime 
 from mock import Mock
-from io import StringIO
+from StringIO import StringIO
 
 from console_logger import Logger
 

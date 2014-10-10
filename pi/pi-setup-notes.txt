@@ -35,10 +35,6 @@ Run GPSD
 
     $ cgps -s
 
-Install python 3.2
-===================
-sudo apt-get install python3
-
 Install git
 ===========
 sudo apt-get install git
