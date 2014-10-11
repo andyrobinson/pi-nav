@@ -1,4 +1,9 @@
-from gps import *
+try:
+    from gps import *
+except ImportError, e:
+    if e.message != 'No module named gps':
+        raise
+
 import threading
 from position import Position
                 
