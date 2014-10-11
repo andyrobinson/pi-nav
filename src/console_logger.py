@@ -10,3 +10,4 @@ class Logger():
 		
 	def message(self,message):
 		self.out.write(message + '\n')
+		self.out.flush()
