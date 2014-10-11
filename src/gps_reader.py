@@ -14,7 +14,7 @@ class GpsReader(threading.Thread):
   def run(self):
     while self.running:
       self.gpsd.next()
-      if (self.status == STATUS_NO_FIX):
+      if (not(hasattr(self.gpsd.fix,'mode')) or self.gpsd.fix.mode == MODE_NO_FIX):
         self._reset()
       else:
         self.hasfix = True
@@ -25,7 +25,7 @@ class GpsReader(threading.Thread):
 
   def _reset(self):
     self.hasfix = False
-    self.position = NaN
+    self.position = Position(NaN,NaN)
     self.heading = NaN
     self.speed = NaN
     self.time = NaN

@@ -19,6 +19,6 @@ if __name__ == '__main__':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','integration_test'])
 
     if command == 'track':
-    	gps = gps_reader.GpsReader()
-    	gps.start()
+        gps = gps_reader.GpsReader()
+        gps.start()
         main.App(console_logger.Logger(),gps,timed_callback.TimedCallback()).track(10)

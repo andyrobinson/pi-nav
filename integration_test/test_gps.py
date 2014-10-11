@@ -22,7 +22,8 @@ class TestGps(unittest.TestCase):
 
     def test_should_return_hasfix_false_and_NaN_for_values_if_gps_has_no_fix(self):
         self.assertEqual(self.gps_reader.hasfix,False)
-        self.assertTrue(isnan(self.gps_reader.position))
+        self.assertTrue(isnan(self.gps_reader.position.latitude))
+        self.assertTrue(isnan(self.gps_reader.position.longitude))
         self.assertTrue(isnan(self.gps_reader.heading))
         self.assertTrue(isnan(self.gps_reader.speed))
         self.assertTrue(isnan(self.gps_reader.time))
