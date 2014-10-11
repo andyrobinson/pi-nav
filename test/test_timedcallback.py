@@ -22,7 +22,7 @@ class TestTimedCallback(unittest.TestCase):
 
         TimedCallback().call(test_object.test_method,1,2,3).every(0.1)
 
-        self.assertEqual(round(float((datetime.now() - start).microseconds)/1000000,1),0.1)
+        self.assertEqual(round(float((datetime.now() - start).microseconds)/1000000,zz),0.1)
         
     def test_callback_only_runs_once_if_callback_returns_false(self):
         test_object = Mock()

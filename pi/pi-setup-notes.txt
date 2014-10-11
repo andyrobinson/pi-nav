@@ -27,6 +27,11 @@ to:
 Reboot pi
 =========
 
+Install git
+===========
+sudo apt-get install git
+
+
 Run GPSD as a service
 =======================
 (both steps can be achieved by running
@@ -43,9 +48,10 @@ Make service start on boot by running:
 to test:
     $ cgps -s
 
-Install git
-===========
-sudo apt-get install git
+Run Application on startup
+==========================
+
+Replace /etc/rc.local with the one in this project
 
 
 
