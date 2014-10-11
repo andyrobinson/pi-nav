@@ -1,8 +1,9 @@
 from gps import *
 import threading
-import math
 from position import Position
                 
+NaN = float('nan')
+
 class GpsReader(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
@@ -13,19 +14,19 @@ class GpsReader(threading.Thread):
   def run(self):
     while self.running:
       self.gpsd.next()
-      if not(math.isnan(self.gpsd.fix.latitude)) and self.gpsd.fix.latitude != 0:
+      if (self.status == STATUS_NO_FIX):
+        self._reset()
+      else:
         self.hasfix = True
         self.heading = self.gpsd.fix.track
         self.speed = self.gpsd.fix.speed
         self.position = Position(self.gpsd.fix.latitude,self.gpsd.fix.longitude)
         self.time = self.gpsd.fix.time
-      else:
-        self._reset()
 
   def _reset(self):
     self.hasfix = False
-    self.position = None
-    self.heading = None
-    self.speed = None
-    self.time = None
+    self.position = NaN
+    self.heading = NaN
+    self.speed = NaN
+    self.time = NaN
     

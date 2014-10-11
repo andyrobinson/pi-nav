@@ -7,6 +7,9 @@ import time
 from gps_reader import GpsReader
 from position import Position
 
+def isnan(number):
+    return str(number) == 'nan'
+
 class TestGps(unittest.TestCase):
     
     def setUp(self):
@@ -17,12 +20,12 @@ class TestGps(unittest.TestCase):
         self.gps_reader.running = False
         self.gps_reader.join()
 
-    def test_should_return_hasfix_false_and_none_for_values_if_gps_has_no_fix(self):
+    def test_should_return_hasfix_false_and_NaN_for_values_if_gps_has_no_fix(self):
         self.assertEqual(self.gps_reader.hasfix,False)
-        self.assertEqual(self.gps_reader.position,None)
-        self.assertEqual(self.gps_reader.heading,None)
-        self.assertEqual(self.gps_reader.speed,None)
-        self.assertEqual(self.gps_reader.time,None)
+        self.assertTrue(isnan(self.gps_reader.position))
+        self.assertTrue(isnan(self.gps_reader.heading))
+        self.assertTrue(isnan(self.gps_reader.speed))
+        self.assertTrue(isnan(self.gps_reader.time))
 
     def test_should_return_values_if_gps_has_fix(self):
         tries = 0
