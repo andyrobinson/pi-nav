@@ -27,12 +27,20 @@ to:
 Reboot pi
 =========
 
-Run GPSD
-========
+Run GPSD as a service
+=======================
+(both steps can be achieved by running
 
-    $ sudo killall gpsd
-    $ sudo gpsd /dev/ttyAMA0 -F /var/run/gpsd.sock
+	$ sudo dpkg-reconfigure gpsd
+)
 
+Replace /etc/default/gpsd with the one in this project
+
+Make service start on boot by running:
+
+	$ sudo update-rc.d /etc/init.d/gpsd defaults 
+
+to test:
     $ cgps -s
 
 Install git
