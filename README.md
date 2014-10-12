@@ -18,7 +18,7 @@ And after much searching, an explanation of the values returned by the GPS is in
 ## Fields in use
 
 I'm interested in the following fields (condensed from table by George Theotokis in first reference above).  The python library typically
-return "nan" (Not a number) when values are not present.
+return "nan" (Not a number) when values are not present.  Note these properties are available from the <b>gps.fix</b> object.
 
 <table>
 	<thead>
@@ -44,7 +44,7 @@ return "nan" (Not a number) when values are not present.
         view.</td></tr>
 		<tr><td>ept</td><td>No</td><td>numeric</td><td>Estimated timestamp error. Present if time is present.</td></tr>
 		<tr><td>epd</td><td>No</td><td>numeric</td><td>Direction error estimate in degrees, 95% confidence.</td></tr>
-		<tr><td>eps</td><td>No</td><td>numeric</td><td>Speed error estinmate in meters/sec, 95% confidence.</td></tr>
+		<tr><td>eps</td><td>No</td><td>numeric</td><td>Speed error estimate in meters/sec, 95% confidence.</td></tr>
 		<tr><td>epc</td><td>No</td><td>numeric</td><td>Climb/sink error estimate in meters/sec, 95% confidence.</td></tr>
 </tbody>
 </table>
