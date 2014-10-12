@@ -1,3 +1,5 @@
+# Based on implementation written by Dan Mandle http://dan.mandle.me September 2012
+# License: GPL 2.0
 try:
     from gps import *
 except ImportError, e:
