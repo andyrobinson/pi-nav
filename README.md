@@ -17,7 +17,8 @@ And after much searching, an explanation of the values returned by the GPS is in
 
 ## Fields in use
 
-I'm interested in the following fields (condensed from table by George Theotokis in first reference above)
+I'm interested in the following fields (condensed from table by George Theotokis in first reference above).  The python library typically
+return "nan" (Not a number) when values are not present.
 
 <table>
 	<thead>
