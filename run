@@ -21,4 +21,4 @@ if __name__ == '__main__':
     if command == 'track':
         gps = gps_reader.GpsReader()
         gps.start()
-        main.App(console_logger.Logger(),gps,timed_callback.TimedCallback()).track(300)
+        main.App(console_logger.Logger(),gps,timed_callback.TimedCallback()).track(30)
