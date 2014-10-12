@@ -15,7 +15,7 @@ os.system('clear') #clear the terminal (optional)
 
 def print_attributes(obj):
   for p in filter(lambda(x):not x.startswith('__'),dir(obj)):
-  print(str(p) + ': ' + str(getattr(x,p)))
+    print(str(p) + ': ' + str(getattr(x,p)))
 
 class GpsPoller(threading.Thread):
   def __init__(self):
