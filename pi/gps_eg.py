@@ -1,5 +1,6 @@
 #! /usr/bin/python
 # Written by Dan Mandle http://dan.mandle.me September 2012
+# Now modified by Andy Robinson
 # License: GPL 2.0
  
 import os
@@ -11,7 +12,11 @@ import threading
 gpsd = None #seting the global variable
  
 os.system('clear') #clear the terminal (optional)
- 
+
+def print_attributes(obj):
+  for p in filter(lambda(x):not x.startswith('__'),dir(obj)):
+  print(str(p) + ': ' + str(getattr(x,p)))
+
 class GpsPoller(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
@@ -49,9 +54,11 @@ if __name__ == '__main__':
       print("climb      " , gpsd.fix.climb)
       print("track      " , gpsd.fix.track)
       print("mode       " , gpsd.fix.mode)
-      print("\nsats       " , gpsd.satellites)
- 
-      time.sleep(5) #set to whatever
+      print("========================================")
+      print_attributes(gpsd)
+      print("========================================")
+      print_attributes(gpsd.fix) 
+      time.sleep(30) #set to whatever
  
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print("\nKilling Thread...")
