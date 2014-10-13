@@ -3,7 +3,7 @@ import sys
 import subprocess
 from src import *
 
-COMMANDS = ['test','track','integration']
+COMMANDS = ['test','track','integration','simulate']
 DEFAULT_COMMAND = 'test'
 
 if __name__ == '__main__':
@@ -22,3 +22,7 @@ if __name__ == '__main__':
         gps = gps_reader.GpsReader()
         gps.start()
         main.App(console_logger.Logger(),gps,timed_callback.TimedCallback()).track(30)
+
+    if command == 'simulate':
+        gps = fake_gps.FakeGPS()
+        main.App(console_logger.Logger(),gps,timed_callback.TimedCallback()).track(3)
