@@ -55,7 +55,7 @@ if __name__ == '__main__':
       print("vertical error " , gpsd.fix.epv)
       print("timestmp error " , gpsd.fix.ept)
       print("speed error    " , gpsd.fix.eps)
-      print("track err deg. " , gpsd.fix.eps)
+      print("track err deg. " , gpsd.fix.epd)
 
       time.sleep(30) #set to whatever
  
