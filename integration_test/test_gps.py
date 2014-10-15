@@ -41,7 +41,7 @@ class TestGps(unittest.TestCase):
         self.assertEqual(self.gps_reader.hasfix,True)
         self.assertIsInstance(self.gps_reader.position,Position)
         self.assertGreater(self.gps_reader.position.latitude,0)
-        self.assertGreater(self.gps_reader.position.longitude,0)
+        self.assertLess(self.gps_reader.position.longitude,0)
         self.assertGreater(self.gps_reader.position.long_error,0)
         self.assertGreater(self.gps_reader.position.lat_error,0)
         self.assertGreater(self.gps_reader.track,0)
