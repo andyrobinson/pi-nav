@@ -29,8 +29,8 @@ class GpsReader(threading.Thread):
         self.speed = self.gpsd.fix.speed
         self.position = Position(self.gpsd.fix.latitude,self.gpsd.fix.longitude,self.gpsd.fix.epy,self.gpsd.fix.epx)
         self.time = self.gpsd.fix.time
-        self.speed_error = self.gpsd.eps
-        self.track_error = self.gpsd.epd
+        self.speed_error = self.gpsd.fix.eps
+        self.track_error = self.gpsd.fix.epd
 
   def _reset(self):
     self.hasfix = False
