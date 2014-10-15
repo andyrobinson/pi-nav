@@ -24,13 +24,13 @@ class TestGps(unittest.TestCase):
         self.assertEqual(self.gps_reader.hasfix,False)
         self.assertTrue(isnan(self.gps_reader.position.latitude))
         self.assertTrue(isnan(self.gps_reader.position.longitude))
-        self.assertEqual(self.gps_reader.position.long_err,0)
-        self.assertEqual(self.gps_reader.position.lat_err,0)
+        self.assertEqual(self.gps_reader.position.long_error,0)
+        self.assertEqual(self.gps_reader.position.lat_error,0)
         self.assertTrue(isnan(self.gps_reader.track))
         self.assertTrue(isnan(self.gps_reader.speed))
         self.assertTrue(isnan(self.gps_reader.time))
         self.assertTrue(isnan(self.gps_reader.speed_error))
-        self.assertTrue(isnan(self.gps_reader.time_error))
+        self.assertTrue(isnan(self.gps_reader.track_error))
 
     def test_should_return_values_if_gps_has_fix(self):
         tries = 0
@@ -42,8 +42,10 @@ class TestGps(unittest.TestCase):
         self.assertIsInstance(self.gps_reader.position,Position)
         self.assertGreater(self.gps_reader.position.latitude,0)
         self.assertGreater(self.gps_reader.position.longitude,0)
+        self.assertGreater(self.gps_reader.position.long_error,0)
+        self.assertGreater(self.gps_reader.position.lat_error,0)
         self.assertGreater(self.gps_reader.track,0)
         self.assertGreater(self.gps_reader.speed,0)
         self.assertGreater(self.gps_reader.time,0)
         self.assertGreater(self.gps_reader.speed_error,0)
-        self.assertGreater(self.gps_reader.time_error,0)
+        self.assertGreater(self.gps_reader.track_error,0)
