@@ -8,6 +8,7 @@ class App():
 
     def track(self, seconds_between_entries):
         self.logger.info('Pi-Nav starting ' + datetime.datetime.now().strftime("%Y-%m-%d"))
+        self.logger.info('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')
         self.timed_callback.call(self.log_position, self.gps).every(seconds_between_entries)
     
     def log_position(self,gps):

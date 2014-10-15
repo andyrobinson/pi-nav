@@ -3,7 +3,7 @@ setup_test()
 from stub_timedcallback import StubTimedCallback
 
 import unittest
-from mock import Mock
+from mock import Mock, call
 import datetime
 
 from main import App
@@ -17,7 +17,7 @@ class TestApp(unittest.TestCase):
 
         App(mock_logger, mock_gps, StubTimedCallback()).track(300)
 
-        mock_logger.info.assert_called_with('Pi-Nav starting ' + now.strftime("%Y-%m-%d"))
+        mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")), call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')])
 
     def test_should_pass_interval_to_callback_timer(self):
         stub_callback = StubTimedCallback()
@@ -31,6 +31,7 @@ class TestApp(unittest.TestCase):
         longitude = -4.1
         speed = 2.0
         heading = 270.2
+        number_of_header_lines = 2
 
         mock_logger = Mock()
         mock_gps = Mock(position=Position(latitude,longitude),speed=speed,heading=heading)
@@ -42,7 +43,7 @@ class TestApp(unittest.TestCase):
         stub_callback.signal_time_elapsed()
         stub_callback.signal_time_elapsed()
         mock_logger.info.assert_called_with('{:+f},{:+f},{:+f},{:+f}'.format(latitude,longitude,speed,heading))
-        self.assertEqual(mock_logger.info.call_count,4) # including the opening announcement
+        self.assertEqual(mock_logger.info.call_count,3 + number_of_header_lines) 
 
     def test_log_method_should_return_true_to_ensure_logging_continues(self):
         mock_gps = Mock(position=Position(0,0),speed=0,heading=0)
