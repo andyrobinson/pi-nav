@@ -18,6 +18,6 @@ if [ "$_IP" ]; then
 fi
 
 # Run the GPS tracker
-sudo /usr/bin/python /home/pi/pi-nav/run track >> /var/log/pi-nav/$(date +"%Y%m%d").log &
+sudo /usr/bin/python /home/pi/pi-nav/run track >> /var/log/pi-nav/out_$(date +"%Y%m%d").log &
 
 exit 0
