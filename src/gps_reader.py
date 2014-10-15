@@ -25,7 +25,7 @@ class GpsReader(threading.Thread):
         self._reset()
       else:
         self.hasfix = True
-        self.heading = self.gpsd.fix.track
+        self.track = self.gpsd.fix.track
         self.speed = self.gpsd.fix.speed
         self.position = Position(self.gpsd.fix.latitude,self.gpsd.fix.longitude)
         self.time = self.gpsd.fix.time
@@ -33,7 +33,7 @@ class GpsReader(threading.Thread):
   def _reset(self):
     self.hasfix = False
     self.position = Position(NaN,NaN)
-    self.heading = NaN
+    self.track = NaN
     self.speed = NaN
     self.time = NaN
     

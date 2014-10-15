@@ -12,5 +12,7 @@ class App():
         self.timed_callback.call(self.log_position, self.gps).every(seconds_between_entries)
     
     def log_position(self,gps):
-        self.logger.info('{:+f},{:+f},{:+f},{:+f}'.format(gps.position.latitude,gps.position.longitude,gps.speed,gps.heading))
+        self.logger.info('{:+f},{:+f},{:+f},{:+f},{:+f},{:+f},{:+f},{:+f}'.format(gps.position.latitude,
+            gps.position.longitude,gps.position.lat_error, gps.position.long_error,
+            gps.speed,gps.track,gps.speed_error,gps.track_error))
         return True
