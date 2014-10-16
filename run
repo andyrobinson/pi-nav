@@ -11,7 +11,7 @@ DEFAULT_COMMAND = 'test'
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
 def application_logger(appname):
-    logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="D",backupCount=30)
+    logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
     logHandler.setFormatter(logging.Formatter(LOGGING_FORMAT))
     logger = logging.getLogger(appname)
     logger.addHandler( logHandler )
@@ -38,5 +38,5 @@ if __name__ == '__main__':
     if command == 'simulate':
         gps = fake_gps.FakeGPS()
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
-        logger = logging.getLogger("Simulate")
+        logger = logging.getLogger("simulate")
         main.App(logger,gps,timed_callback.TimedCallback()).track(3)

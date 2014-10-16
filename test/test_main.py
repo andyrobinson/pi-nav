@@ -17,7 +17,8 @@ class TestApp(unittest.TestCase):
 
         App(mock_logger, mock_gps, StubTimedCallback()).track(300)
 
-        mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")), call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')])
+        mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")), 
+            call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')])
 
     def test_should_pass_interval_to_callback_timer(self):
         stub_callback = StubTimedCallback()
