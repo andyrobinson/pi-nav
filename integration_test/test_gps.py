@@ -32,7 +32,7 @@ class TestGps(unittest.TestCase):
         self.assertTrue(isnan(self.gps_reader.speed_error))
         self.assertTrue(isnan(self.gps_reader.track_error))
 
-    def test_should_return_values_if_gps_has_fix(self):
+    def test_should_return_values_except_track_error_if_gps_has_fix(self):
         tries = 0
         while (not(self.gps_reader.hasfix) and tries < 100):
             tries = tries + 1
@@ -48,4 +48,3 @@ class TestGps(unittest.TestCase):
         self.assertGreater(self.gps_reader.speed,0)
         self.assertGreater(self.gps_reader.time,0)
         self.assertGreater(self.gps_reader.speed_error,0)
-        self.assertGreater(self.gps_reader.track_error,0)
