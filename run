@@ -42,9 +42,8 @@ if __name__ == '__main__':
         main.App(logger,gps,timed_callback.TimedCallback()).track(3)
 
     if command == 'showgps':
-#        gps = gps_reader.GpsReader()
-#        gps.start()
-        gps = fake_gps.FakeGPS()
+        gps = gps_reader.GpsReader()
+        gps.start()
         gps_writer = gps_console_writer.GpsConsoleWriter(gps)
         timed_callback.TimedCallback().call(gps_writer.write).every(5)
         
