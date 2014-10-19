@@ -9,7 +9,7 @@ import datetime
 from main import App
 from position import Position
 
-class TestApp(unittest.TestCase):
+class TestTrack(unittest.TestCase):
     def test_should_log_welcome_message(self):
         now = datetime.datetime.now()
         mock_logger = Mock()
