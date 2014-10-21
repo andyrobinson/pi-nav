@@ -1,8 +1,9 @@
 from math import sin,asin,cos,atan2,radians,degrees,sqrt
+from position import Position
 
 EARTH_RADIUS_METRES = 6371000
 
-# haversine & bearing, see http://www.movable-type.co.uk/scripts/latlong.html
+# all calculations based on http://www.movable-type.co.uk/scripts/latlong.html
 class Globe():
 
     def distance_between(self,start,finish):
@@ -17,5 +18,13 @@ class Globe():
         x = cos(start_lat) * sin(end_lat) - (sin(start_lat) * cos(end_lat) * cos(diff_long))
         return (360 + degrees(atan2(y,x))) % 360
         
+    def new_position(self,start,bearing,distance):
+        start_lat, start_long, bearing_in_rads = self._to_radians(start.latitude,start.longitude, bearing)
+        distance_in_rads = float(distance)/EARTH_RADIUS_METRES
+        new_lat = asin(sin(start_lat) * cos(distance_in_rads) + cos(start_lat)*sin(distance_in_rads)*cos(bearing_in_rads))
+        new_long = start_long + atan2(sin(bearing_in_rads)*sin(distance_in_rads)*cos(start_lat),cos(distance_in_rads) - sin(start_lat)*sin(new_lat))
+
+        return Position(degrees(new_lat),degrees(new_long))
+
     def _to_radians(self,*degs):
         return map((lambda x: radians(x)), degs)

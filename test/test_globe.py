@@ -15,7 +15,7 @@ Capetown = Position(-33.9248685, 18.4240553)
 Santiago = Position(-33.4691199,-70.641997)
 
 def percentage_diff(original,to_compare):
-    return abs(to_compare-original)*100/original    
+    return abs(to_compare-original)*100/abs(original)    
 
 class TestGlobe(unittest.TestCase):
     def test_should_calculate_distance_to_within_one_tenth_percent(self):
@@ -34,10 +34,21 @@ class TestGlobe(unittest.TestCase):
         self.assertEqual(percentage_diff(20,21),5)
         self.assertEqual(percentage_diff(100,83),17)
         
-    def test_should_calculate_the_compass_bearing_between_points(self):
+    def test_should_calculate_the_initial_compass_bearing_between_points(self):
         globe = Globe()
         self.assertLess(percentage_diff(200.1,globe.bearing(Manchester,Chorlton)),0.1)
         self.assertLess(percentage_diff(145.9,globe.bearing(Manchester,London)),0.1)
+        self.assertLess(percentage_diff(288.3,globe.bearing(London,NewYork)),0.1)
         self.assertLess(percentage_diff(64.3,globe.bearing(London,Moscow)),0.1)
         self.assertLess(percentage_diff(357.3,globe.bearing(Santiago,NewYork)),0.1)
+    
+    def test_should_calculate_new_position_from_bearing_and_distance(self):
+        globe = Globe()
+        chorlton = globe.new_position(Manchester,200.1,4565)
+        new_york = globe.new_position(London,288.3,5570000)
+        self.assertLess(percentage_diff(chorlton.latitude, Chorlton.latitude),1)
+        self.assertLess(percentage_diff(chorlton.longitude, Chorlton.longitude),1)
+        self.assertLess(percentage_diff(new_york.longitude, NewYork.longitude),1)
+        self.assertLess(percentage_diff(new_york.latitude, NewYork.latitude),1)
+        
         
