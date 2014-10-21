@@ -1,6 +1,6 @@
 import datetime
 
-class App():
+class Tracker():
     def __init__(self,logger, gps, timed_callback):
         self.logger = logger
         self.gps = gps

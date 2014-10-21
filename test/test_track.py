@@ -6,7 +6,7 @@ import unittest
 from mock import Mock, call
 import datetime
 
-from main import App
+from track import Tracker
 from position import Position
 
 class TestTrack(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestTrack(unittest.TestCase):
         mock_logger = Mock()
         mock_gps = Mock(position=Position(0,0))
 
-        App(mock_logger, mock_gps, StubTimedCallback()).track(300)
+        Tracker(mock_logger, mock_gps, StubTimedCallback()).track(300)
 
         mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")), 
             call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')])
@@ -23,7 +23,7 @@ class TestTrack(unittest.TestCase):
     def test_should_pass_interval_to_callback_timer(self):
         stub_callback = StubTimedCallback()
 
-        App(Mock(), Mock(), stub_callback).track(300)
+        Tracker(Mock(), Mock(), stub_callback).track(300)
 
         self.assertEqual(stub_callback.seconds,300)
 
@@ -39,7 +39,7 @@ class TestTrack(unittest.TestCase):
         mock_gps = Mock(position=Position(latitude,longitude,error,error),speed=speed,track=track,speed_error=error,track_error=error)
         stub_callback = StubTimedCallback()
 
-        App(mock_logger, mock_gps, stub_callback).track(300)    
+        Tracker(mock_logger, mock_gps, stub_callback).track(300)    
     
         stub_callback.signal_time_elapsed()
         stub_callback.signal_time_elapsed()
@@ -49,6 +49,6 @@ class TestTrack(unittest.TestCase):
 
     def test_log_method_should_return_true_to_ensure_logging_continues(self):
         mock_gps = Mock(position=Position(0,0),speed=0,track=0,speed_error=0,track_error=0)
-        app=App(Mock(), Mock(), Mock())    
+        tracker=Tracker(Mock(), Mock(), Mock())    
 
-        self.assertTrue(app.log_position(mock_gps))
+        self.assertTrue(tracker.log_position(mock_gps))

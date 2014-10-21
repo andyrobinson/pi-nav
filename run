@@ -6,7 +6,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 from src import *
 
-COMMANDS = ['test','track','integration','simulate','showgps']
+COMMANDS = ['test','track','integration','simtrack','showgps']
 DEFAULT_COMMAND = 'test'
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
@@ -33,13 +33,13 @@ if __name__ == '__main__':
     if command == 'track':
         gps = gps_reader.GpsReader()
         gps.start()
-        main.App(application_logger("track"),gps,timed_callback.TimedCallback()).track(30)
+        track.Tracker(application_logger("track"),gps,timed_callback.TimedCallback()).track(30)
 
-    if command == 'simulate':
+    if command == 'simtrack':
         gps = fake_gps.FakeGPS()
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
         logger = logging.getLogger("simulate")
-        main.App(logger,gps,timed_callback.TimedCallback()).track(3)
+        track.Tracker(logger,gps,timed_callback.TimedCallback()).track(3)
 
     if command == 'showgps':
         try:
