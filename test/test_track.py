@@ -10,7 +10,7 @@ from track import Tracker
 from position import Position
 
 class TestTrack(unittest.TestCase):
-    def test_should_log_welcome_message(self):
+    def test_should_log_welcome_message_and_column_headers(self):
         now = datetime.datetime.now()
         mock_logger = Mock()
         mock_gps = Mock(position=Position(0,0))
