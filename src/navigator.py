@@ -20,7 +20,6 @@ class Navigator():
             self.callback_on_arrived(*self.callback_args)
         else:
             bearing = self.globe.bearing(self.gps.position, self.navigating_to.position)
-            self.logger.info('blah')
             self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
                 .format(self.navigating_to.latitude,self.navigating_to.longitude, bearing, self._distance()))
             self.helm.steer(bearing,self.check_progress)
