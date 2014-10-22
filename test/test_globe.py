@@ -18,6 +18,7 @@ def percentage_diff(original,to_compare):
     return abs(to_compare-original)*100/abs(original)    
 
 class TestGlobe(unittest.TestCase):
+    
     def test_should_calculate_distance_to_within_one_tenth_percent(self):
         globe = Globe()
         
