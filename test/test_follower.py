@@ -18,7 +18,7 @@ class TestFollower(unittest.TestCase):
         navigator.follow_route([new_position])
 
         mock_navigator.to.assert_called_with(new_position, navigator.follow_route,[])
-        mock_logger.info.assert_called_with('Next waypoint {:+f},{:+f}'.format(new_position.longitude, new_position.latitude))
+        mock_logger.info.assert_called_with('Follower, next waypoint {:+f},{:+f}'.format(new_position.longitude, new_position.latitude))
 
     def test_should_finish_navigation_and_log_on_empty(self):
         mock_navigator = Mock()
@@ -27,7 +27,7 @@ class TestFollower(unittest.TestCase):
         navigator = Follower(mock_navigator, mock_logger)
         navigator.follow_route([])
 
-        mock_logger.info.assert_called_with('All waypoints reached, navigation complete')
+        mock_logger.info.assert_called_with('Follower, all waypoints reached, navigation complete')
         
         
         

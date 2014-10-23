@@ -6,7 +6,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 from src import *
 
-COMMANDS = ['test','track','integration','simtrack','showgps']
+COMMANDS = ['test','track','integration','simtrack','showgps', 'simnav']
 DEFAULT_COMMAND = 'test'
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
@@ -18,6 +18,10 @@ def application_logger(appname):
     logger.setLevel( logging.INFO )
     return logger
 
+def console_logger():
+    logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+    return logging.getLogger("simulate")
+    
 if __name__ == '__main__':
     command =  sys.argv[1] if len(sys.argv) > 1 else DEFAULT_COMMAND
 
@@ -37,9 +41,7 @@ if __name__ == '__main__':
 
     if command == 'simtrack':
         gps = fake_gps.FakeGPS()
-        logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
-        logger = logging.getLogger("simulate")
-        track.Tracker(logger,gps,timed_callback.TimedCallback()).track(3)
+        track.Tracker(console_logger(),gps,timed_callback.TimedCallback()).track(3)
 
     if command == 'showgps':
         try:
@@ -50,4 +52,13 @@ if __name__ == '__main__':
         except (KeyboardInterrupt, SystemExit):
             gps.running = False
             gps.join() 
+        
+    if command == 'simnav':
+        manchester = position.Position(53.479324,-2.2484851)
+        chorlton = position.Position(53.4407973,-2.272291)
+        logger = console_logger()
+        globe = globe.Globe()
+        fake_vehicle = fake_vehicle.FakeVehicle(chorlton, globe,logger)
+        navigator = navigator.Navigator(fake_vehicle.gps,fake_vehicle,globe,logger)
+        follower.Follower(navigator,logger).follow_route([waypoint.Waypoint(manchester,5)])
         
