@@ -1,26 +1,12 @@
 #!/usr/bin/env python
 import sys
 import subprocess
-import logging
-from logging.handlers import TimedRotatingFileHandler
-
-from src import *
 
 COMMANDS = ['test','track','integration','simtrack','showgps', 'simnav']
 DEFAULT_COMMAND = 'test'
-LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
-def application_logger(appname):
-    logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
-    logHandler.setFormatter(logging.Formatter(LOGGING_FORMAT))
-    logger = logging.getLogger(appname)
-    logger.addHandler( logHandler )
-    logger.setLevel( logging.INFO )
-    return logger
-
-def console_logger():
-    logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
-    return logging.getLogger("simulate")
+from src import wiring
+wiring = wiring.Wiring()
     
 if __name__ == '__main__':
     command =  sys.argv[1] if len(sys.argv) > 1 else DEFAULT_COMMAND
@@ -35,31 +21,14 @@ if __name__ == '__main__':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','integration_test'])
 
     if command == 'track':
-        gps = gps_reader.GpsReader()
-        gps.start()
-        track.Tracker(application_logger("track"),gps,timed_callback.TimedCallback()).track(30)
+        wiring.tracker().track(30)
 
     if command == 'simtrack':
-        gps = fake_gps.FakeGPS()
-        track.Tracker(console_logger(),gps,timed_callback.TimedCallback()).track(3)
-
+        wiring.tracker_simulator().track(3)
+        
     if command == 'showgps':
-        try:
-            gps = gps_reader.GpsReader()
-            gps.start()
-            gps_writer = gps_console_writer.GpsConsoleWriter(gps)
-            timed_callback.TimedCallback().call(gps_writer.write).every(5)        
-        except (KeyboardInterrupt, SystemExit):
-            gps.running = False
-            gps.join() 
+        wiring.showgps()
         
     if command == 'simnav':
-        manchester = position.Position(53.479324,-2.2484851)
-        chorlton = position.Position(53.4407973,-2.272291)
-        lowry = position.Position(53.4708,-2.29607)
-        logger = console_logger()
-        globe = globe.Globe()
-        fake_vehicle = fake_vehicle.FakeVehicle(chorlton, globe,logger)
-        navigator = navigator.Navigator(fake_vehicle.gps,fake_vehicle,globe,logger)
-        follower.Follower(navigator,logger).follow_route([waypoint.Waypoint(manchester,5),waypoint.Waypoint(lowry,5)])
+        wiring.follower_simulator().follow_route(wiring.manchester_tour())
         
