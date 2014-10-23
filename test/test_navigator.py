@@ -8,6 +8,18 @@ from globe import Globe
 from position import Position
 from waypoint import Waypoint
 
+class FakeMovingGPS():
+    def __init__(self,positions):
+        self.positions = positions
+        
+    def get_position(self):
+        value = self.positions[0]
+        if len(self.positions) > 1:
+            self.positions = self.positions[1:]
+        return value
+        
+    position = property(get_position)    
+        
 class TestNavigator(unittest.TestCase):
     
     def setUp(self):
@@ -15,71 +27,57 @@ class TestNavigator(unittest.TestCase):
         self.mock_gps = Mock(position=self.current_position)
         self.mock_helm = Mock()
         self.globe = Globe()
-    
-    def test_should_steer_from_current_position_to_next_and_log(self):
-        mock_logger = Mock()
-        new_waypoint = Waypoint(Position(11,11),0)
-        bearing = self.globe.bearing(self.current_position,new_waypoint.position)
-        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, mock_logger)
+        self.mock_logger = Mock()
 
-        navigator.to(new_waypoint,None,None)
-    
-        mock_logger.info.assert_called_with('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
-            .format(11.0,11.0,bearing,self.globe.distance_between(self.current_position,new_waypoint.position)))
-        self.mock_helm.steer.assert_called_with(bearing,navigator.check_progress)
-    
-    def test_should_invoke_callback_and_log_if_new_position_has_been_reached(self):
-        mock_logger = Mock()
-        mock_callback_nav_complete = Mock()
-        navigator = Navigator(self.mock_gps,Mock(),self.globe, mock_logger)
+    def test_should_not_steer_and_log_arrival_if_arrived(self):
+        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, self.mock_logger)
 
-        navigator.to(Waypoint(self.current_position,0),mock_callback_nav_complete,'arrived!')
+        navigator.to(Waypoint(self.current_position,0))
 
-        mock_callback_nav_complete.assert_called_with('arrived!')
-        mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(self.current_position.latitude,self.current_position.longitude))
-        
+        self.assertEqual(self.mock_helm.call_count,0,"expected no call to steer if we have arrived")
+        self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(self.current_position.latitude,self.current_position.longitude))
+
     def test_should_allow_a_tolerance_and_consider_errors_when_calculating_if_we_have_reached_waypoint(self):
+        waypoint = Waypoint(Position(53.0001,-1.9999),10)
+        navigator = Navigator(self.mock_gps,Mock(),self.globe, self.mock_logger)
+
+        navigator.to(waypoint)
+
+        self.assertEqual(self.mock_helm.call_count,0,"expected no call to steer if we have arrived")
+        self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(waypoint.latitude,waypoint.longitude))
+
+    def test_should_steer_from_current_position_to_next_and_log_until_point_is_reached(self):
+        waypoint = Waypoint(Position(11,11),0)
+        bearing = self.globe.bearing(self.current_position,waypoint.position)
+        fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
+
+        navigator.to(waypoint)
+
+        self.mock_logger.info.assert_any_call('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
+            .format(11.0,11.0,bearing,self.globe.distance_between(self.current_position,waypoint.position)))
+        self.mock_helm.steer.assert_called_with(bearing)
+
+    def test_should_steer_to_waypoint_if_outside_tolerance(self):
         mock_callback_nav_complete = Mock()
-        new_waypoint = Waypoint(Position(53.0001,-1.9999),10)
-        navigator = Navigator(self.mock_gps,Mock(),self.globe, Mock())
+        waypoint = Waypoint(Position(53.0001,-1.9999),5)
+        bearing = self.globe.bearing(self.current_position,waypoint.position)
+        fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
 
-        navigator.to(new_waypoint,mock_callback_nav_complete,'arrived!')
+        navigator.to(waypoint)
 
-        mock_callback_nav_complete.assert_called_with('arrived!')
+        self.mock_helm.steer.assert_called_with(bearing)
 
-    def test_should_not_signal_arrival_if_outside_tolerance(self):
-        mock_callback_nav_complete = Mock()
-        new_waypoint = Waypoint(Position(53.0001,-1.9999),5)
-        navigator = Navigator(self.mock_gps,Mock(),self.globe, Mock())
+    def test_at_intermediate_point_should_adjust_heading(self):
+        waypoint = Waypoint(Position(11,11),0)
+        intermediate_position = Position(12,12)
+        fake_gps = FakeMovingGPS([self.current_position, intermediate_position, waypoint.position])
+        bearing1 = self.globe.bearing(self.current_position,waypoint.position)
+        bearing2 = self.globe.bearing(intermediate_position,waypoint.position)
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock())
 
-        navigator.to(new_waypoint,mock_callback_nav_complete,'arrived!')
-
-        self.assertEqual(mock_callback_nav_complete.call_count,0,"expected no call to nav complete")
-
-    def test_should_check_bearing_and_adjust_to_new_circumstances(self):
-        new_waypoint = Waypoint(Position(11,11),0)
-        bearing = self.globe.bearing(self.current_position,new_waypoint.position)
-        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, Mock())
-
-        navigator.to(new_waypoint,None,None)
-        self.mock_helm.steer.assert_called_with(bearing,navigator.check_progress)
+        navigator.to(waypoint)
         
-        new_position = Position(12,12)
-        self.mock_gps.position = new_position
-        new_bearing = self.globe.bearing(new_position,new_waypoint.position)
-
-        navigator.check_progress()
-        self.mock_helm.steer.assert_called_with(new_bearing,navigator.check_progress)
-
-    def test_should_check_bearing_and_signal_arrival_if_finished(self):
-        mock_callback_nav_complete = Mock()
-        new_waypoint = Waypoint(Position(11,11),0)
-        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, Mock())
-
-        navigator.to(new_waypoint,mock_callback_nav_complete,'arrived!')
-        self.assertEqual(mock_callback_nav_complete.call_count,0,"expected no call to nav complete yet")
-
-        self.mock_gps.position = new_waypoint.position
-
-        navigator.check_progress()
-        mock_callback_nav_complete.assert_called_with('arrived!')
+        self.mock_helm.steer.has_calls([call(bearing1),call(bearing2)])
+        

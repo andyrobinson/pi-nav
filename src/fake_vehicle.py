@@ -19,11 +19,12 @@ class FakeVehicle():
         self.globe = globe
         self.logger = logger
     
-    def steer(self,bearing,callback):
+    def steer(self,bearing):
         new_position = self.globe.new_position(self.gps.position,bearing,SPEED)
+        new_position.lat_error = 3
+        new_position.long_error = 3
         self.logger.debug("Vehicle at: {:+f},{:+f}, stack size: {:d}".format(new_position.latitude, new_position.longitude, len(traceback.format_stack())))
         self.gps.position = new_position
         self.gps.track = bearing
         self.gps.speed = SPEED
-        callback()
         
