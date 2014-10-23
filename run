@@ -56,9 +56,10 @@ if __name__ == '__main__':
     if command == 'simnav':
         manchester = position.Position(53.479324,-2.2484851)
         chorlton = position.Position(53.4407973,-2.272291)
+        lowry = position.Position(53.4708,-2.29607)
         logger = console_logger()
         globe = globe.Globe()
         fake_vehicle = fake_vehicle.FakeVehicle(chorlton, globe,logger)
         navigator = navigator.Navigator(fake_vehicle.gps,fake_vehicle,globe,logger)
-        follower.Follower(navigator,logger).follow_route([waypoint.Waypoint(manchester,5)])
+        follower.Follower(navigator,logger).follow_route([waypoint.Waypoint(manchester,5),waypoint.Waypoint(lowry,5)])
         
