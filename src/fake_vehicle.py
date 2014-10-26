@@ -1,12 +1,9 @@
 import traceback
 import random
 from position import Position
+from nan import NaN,isNaN
 
 SPEED = 10
-NaN = float('nan')
-
-def isNaN(x):
-    return str(float(x)).lower() == 'nan'
     
 class VehicleGPS():
     def __init__(self, position, track, speed):
@@ -36,13 +33,12 @@ class FakeVehicle():
         self.gps = VehicleGPS(initial_position,0,0)
         self.globe = globe
         self.logger = logger
-        self.bearing = 0
     
     def steer(self,requested_bearing):
-        if not isNaN(requested_bearing):
-            self.bearing = requested_bearing
+        if isNaN(requested_bearing):
+           raise RuntimeError("Steer called without a valid bearing")
 
-        new_position = self.globe.new_position(self.position,self.bearing,SPEED)
+        new_position = self.globe.new_position(self.position,requested_bearing,SPEED)
         new_position.lat_error = 3
         new_position.long_error = 3
 
@@ -53,5 +49,5 @@ class FakeVehicle():
             print '********* GPS LOST SIGNAL *********'
             self.gps.no_signal()
         else:
-            self.gps.set_position(new_position,self.bearing,SPEED)
+            self.gps.set_position(new_position,requested_bearing,SPEED)
 

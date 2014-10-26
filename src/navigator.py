@@ -1,4 +1,5 @@
 import math
+from nan import isNaN
 
 class Navigator():
     def __init__(self,gps,helm,globe,logger):
@@ -6,14 +7,19 @@ class Navigator():
         self.helm = helm
         self.globe = globe
         self.logger = logger
+        self.bearing = 0.0
         
     def to(self,destination_waypoint):
         current_position = self.gps.position
         while not self._arrived(current_position,destination_waypoint):
             bearing = self.globe.bearing(current_position, destination_waypoint.position)
-            self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
-                .format(destination_waypoint.latitude,destination_waypoint.longitude, bearing, self._distance(current_position,destination_waypoint)))
-            self.helm.steer(bearing)
+            if isNaN(bearing):
+                self.logger.warn('Navigator, no information from GPS, continuing on bearing {:5.1f}'.format(self.bearing))
+            else:
+                self.bearing = bearing
+                self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
+                    .format(destination_waypoint.latitude,destination_waypoint.longitude, bearing, self._distance(current_position,destination_waypoint)))
+            self.helm.steer(self.bearing)
             current_position = self.gps.position
 
         self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(destination_waypoint.latitude,destination_waypoint.longitude))
