@@ -55,7 +55,7 @@ Replace /etc/rc.local with the one in this project
 
 Install the pyserial library
 ============================
-sudo apt-get install pyserial
+sudo apt-get install python-serial
 
 
 
