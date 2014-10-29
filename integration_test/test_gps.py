@@ -18,7 +18,7 @@ class TestGps(unittest.TestCase):
     
     def tearDown(self):
         self.gps_reader.running = False
-        self.gps_reader.join()
+        self.gps_reader.join(1)
 
     def test_should_return_hasfix_false_and_NaN_for_values_if_gps_has_no_fix(self):
         self.assertEqual(self.gps_reader.hasfix,False)
