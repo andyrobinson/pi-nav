@@ -18,7 +18,7 @@ And after much searching, an explanation of the values returned by the GPS is in
 ## Fields in use
 
 I'm interested in the following fields (condensed from table by George Theotokis in first reference above).  The python library typically
-return "nan" (Not a number) when values are not present.  Note these properties are available from the <b>gps.fix</b> object.
+returns "nan" (Not a number) when values are not present.  Note these properties are available from the <b>gps.fix</b> object.
 
 <table>
 	<thead>
