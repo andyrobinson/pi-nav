@@ -5,6 +5,7 @@ import unittest
 
 from fake_gps import FakeGPS
 from sensors import Sensors
+from nan import NaN
 
 class TestSensors(unittest.TestCase):
 
@@ -14,7 +15,10 @@ class TestSensors(unittest.TestCase):
 
 	def test_should_pass_through_gps_values(self):
 		self.assertEqual(self.sensors.hasfix, self.gps.hasfix)
-		self.assertEqual(self.sensors.position, self.gps.position)
+ 		self.assertEqual(self.sensors.position.latitude, self.gps.position.latitude)
+ 		self.assertEqual(self.sensors.position.longitude, self.gps.position.longitude)
+ 		self.assertEqual(self.sensors.position.lat_error, self.gps.position.lat_error)
+ 		self.assertEqual(self.sensors.position.long_error, self.gps.position.long_error)
 		self.assertEqual(self.sensors.track, self.gps.track)
 		self.assertEqual(self.sensors.speed, self.gps.speed)
 		self.assertEqual(self.sensors.time, self.gps.time)
@@ -24,3 +28,17 @@ class TestSensors(unittest.TestCase):
 	def test_should_reflect_changes_in_gps_values(self):
 		self.gps.hasfix = 'blah'
 		self.assertEqual(self.sensors.hasfix,'blah')
+
+	def test_should_default_error_values_to_twenty_if_gps_returns_NaN(self):
+		gps = FakeGPS()
+		gps.position.lat_error = NaN
+		gps.position.long_error = NaN
+		gps.speed_error = NaN
+		gps.track_error = NaN
+
+		sensors = Sensors(gps)
+
+		self.assertEqual(sensors.position.lat_error,20)
+		self.assertEqual(sensors.position.long_error,20)
+		self.assertEqual(sensors.speed_error,20)
+		self.assertEqual(sensors.track_error,20)
