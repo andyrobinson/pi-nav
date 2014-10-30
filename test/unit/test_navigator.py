@@ -2,6 +2,7 @@ from setup_test import setup_test
 setup_test()
 import unittest
 from mock import Mock, call
+from fake_moving_gps import FakeMovingGPS
 
 from navigator import Navigator
 from globe import Globe
@@ -11,18 +12,6 @@ from nan import NaN, isNaN
 
 def last_called_args(mock):
     return mock.call_args[0]
-
-class FakeMovingGPS():
-    def __init__(self,positions):
-        self.positions = positions
-        
-    def get_position(self):
-        value = self.positions[0]
-        if len(self.positions) > 1:
-            self.positions = self.positions[1:]
-        return value
-        
-    position = property(get_position)    
         
 class TestNavigator(unittest.TestCase):
     

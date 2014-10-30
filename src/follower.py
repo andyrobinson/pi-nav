@@ -12,6 +12,8 @@ class Follower():
                 self.logger.info('Follower, next waypoint {:+f},{:+f}'.format(next_waypoint.longitude, next_waypoint.latitude))
                 self.navigator.to(next_waypoint)
                 waypoints = waypoints[1:]
+            except(KeyboardInterrupt):
+                quit()
             except:
                 try:
                     etype,e,traceback = sys.exc_info()
