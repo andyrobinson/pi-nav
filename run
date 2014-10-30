@@ -2,7 +2,7 @@
 import sys
 import subprocess
 
-COMMANDS = ['test','track','integration','simtrack','showgps', 'simnav']
+COMMANDS = ['test','track','hardware','simtrack','showgps', 'simnav']
 DEFAULT_COMMAND = 'test'
 
 from src import wiring
@@ -17,8 +17,8 @@ if __name__ == '__main__':
     if command == 'test':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','test'])
 
-    if command == 'integration':
-        subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','integration_test'])
+    if command == 'hardware':
+        subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','hw_integration_test'])
 
     if command == 'track':
         wiring.tracker().track(30)
