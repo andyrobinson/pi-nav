@@ -14,11 +14,12 @@ class TestGps(unittest.TestCase):
     
     def setUp(self):
         self.gps_reader = GpsReader()
+        self.gps_reader.setDaemon(True)
         self.gps_reader.start()
     
     def tearDown(self):
         self.gps_reader.running = False
-        self.gps_reader.join(1)
+        self.gps_reader.join(0.1)
 
     def test_should_return_hasfix_false_and_NaN_for_values_if_gps_has_no_fix(self):
         self.assertEqual(self.gps_reader.hasfix,False)
