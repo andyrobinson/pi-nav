@@ -11,6 +11,7 @@ from waypoint import Waypoint
 from fake_vehicle import FakeVehicle
 from navigator import Navigator
 from follower import Follower
+from sensors import Sensors
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
@@ -67,11 +68,13 @@ class Wiring():
 
     def globe(self):
         return self._globe
-        
-    def follower_simulator(self):
+
+    def navigator_simulator(self):
         fake_vehicle = FakeVehicle(CHORLTON.position, self.globe(),self.console_logger())
-        navigator = Navigator(fake_vehicle.gps,fake_vehicle,self.globe(),self.console_logger())
-        return Follower(navigator,self.console_logger())
+        return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe(),self.console_logger())
+
+    def follower_simulator(self):
+        return Follower(self.navigator_simulator(),self.console_logger())
     
     def manchester_tour(self):
         return [CHORLTON, MANCHESTER, LOWRY, ALTRINCHAM, CHORLTON]
