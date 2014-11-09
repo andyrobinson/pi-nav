@@ -6,8 +6,11 @@ COMMANDS = ['test','track','hardware','simtrack','showgps', 'simnav']
 DEFAULT_COMMAND = 'test'
 
 from src import wiring
+from test import sim_wiring
+
 wiring = wiring.Wiring()
-    
+sim_wiring = sim_wiring.SimWiring()
+
 if __name__ == '__main__':
     command =  sys.argv[1] if len(sys.argv) > 1 else DEFAULT_COMMAND
 
@@ -30,5 +33,5 @@ if __name__ == '__main__':
         wiring.showgps()
         
     if command == 'simnav':
-        wiring.follower_simulator().follow_route(wiring.manchester_tour())
+        sim_wiring.follower_simulator().follow_route(sim_wiring.manchester_tour())
         
