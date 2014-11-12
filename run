@@ -26,11 +26,11 @@ if __name__ == '__main__':
     if command == 'track':
         wiring.tracker().track(30)
 
-    if command == 'simtrack':
-        wiring.tracker_simulator().track(3)
-        
     if command == 'showgps':
         wiring.showgps()
+        
+    if command == 'simtrack':
+        sim_wiring.tracker_simulator().track(3)
         
     if command == 'simnav':
         sim_wiring.follower_simulator().follow_route(sim_wiring.manchester_tour())
