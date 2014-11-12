@@ -3,7 +3,7 @@ setup_test()
 
 import unittest
 
-from stub_gps import StubGPS
+from simulate.stub_gps import StubGPS
 from sensors import Sensors
 from nan import NaN
 
