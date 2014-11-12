@@ -3,14 +3,14 @@ setup_test()
 
 import unittest
 
-from fake_gps import FakeGPS
+from stub_gps import StubGPS
 from sensors import Sensors
 from nan import NaN
 
 class TestSensors(unittest.TestCase):
 
 	def setUp(self):
-		self.gps = FakeGPS()
+		self.gps = StubGPS()
 		self.sensors = Sensors(self.gps)
 
 	def test_should_pass_through_gps_values(self):
@@ -30,7 +30,7 @@ class TestSensors(unittest.TestCase):
 		self.assertEqual(self.sensors.hasfix,'blah')
 
 	def test_should_default_error_values_to_twenty_if_gps_returns_NaN(self):
-		gps = FakeGPS()
+		gps = StubGPS()
 		gps.position.lat_error = NaN
 		gps.position.long_error = NaN
 		gps.speed_error = NaN

@@ -1,6 +1,6 @@
 from position import Position
 
-class FakeGPS():
+class StubGPS():
     def __init__(self):
         self.hasfix = True
         self.position = Position(53.2,-2.3)

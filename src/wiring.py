@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from track import Tracker
-from fake_gps import FakeGPS
+from stub_gps import StubGPS
 from timed_callback import TimedCallback
 from gps_reader import GpsReader
 from gps_console_writer import GpsConsoleWriter
@@ -41,7 +41,7 @@ class Wiring():
         return TimedCallback()
         
     def tracker_simulator(self):
-        gps = FakeGPS()
+        gps = StubGPS()
         return Tracker(self.console_logger(),gps,self.timed_callback())
 
     def gps_console_writer(self):
