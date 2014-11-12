@@ -27,7 +27,7 @@ class TestSimWiring(unittest.TestCase):
 
     def test_navigator_simulator_should_use_sensors(self):
         navigator = self.wiring.navigator_simulator()
-        self.assertTrue(isinstance(navigator.gps,Sensors))
+        self.assertTrue(isinstance(navigator.sensors,Sensors))
 
     def test_follower_simulator_should_use_navigator(self):
         follower = self.wiring.follower_simulator()
