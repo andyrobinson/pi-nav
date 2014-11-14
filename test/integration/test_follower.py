@@ -22,7 +22,7 @@ class TestFollower(unittest.TestCase):
         self.mock_logger = Mock()
         self.mock_logger.error = Mock(side_effect=print_msg)
         self.mock_helm = Mock()
-	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
+    	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
         navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger)
         self.follower = Follower(navigator, self.mock_logger)
     
@@ -32,9 +32,19 @@ class TestFollower(unittest.TestCase):
 
         self.follower.follow_route([waypoint1,waypoint2])
 
-        self.mock_logger.info.has_calls(
-            [call('Follower, next waypoint {:+f},{:+f}'.format(waypoint1.position.longitude, waypoint1.position.latitude)),
-             call('Follower, next waypoint {:+f},{:+f}'.format(waypoint2.position.longitude, waypoint2.position.latitude)),
-             call('Follower, all waypoints reached, navigation complete')])
+        self.mock_logger.info.assert_has_calls(
+            [call('Follower, next waypoint +11.000000,+11.000000'),
+            call('Navigator, steering to +11.000000,+11.000000, bearing  44.4, distance 155941.2m'),
+            call('Navigator, arrived at +11.000000,+11.000000'),
+            call('Follower, next waypoint +13.000000,+13.000000'),
+            call('Navigator, steering to +13.000000,+13.000000, bearing  44.2, distance 155399.6m'),
+            call('Navigator, arrived at +13.000000,+13.000000'),
+            call('Follower, all waypoints reached, navigation complete')])
 
+    def test_should_steer_towards_waypoints(self):
+        waypoint = Waypoint(Position(11,11),10)
+        gps = FakeMovingGPS([Position(10,10),Position(11,11)])
 
+        self.follower.follow_route([waypoint])
+        
+        self.mock_helm.steer.assert_has_calls([call(44.42621683500943)])
