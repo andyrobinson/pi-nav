@@ -2,73 +2,81 @@ from setup_test import setup_test
 setup_test()
 import unittest
 from mock import Mock, call
-from helm import Helm,FULL_LEFT
+from helm import Helm
+
+FULL_DEFLECTION = 30
 
 class TestHelm(unittest.TestCase):
     
     def setUp(self):
-        self.direction = 200
         self.sensors = Mock()
         self.servo = Mock()
 
-        self.helm = Helm(self.sensors,self.servo)
+        self.helm = Helm(self.sensors,self.servo, {'full deflection': FULL_DEFLECTION})
 
-    def test_should_not_change_direction_if_within_five_degrees_of_right_course(self):
-        self.sensors.track = self.direction
-        self.helm.steer(self.direction + 3)
+    def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rudder_is_less_than_five_degrees(self):
+        self.sensors.track = 200
+        self.helm.rudder_angle = -1
+        self.servo.set_position.reset_mock()
+
+        self.helm.steer(203)
+
         self.assertEqual(self.servo.set_position.call_count,0)
-    
+
+    def test_should_set_the_rudder_if_track_within_five_degress_but_still_large_rudder_deflection(self):
+        self.sensors.track = 200
+        self.helm.rudder_angle = 20
+        self.servo.set_position.reset_mock()
+
+        self.helm.steer(202)
+
+        self.servo.set_position.assert_called_with(1)
+
     def test_should_steer_left_if_difference_is_less_than_180(self):
-        self.sensors.track = self.direction
+        self.sensors.track = 200
         self.helm.steer(45)
 
-        self.servo.set_position.assert_called_with(FULL_LEFT)
+        self.servo.set_position.assert_called_with(-FULL_DEFLECTION)
+        self.assertEqual(self.helm.rudder_angle,-FULL_DEFLECTION)
 
     def test_should_steer_left_if_difference_is_less_than_180_but_straddles_zero(self):
-        self.sensors.track = 10
+        self.sensors.track = 30
         self.helm.steer(320)
-        self.servo.set_position.assert_called_with(FULL_LEFT)
+        self.servo.set_position.assert_called_with(-FULL_DEFLECTION)
+        self.assertEqual(self.helm.rudder_angle,-FULL_DEFLECTION)
 
-    def test_heading_difference_should_produce_value_between_zero_and_minus_180_when_turning_left(self):
-        self.assertEqual(self.helm._angular_diff(0,0),0)
-        self.assertEqual(self.helm._angular_diff(1,0),-1)
-        self.assertEqual(self.helm._angular_diff(90,0),-90)
-        self.assertEqual(self.helm._angular_diff(180,1),-179)
-        self.assertEqual(self.helm._angular_diff(359,270),-89)
-        self.assertEqual(self.helm._angular_diff(360,270),-90)
+    def test_should_steer_right_if_difference_is_less_than_180(self):
+        self.sensors.track = 200
+        self.helm.steer(10)
 
-    def test_heading_difference_should_produce_value_between_zero_and_minus_180_when_turning_left_across_due_north(self):
-        self.assertEqual(self.helm._angular_diff(0,359),-1)
-        self.assertEqual(self.helm._angular_diff(0,270),-90)
-        self.assertEqual(self.helm._angular_diff(1,270),-91)
-        self.assertEqual(self.helm._angular_diff(180,1),-179)
-        self.assertEqual(self.helm._angular_diff(1,182),-179)
+        self.servo.set_position.assert_called_with(FULL_DEFLECTION)
+        self.assertEqual(self.helm.rudder_angle,FULL_DEFLECTION)
 
-    def test_heading_difference_should_produce_value_between_zero_and_180_when_turning_right(self):
-        self.assertEqual(self.helm._angular_diff(0,1),1)
-        self.assertEqual(self.helm._angular_diff(0,90),90)
-        self.assertEqual(self.helm._angular_diff(1,180),179)
-        self.assertEqual(self.helm._angular_diff(181,0),179)
-        self.assertEqual(self.helm._angular_diff(300,320),20)
+    def test_should_steer_right_if_difference_is_exactly_180(self):
+        self.sensors.track = 200
+        self.helm.steer(20)
 
-    def test_heading_difference_should_produce_value_between_zero_and_180_when_turning_right_across_due_north(self):
-        self.assertEqual(self.helm._angular_diff(270,0),90)
-        self.assertEqual(self.helm._angular_diff(359,1),2)
-        self.assertEqual(self.helm._angular_diff(359,178),179)
-        self.assertEqual(self.helm._angular_diff(181,0),179)
-        self.assertEqual(self.helm._angular_diff(181,360),179)
-        self.assertEqual(self.helm._angular_diff(181,270),89)
-        self.assertEqual(self.helm._angular_diff(270,89),179)
+        self.servo.set_position.assert_called_with(FULL_DEFLECTION)
+        self.assertEqual(self.helm.rudder_angle,FULL_DEFLECTION)
 
-    def test_heading_should_be_positive_for_180_turns(self):
-        self.assertEqual(self.helm._angular_diff(1,181),180)
-        self.assertEqual(self.helm._angular_diff(181,1),180)
-        self.assertEqual(self.helm._angular_diff(180,0),180)
-        self.assertEqual(self.helm._angular_diff(0,180),180)
-        self.assertEqual(self.helm._angular_diff(90,270),180)
-        self.assertEqual(self.helm._angular_diff(270,90),180)
-        self.assertEqual(self.helm._angular_diff(360,180),180)
-        self.assertEqual(self.helm._angular_diff(360,180),180)
-        self.assertEqual(self.helm._angular_diff(179,359),180)
-        self.assertEqual(self.helm._angular_diff(359,179),180)
+    def test_should_set_rudder_angle_at_half_of_turn_angle_if_this_is_less_than_full_deflection(self):
+        self.sensors.track = 10
+        self.helm.steer(52)
+
+        self.servo.set_position.assert_called_with(21)
+        self.assertEqual(self.helm.rudder_angle,21)
+
+    def test_should_set_rudder_angle_at_full_deflection_if_turn_angle_more_than_twice_full_deflection(self):
+        self.sensors.track = 0
+        self.helm.steer((FULL_DEFLECTION * 2) + 2)
+
+        self.servo.set_position.assert_called_with(FULL_DEFLECTION)
+        self.assertEqual(self.helm.rudder_angle,FULL_DEFLECTION)
+
+    def test_should_ignore_fractional_parts(self):
+        self.sensors.track = 0.9
+        self.helm.steer(57.23)
+
+        self.servo.set_position.assert_called_with(28)
+
 
