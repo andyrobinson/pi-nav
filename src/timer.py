@@ -12,3 +12,6 @@ class Timer():
         
         while self.method(*self.args):
             time.sleep(seconds)
+
+    def wait_for(self,seconds):
+        time.sleep(seconds)

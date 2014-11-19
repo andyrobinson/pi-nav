@@ -43,3 +43,9 @@ class TestTimer(unittest.TestCase):
     def test_callback_flags_error_if_every_called_without_callback(self):
         self.assertRaises(RuntimeError, Timer().every,0)
         
+    def test_waitfor_waits_for_the_amount_of_time_specified(self):
+        start = datetime.now()
+
+        Timer().wait_for(0.1)
+
+        self.assertEqual(round(float((datetime.now() - start).microseconds)/1000000,1),0.1)
