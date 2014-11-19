@@ -21,8 +21,8 @@ class TestFollower(unittest.TestCase):
 
         self.follower.follow_route([position1,position2])
 
-        self.mock_navigator.to.has_calls([call(position1),call(position2)])
-        self.mock_logger.info.has_calls(
+        self.mock_navigator.to.assert_has_calls([call(position1),call(position2)])
+        self.mock_logger.info.assert_has_calls(
             [call('Follower, next waypoint {:+f},{:+f}'.format(position1.longitude, position1.latitude)),
              call('Follower, next waypoint {:+f},{:+f}'.format(position2.longitude, position2.latitude)),
              call('Follower, all waypoints reached, navigation complete')])
@@ -53,7 +53,7 @@ class TestFollower(unittest.TestCase):
         follower = Follower(mock_nav, self.mock_logger)
 
         follower.follow_route([position1,position2])
-        self.mock_navigator.to.has_calls([call(position1),call(position2)])
+        mock_nav.to.assert_has_calls([call(position1),call(position2)])
         self.mock_logger.error.assert_called_with('Follower, RuntimeError: oops')
 
     def test_errors_during_error_logging_should_be_skipped_and_navigation_continues(self):
@@ -76,4 +76,4 @@ class TestFollower(unittest.TestCase):
         follower = Follower(mock_nav, mock_logger)
 
         follower.follow_route([position1,position2])
-        self.mock_navigator.to.has_calls([call(position1),call(position2)])
+        mock_nav.to.assert_has_calls([call(position1),call(position2)])

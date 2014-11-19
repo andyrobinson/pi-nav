@@ -12,8 +12,9 @@ class TestHelm(unittest.TestCase):
     def setUp(self):
         self.sensors = Mock()
         self.servo = Mock()
+        timer = Mock()
 
-        self.helm = Helm(self.sensors,self.servo, CONFIG['helm'])
+        self.helm = Helm(self.sensors,self.servo,timer,CONFIG['helm'])
 
     def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rudder_is_less_than_five_degrees(self):
         self.sensors.track = 200

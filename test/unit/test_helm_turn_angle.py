@@ -7,7 +7,7 @@ from helm import Helm
 class TestTurnCalculation(unittest.TestCase):
     
     def setUp(self):
-        self.helm = Helm(Mock(),Mock(),{'full deflection': 10})
+        self.helm = Helm(Mock(),Mock(),Mock(),Mock())
 
     def test_heading_difference_should_produce_value_between_zero_and_minus_180_when_turning_left(self):
         self.assertEqual(self.helm._turn_angle(0,0),0)

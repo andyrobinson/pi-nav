@@ -1,11 +1,21 @@
 from math import copysign
 
+WAIT_BETWEEN_STEERING_CORRECTION = 1
+
 class Helm():
-    def __init__(self,sensors,rudder_servo,config):
+    def __init__(self,sensors,rudder_servo,timer,config):
         self.sensors = sensors
         self.rudder_servo = rudder_servo
         self._set_rudder_angle(0)
         self.config = config
+        self.timer = timer
+
+    def steer_course(self,requested_heading,for_seconds):
+        remaining_seconds = for_seconds
+        while remaining_seconds > 0:
+            self.steer(requested_heading)
+            self.timer.wait_for(WAIT_BETWEEN_STEERING_CORRECTION)
+            remaining_seconds = remaining_seconds - WAIT_BETWEEN_STEERING_CORRECTION
 
     def steer(self,requested_heading):
         int_track = int(round(self.sensors.track))

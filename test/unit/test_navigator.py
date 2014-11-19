@@ -71,7 +71,7 @@ class TestNavigator(unittest.TestCase):
 
         navigator.to(waypoint)
         
-        self.mock_helm.steer.has_calls([call(bearing1),call(bearing2)])
+        self.mock_helm.steer.assert_has_calls([call(bearing1),call(bearing2)])
         
     def test_should_not_call_steer_with_NaN_bearing_even_if_GPS_lost_signal(self):
         waypoint = Waypoint(Position(-60,22),0)
