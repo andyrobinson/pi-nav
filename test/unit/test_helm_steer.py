@@ -3,8 +3,9 @@ setup_test()
 import unittest
 from mock import Mock, call
 from helm import Helm
+from config import CONFIG
 
-FULL_DEFLECTION = 30
+FULL_DEFLECTION = CONFIG['helm']['full deflection']
 
 class TestHelm(unittest.TestCase):
     
@@ -12,7 +13,7 @@ class TestHelm(unittest.TestCase):
         self.sensors = Mock()
         self.servo = Mock()
 
-        self.helm = Helm(self.sensors,self.servo, {'full deflection': FULL_DEFLECTION})
+        self.helm = Helm(self.sensors,self.servo, CONFIG['helm'])
 
     def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rudder_is_less_than_five_degrees(self):
         self.sensors.track = 200
@@ -23,7 +24,7 @@ class TestHelm(unittest.TestCase):
 
         self.assertEqual(self.servo.set_position.call_count,0)
 
-    def test_should_set_the_rudder_if_track_within_five_degress_but_still_large_rudder_deflection(self):
+    def test_should_set_the_rudder_if_track_within_five_degrees_but_still_large_rudder_deflection(self):
         self.sensors.track = 200
         self.helm.rudder_angle = 20
         self.servo.set_position.reset_mock()
