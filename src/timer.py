@@ -1,6 +1,6 @@
 import time
 
-class TimedCallback():
+class Timer():
     def call(self,method, *args):
         self.method = method
         self.args = args

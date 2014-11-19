@@ -7,7 +7,7 @@ from navigator import Navigator
 from follower import Follower
 from sensors import Sensors
 from globe import Globe
-from timed_callback import TimedCallback
+from timer import Timer
 from track import Tracker
 
 from simulate.fake_vehicle import FakeVehicle
@@ -47,8 +47,8 @@ class SimWiring():
         
     def tracker_simulator(self):
         gps = StubGPS()
-        return Tracker(self.console_logger(),gps,self.timed_callback())
+        return Tracker(self.console_logger(),gps,self.timer())
 
-    def timed_callback(self):
-        return TimedCallback()
+    def timer(self):
+        return Timer()
         

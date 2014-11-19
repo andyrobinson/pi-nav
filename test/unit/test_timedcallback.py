@@ -5,13 +5,13 @@ from datetime import datetime
 import unittest
 from mock import Mock
 
-from timed_callback import TimedCallback
+from timer import Timer
    
-class TestTimedCallback(unittest.TestCase):
+class TestTimer(unittest.TestCase):
     def test_callback_given_method_with_arguments(self):
         test_object = Mock(**{'test_method.return_value' : False})
 
-        TimedCallback().call(test_object.test_method,1,2,3).every(0)
+        Timer().call(test_object.test_method,1,2,3).every(0)
 
         test_object.test_method.assert_called_with(1,2,3)
 
@@ -20,7 +20,7 @@ class TestTimedCallback(unittest.TestCase):
         test_object.test_method.side_effect = [True,False]
         start = datetime.now()
 
-        TimedCallback().call(test_object.test_method,1,2,3).every(0.1)
+        Timer().call(test_object.test_method,1,2,3).every(0.1)
 
         self.assertEqual(round(float((datetime.now() - start).microseconds)/1000000,1),0.1)
         
@@ -28,7 +28,7 @@ class TestTimedCallback(unittest.TestCase):
         test_object = Mock()
         test_object.test_method.side_effect = [False]
         
-        TimedCallback().call(test_object.test_method).every(0)
+        Timer().call(test_object.test_method).every(0)
 
         self.assertEqual(test_object.test_method.call_count,1)
 
@@ -36,10 +36,10 @@ class TestTimedCallback(unittest.TestCase):
         test_object = Mock()
         test_object.test_method.side_effect = [True,True,False]
 
-        TimedCallback().call(test_object.test_method).every(0)
+        Timer().call(test_object.test_method).every(0)
 
         self.assertEqual(test_object.test_method.call_count,3)
 
     def test_callback_flags_error_if_every_called_without_callback(self):
-        self.assertRaises(RuntimeError, TimedCallback().every,0)
+        self.assertRaises(RuntimeError, Timer().every,0)
         

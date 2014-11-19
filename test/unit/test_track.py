@@ -1,6 +1,6 @@
 from setup_test import setup_test
 setup_test()
-from stub_timedcallback import StubTimedCallback
+from stub_timer import StubTimer
 
 import unittest
 from mock import Mock, call
@@ -15,13 +15,13 @@ class TestTrack(unittest.TestCase):
         mock_logger = Mock()
         mock_gps = Mock(position=Position(0,0))
 
-        Tracker(mock_logger, mock_gps, StubTimedCallback()).track(300)
+        Tracker(mock_logger, mock_gps, StubTimer()).track(300)
 
         mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")), 
             call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track')])
 
     def test_should_pass_interval_to_callback_timer(self):
-        stub_callback = StubTimedCallback()
+        stub_callback = StubTimer()
 
         Tracker(Mock(), Mock(), stub_callback).track(300)
 
@@ -37,7 +37,7 @@ class TestTrack(unittest.TestCase):
 
         mock_logger = Mock()
         mock_gps = Mock(position=Position(latitude,longitude,error,error),speed=speed,track=track,speed_error=error,track_error=error)
-        stub_callback = StubTimedCallback()
+        stub_callback = StubTimer()
 
         Tracker(mock_logger, mock_gps, stub_callback).track(300)    
     

@@ -1,4 +1,4 @@
-class StubTimedCallback():
+class StubTimer():
     def every(self,seconds):
         self.seconds = seconds
 

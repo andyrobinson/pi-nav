@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from track import Tracker
-from timed_callback import TimedCallback
+from timer import Timer
 from gps_reader import GpsReader
 from gps_console_writer import GpsConsoleWriter
 from globe import Globe
@@ -27,7 +27,7 @@ class Wiring():
         return logger
 
     def tracker(self):
-        return Tracker(self.application_logger("track"),self.gps(),self.timed_callback())
+        return Tracker(self.application_logger("track"),self.gps(),self.timer())
         
     def gps(self):
         if not self._gps:
@@ -35,15 +35,15 @@ class Wiring():
             self._gps.start()
         return self._gps
     
-    def timed_callback(self):
-        return TimedCallback()
+    def timer(self):
+        return Timer()
         
     def gps_console_writer(self):
         return GpsConsoleWriter(self.gps())
         
     def showgps(self):
         try:
-            self.timed_callback().call(self.gps_console_writer().write).every(5)
+            self.timer().call(self.gps_console_writer().write).every(5)
         except (KeyboardInterrupt, SystemExit):
             self.gps().running = False
             self.gps().join() 
