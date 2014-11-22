@@ -9,7 +9,7 @@ class Follower():
         while waypoints:
             try:        
                 next_waypoint = waypoints[0]
-                self.logger.info('Follower, next waypoint {:+f},{:+f}'.format(next_waypoint.longitude, next_waypoint.latitude))
+                self.logger.info('Follower, next waypoint {:+f},{:+f}'.format(next_waypoint.latitude, next_waypoint.longitude))
                 self.navigator.to(next_waypoint)
                 waypoints = waypoints[1:]
             except(KeyboardInterrupt):

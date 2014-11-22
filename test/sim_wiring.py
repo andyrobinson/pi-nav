@@ -11,6 +11,8 @@ from timer import Timer
 from track import Tracker
 
 from simulate.fake_vehicle import FakeVehicle
+from simulate.fake_vehicle_gps import FakeVehicleGPS
+
 from simulate.stub_gps import StubGPS
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
@@ -36,7 +38,8 @@ class SimWiring():
         return self._globe
 
     def navigator_simulator(self):
-        fake_vehicle = FakeVehicle(CHORLTON.position, self.globe(),self.console_logger())
+        fake_gps = FakeVehicleGPS(CHORLTON.position,0,0.1,False)
+        fake_vehicle = FakeVehicle(fake_gps, self.globe(),self.console_logger())
         return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe(),self.console_logger())
 
     def follower_simulator(self):

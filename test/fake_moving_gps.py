@@ -8,5 +8,6 @@ class FakeMovingGPS():
             self.positions = self.positions[1:]
         return value
         
-    position = property(get_position)    
+    position = property(get_position)
+    speed = 1
         
