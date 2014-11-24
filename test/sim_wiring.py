@@ -9,6 +9,7 @@ from sensors import Sensors
 from globe import Globe
 from timer import Timer
 from track import Tracker
+from config import CONFIG
 
 from simulate.fake_vehicle import FakeVehicle
 from simulate.fake_vehicle_gps import FakeVehicleGPS
@@ -40,7 +41,7 @@ class SimWiring():
     def navigator_simulator(self):
         fake_gps = FakeVehicleGPS(CHORLTON.position,0,0.1,False)
         fake_vehicle = FakeVehicle(fake_gps, self.globe(),self.console_logger())
-        return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe(),self.console_logger())
+        return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe(),self.console_logger(),CONFIG['navigator'])
 
     def follower_simulator(self):
         return Follower(self.navigator_simulator(),self.console_logger())

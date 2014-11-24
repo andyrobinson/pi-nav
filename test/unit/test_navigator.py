@@ -10,6 +10,8 @@ from position import Position
 from waypoint import Waypoint
 from nan import NaN, isNaN
 
+MIN_TIME_TO_STEER = 7
+
 def last_called_args(mock):
     return mock.call_args[0]
 
@@ -26,9 +28,10 @@ class TestNavigator(unittest.TestCase):
         self.mock_helm = Mock()
         self.globe = Globe()
         self.mock_logger = Mock()
+        self.config = {'min time to steer' : MIN_TIME_TO_STEER}
 
     def test_should_not_steer_and_log_arrival_if_arrived(self):
-        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, self.mock_logger)
+        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
 
         navigator.to(Waypoint(self.current_position,0))
 
@@ -37,7 +40,7 @@ class TestNavigator(unittest.TestCase):
 
     def test_should_allow_a_tolerance_and_consider_errors_when_calculating_if_we_have_reached_waypoint(self):
         waypoint = Waypoint(Position(53.0001,-1.9999),10)
-        navigator = Navigator(self.mock_gps,Mock(),self.globe, self.mock_logger)
+        navigator = Navigator(self.mock_gps,Mock(),self.globe, self.mock_logger, self.config)
 
         navigator.to(waypoint)
 
@@ -47,7 +50,7 @@ class TestNavigator(unittest.TestCase):
     def test_should_steer_from_current_position_to_next_and_log_until_point_is_reached(self):
         waypoint = Waypoint(Position(11,11),0)
         fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
         expected_time = expected_steering_duration(self.current_position,waypoint.position,fake_gps.speed)
 
@@ -60,7 +63,7 @@ class TestNavigator(unittest.TestCase):
     def test_should_steer_to_waypoint_if_outside_tolerance(self):
         waypoint = Waypoint(Position(53.0001,-1.9999),5)
         fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
         expected_time = expected_steering_duration(self.current_position,waypoint.position,fake_gps.speed)
 
@@ -76,7 +79,7 @@ class TestNavigator(unittest.TestCase):
         bearing2 = self.globe.bearing(intermediate_position,waypoint.position)
         time1 = expected_steering_duration(self.current_position, waypoint.position,fake_gps.speed)
         time2 = expected_steering_duration(intermediate_position, waypoint.position,fake_gps.speed)
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock())
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock(), self.config)
 
         navigator.to(waypoint)
         
@@ -87,7 +90,7 @@ class TestNavigator(unittest.TestCase):
         no_position = Position(NaN,NaN,NaN,NaN)
         fake_gps = FakeMovingGPS([self.current_position, no_position, waypoint.position])
         bearing = self.globe.bearing(self.current_position,waypoint.position)
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock())
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock(), self.config)
 
         navigator.to(waypoint)
 
@@ -97,7 +100,7 @@ class TestNavigator(unittest.TestCase):
         waypoint = Waypoint(Position(53.0001,-1.999699),5) #23m from current position
         bearing = self.globe.bearing(self.current_position,waypoint.position)
         fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
         for_expected_seconds = expected_steering_duration(self.current_position,waypoint.position,fake_gps.speed)
 
         navigator.to(waypoint)
@@ -111,12 +114,12 @@ class TestNavigator(unittest.TestCase):
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
         for_expected_seconds = expected_steering_duration(self.current_position,waypoint.position,fake_gps.speed)
 
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock())
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, Mock(), self.config)
         navigator.to(waypoint)
 
         self.mock_helm.steer_course.assert_has_calls([
             call(expected_bearing,for_expected_seconds),
-            call(expected_bearing,5)])
+            call(expected_bearing,MIN_TIME_TO_STEER)])
 
     def test_should_use_minimum_steer_time_if_time_calculation_returns_small_value(self):
         waypoint = Waypoint(Position(53.0001,-1.9999),5)
@@ -125,7 +128,7 @@ class TestNavigator(unittest.TestCase):
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
         expected_time = expected_steering_duration(self.current_position,waypoint.position,fake_gps.speed)
 
-        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger)
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
         navigator.to(waypoint)
 
-        self.mock_helm.steer_course.assert_called_with(expected_bearing,5)
+        self.mock_helm.steer_course.assert_called_with(expected_bearing,MIN_TIME_TO_STEER)

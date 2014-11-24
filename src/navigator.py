@@ -2,12 +2,13 @@ import math
 from nan import isNaN
 
 class Navigator():
-    def __init__(self,sensors,helm,globe,logger):
+    def __init__(self,sensors,helm,globe,logger,config):
         self.sensors = sensors
         self.helm = helm
         self.globe = globe
         self.logger = logger
         self.bearing = 0.0
+        self.config = config
         
     def to(self,destination_waypoint):
         current_position = self.sensors.position
@@ -29,9 +30,10 @@ class Navigator():
         self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(destination_waypoint.latitude,destination_waypoint.longitude))
 
     def _time_to_waypoint(self, position, destination_waypoint):
+        min_time = self.config['min time to steer']
         result = self._distance(position,destination_waypoint)/self.sensors.speed
-        if isNaN(result) or result < 5:
-            result = 5
+        if isNaN(result) or result < min_time:
+            result = min_time
         return int(result)
 
     def _error_radius(self,position):

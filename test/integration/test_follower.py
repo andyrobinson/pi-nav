@@ -12,6 +12,7 @@ from position import Position
 from navigator import Navigator
 from waypoint import Waypoint
 from globe import Globe
+from config import CONFIG
 
 def print_msg(msg):
     print msg
@@ -23,7 +24,7 @@ class TestFollower(unittest.TestCase):
         self.mock_logger.error = Mock(side_effect=print_msg)
         self.mock_helm = Mock()
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
-        navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger)
+        navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger, CONFIG['navigator'])
         self.follower = Follower(navigator, self.mock_logger)
     
     def test_should_navigate_along_list_of_waypoints_with_logging(self):
