@@ -6,7 +6,7 @@ Current tasks
     - subtract min steer course time from time calculation to allow margin for error
     - deal with possible NaN returns from GPS elegantly
     - deal with possible zero value for speed (overflow)
-    - put max and min in config
+    - use max and min from config
 - use an average speed rather than instantaneous speed
     - circular array
     - record array of gps data in sensors class
