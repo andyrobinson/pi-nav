@@ -31,9 +31,9 @@ class Navigator():
 
     def _time_to_waypoint(self, position, destination_waypoint):
         min_time = self.config['min time to steer']
-        result = self._distance(position,destination_waypoint)/self.sensors.speed
-        if isNaN(result) or result < min_time:
-            result = min_time
+        max_time = self.config['max time to steer']
+        #by some quirk max and min remove NaN if there is a real number in the first position
+        result = min(max_time, max(min_time, self._distance(position,destination_waypoint)/self.sensors.speed))
         return int(result)
 
     def _error_radius(self,position):

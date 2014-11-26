@@ -48,4 +48,4 @@ class TestFollower(unittest.TestCase):
 
         self.follower.follow_route([waypoint])
         
-        self.mock_helm.steer_course.assert_has_calls([call(44.42621683500943,155941)])
+        self.mock_helm.steer_course.assert_has_calls([call(44.42621683500943,CONFIG['navigator']['max time to steer'])])
