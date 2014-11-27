@@ -143,3 +143,16 @@ class TestNavigator(unittest.TestCase):
         navigator.to(waypoint)
 
         self.mock_helm.steer_course.assert_called_with(expected_bearing,MAX_TIME_TO_STEER)
+
+    def test_should_use_a_minimum_speed_for_calculation_preventing_divide_by_zero_error(self):
+        waypoint = Waypoint(Position(53.001,-2.001),5)
+        fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
+        fake_gps.speed = 0
+        expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
+        expected_time = expected_steering_duration(self.current_position,waypoint.position,0.01)
+
+        navigator = Navigator(fake_gps,self.mock_helm,self.globe, self.mock_logger, self.config)
+        navigator.to(waypoint)
+
+        self.mock_helm.steer_course.assert_called_with(expected_bearing,expected_time)
+

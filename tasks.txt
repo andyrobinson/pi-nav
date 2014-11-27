@@ -2,8 +2,6 @@ Epie - steering using servo
 
 Current tasks
 - hook up nav to helm
-    - subtract min steer course time from time calculation to allow margin for error
-    - deal with possible zero value for speed (overflow)
     - add debug logging to helm
 - use an average speed rather than instantaneous speed
     - circular array
