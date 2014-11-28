@@ -4,6 +4,7 @@ import unittest
 from mock import Mock, call
 from helm import Helm
 from config import CONFIG
+from nan import NaN
 
 FULL_DEFLECTION = CONFIG['helm']['full deflection']
 
@@ -81,4 +82,8 @@ class TestHelm(unittest.TestCase):
 
         self.servo.set_position.assert_called_with(28)
 
+    def test_should_centralise_rudder_if_sensor_returns_NaN(self):
+        self.sensors.track = NaN
+        self.helm.steer(57.23)
 
+        self.servo.set_position.assert_called_with(0)

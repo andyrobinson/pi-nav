@@ -1,4 +1,5 @@
 from math import copysign
+from nan import isNaN
 
 WAIT_BETWEEN_STEERING_CORRECTION = 1
 
@@ -18,15 +19,20 @@ class Helm():
             remaining_seconds = remaining_seconds - WAIT_BETWEEN_STEERING_CORRECTION
 
     def steer(self,requested_heading):
-        int_track = int(round(self.sensors.track))
-        int_heading = int(round(requested_heading))
-        turn_angle = self._turn_angle(int_track,int_heading)
-        ignore_below = self.config['ignore deviation below']
+        track = self.sensors.track
 
-        if abs(turn_angle) <  ignore_below and abs(self.rudder_angle) < ignore_below:
-            return
+        if isNaN(track):
+            self._set_rudder_angle(0)
+        else:
+            int_track = int(round(track))
+            int_heading = int(round(requested_heading))
+            turn_angle = self._turn_angle(int_track,int_heading)
+            ignore_below = self.config['ignore deviation below']
 
-        self._set_rudder_angle(self._calculate_rudder_angle(turn_angle))
+            if abs(turn_angle) <  ignore_below and abs(self.rudder_angle) < ignore_below:
+                return
+
+            self._set_rudder_angle(self._calculate_rudder_angle(turn_angle))
 
     def _calculate_rudder_angle(self,turn_angle):
         unsigned_rudder_angle = min(self.config['full deflection'],int(abs(turn_angle)/2))
