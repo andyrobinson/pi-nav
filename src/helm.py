@@ -10,6 +10,7 @@ class Helm():
         self._set_rudder_angle(0)
         self.config = config
         self.timer = timer
+        self.previous_track = 0
 
     def steer_course(self,requested_heading,for_seconds):
         remaining_seconds = for_seconds
@@ -27,16 +28,19 @@ class Helm():
             int_track = int(round(track))
             int_heading = int(round(requested_heading))
             turn_angle = self._turn_angle(int_track,int_heading)
+            rate_of_turn = self._turn_angle(self.previous_track,track)
             ignore_below = self.config['ignore deviation below']
 
-            if abs(turn_angle) <  ignore_below and abs(self.rudder_angle) < ignore_below:
+            if abs(turn_angle) <  ignore_below and abs(rate_of_turn) < ignore_below:
                 return
 
-            self._set_rudder_angle(self._calculate_rudder_angle(turn_angle))
+            self._set_rudder_angle(self._calculate_rudder_angle(turn_angle,rate_of_turn))
+            self.previous_track = track
 
-    def _calculate_rudder_angle(self,turn_angle):
-        unsigned_rudder_angle = min(self.config['full deflection'],int(abs(turn_angle)/2))
-        return int(copysign(unsigned_rudder_angle,turn_angle))
+    def _calculate_rudder_angle(self,turn_angle,rate_of_turn):
+        rate_adjusted_turn_angle = self.rudder_angle + (turn_angle - rate_of_turn)
+        unsigned_rudder_angle = min(self.config['full deflection'],int(abs(rate_adjusted_turn_angle)))
+        return int(copysign(unsigned_rudder_angle,rate_adjusted_turn_angle))
 
     def _set_rudder_angle(self,angle):
         self.rudder_angle = angle
