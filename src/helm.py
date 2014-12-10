@@ -1,5 +1,6 @@
 from math import copysign
 from nan import isNaN
+from bearing import angle_between
 
 WAIT_BETWEEN_STEERING_CORRECTION = 1
 
@@ -27,8 +28,8 @@ class Helm():
         else:
             int_track = int(round(track))
             int_heading = int(round(requested_heading))
-            turn_angle = self._turn_angle(int_track,int_heading)
-            rate_of_turn = self._turn_angle(self.previous_track,track)
+            turn_angle = angle_between(int_track,int_heading)
+            rate_of_turn = angle_between(self.previous_track,track)
             ignore_below = self.config['ignore deviation below']
 
             if abs(turn_angle) <  ignore_below and abs(rate_of_turn) < ignore_below:
@@ -46,10 +47,3 @@ class Helm():
         self.rudder_angle = angle
         self.rudder_servo.set_position(angle)
 
-    def _turn_angle(self,track,requested_heading):
-        diff = requested_heading - track
-        if diff <= -180:
-            diff = diff + 360
-        if diff > 180:
-            diff = diff - 360
-        return diff
