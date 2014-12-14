@@ -78,10 +78,10 @@ class TestHelm(unittest.TestCase):
         self.helm.steer(20)
         self.servo.set_position.assert_called_with(FULL_DEFLECTION)
 
-    def test_should_ignore_fractional_parts(self):
+    def test_should_work_with_fractional_parts(self):
         self.currently_tracking(0.9,0.9)
-        self.helm.steer(29.23)
-        self.servo.set_position.assert_called_with(28)
+        self.helm.steer(29.4)
+        self.servo.set_position.assert_called_with(28.5)
 
     def test_should_centralise_rudder_if_sensor_returns_NaN(self):
         self.sensors.track = NaN

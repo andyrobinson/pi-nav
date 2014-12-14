@@ -26,9 +26,7 @@ class Helm():
         if isNaN(track):
             self._set_rudder_angle(0)
         else:
-            int_track = int(round(track))
-            int_heading = int(round(requested_heading))
-            turn_angle = angle_between(int_track,int_heading)
+            turn_angle = angle_between(track,requested_heading)
             rate_of_turn = angle_between(self.previous_track,track)
             ignore_below = self.config['ignore deviation below']
 
@@ -40,8 +38,8 @@ class Helm():
 
     def _calculate_rudder_angle(self,turn_angle,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle + (turn_angle - rate_of_turn)
-        unsigned_rudder_angle = min(self.config['full deflection'],int(abs(rate_adjusted_turn_angle)))
-        return int(copysign(unsigned_rudder_angle,rate_adjusted_turn_angle))
+        unsigned_rudder_angle = min(self.config['full deflection'],abs(rate_adjusted_turn_angle))
+        return copysign(unsigned_rudder_angle,rate_adjusted_turn_angle)
 
     def _set_rudder_angle(self,angle):
         self.rudder_angle = angle
