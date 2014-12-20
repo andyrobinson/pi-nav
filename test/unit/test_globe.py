@@ -1,5 +1,6 @@
 from setup_test import setup_test
 setup_test()
+from test_utils import percentage_diff
 
 import unittest
 from position import Position
@@ -13,9 +14,6 @@ Moscow = Position(55.755826, 37.6173)
 Sydney = Position(-33.8674869, 151.2069902)
 Capetown = Position(-33.9248685, 18.4240553)
 Santiago = Position(-33.4691199,-70.641997)
-
-def percentage_diff(original,to_compare):
-    return abs(to_compare-original)*100/abs(original)    
 
 class TestGlobe(unittest.TestCase):
     

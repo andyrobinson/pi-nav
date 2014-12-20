@@ -2,10 +2,9 @@ Epic - steering using servo
 
 Current tasks
 - write hardware integration test
-- integration test for navigator/helm
-- test steering algorithm against different turn rates
 - write servo simulator
 - hook up and test simulator; make it easy to change the turn rate
+- test steering algorithm against different turn rates
 - wire up real follower to helm and servo controller
 - field test steering
 
