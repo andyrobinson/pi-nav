@@ -17,8 +17,8 @@ class TestServo(unittest.TestCase):
         return servo.get_position()
 
     def test_should_be_able_to_move_servo_and_read_position(self):
-        serial = serial.Serial('/dev/ttyACM0')
-        servo = Servo(serial,0,500,-90,2500,90)
+        serial_port0 = serial.Serial('/dev/ttyACM0')
+        servo = Servo(serial_port0,0,500,-90,2500,90)
 
         for position in [-90,-45,0,45,90,0]:
             self.assertLess(percentage_diff(set_and_read_position(position),position),0.1)
