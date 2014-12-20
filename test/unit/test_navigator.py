@@ -156,3 +156,10 @@ class TestNavigator(unittest.TestCase):
 
         self.mock_helm.steer_course.assert_called_with(expected_bearing,expected_time)
 
+    def test_should_return_false_for_arrived_if_current_position_is_NaN(self):
+        navigator = Navigator(Mock(),self.mock_helm,self.globe, self.mock_logger, self.config)
+        destination = Waypoint(Position(53.001,-2.001),5)
+        nan_position = Position(NaN,NaN,NaN,NaN)
+        self.assertFalse(navigator._arrived(nan_position, destination))
+
+
