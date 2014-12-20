@@ -5,11 +5,11 @@ from test_utils import percentage_diff
 
 import unittest
 import time
-import serial
 
+import serial
 from servo import Servo
 
-class TestGps(unittest.TestCase):
+class TestServo(unittest.TestCase):
     
     def set_and_read_position(self,servo,position):
         servo.set_position(position)
@@ -17,7 +17,7 @@ class TestGps(unittest.TestCase):
         return servo.get_position()
 
     def test_should_be_able_to_move_servo_and_read_position(self):
-        serial = Serial.serial('/dev/ttyACM0')
+        serial = serial.Serial('/dev/ttyACM0')
         servo = Servo(serial,0,500,-90,2500,90)
 
         for position in [-90,-45,0,45,90,0]:
