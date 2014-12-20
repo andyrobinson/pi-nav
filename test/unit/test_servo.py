@@ -11,13 +11,13 @@ class TestServo(unittest.TestCase):
         self.channel,self.min_pulse,self.min_angle,self.max_pulse,self.max_angle = 1,500,-90,2500,90
         self.servo = Servo(self.serial,self.channel,self.min_pulse,self.min_angle,self.max_pulse,self.max_angle)
 
-    def position_bytes_from_angle(self,angle):
+    def position_bytes_from_angle(self,angle, shift=7, mask=0x7f):
         arc = self.max_angle - self.min_angle
         zeroed_angle = angle - self.min_angle
         pulse_range = self.max_pulse-self.min_pulse
         position = int(((float(zeroed_angle)/arc) * pulse_range) + self.min_pulse) * 4
-        position_low = chr(position & 0x7f)
-        position_high = chr((position >> 7) & 0x7f)
+        position_low = chr(position & mask)
+        position_high = chr((position >> shift) & mask)
         return position_low,position_high
 
     def test_should_initialise(self):
@@ -31,11 +31,11 @@ class TestServo(unittest.TestCase):
         self.servo.set_position(10)
         position_low,position_high = self.position_bytes_from_angle(10)
         set_position_command = chr(0xaa) + chr(0x0c) + chr(0x04)
-        self.serial.write.assert_called_with(set_position_command + chr(self.channel) + position_high + position_low)
+        self.serial.write.assert_called_with(set_position_command + chr(self.channel) + position_low + position_high)
 
-    def test_should_issue_the_get_position_command_then_read_the_results(self):
+    def test_should_issue_the_get_position_command_then_read_the_8bit_results(self):
         expected_position = -15
-        position_low,position_high = self.position_bytes_from_angle(expected_position)
+        position_low,position_high = self.position_bytes_from_angle(expected_position,8,0xff)
         self.serial.read.side_effect = [position_low,position_high]
         get_position_command = chr(0xaa) + chr(0x0c) + chr(0x10)
         position = int(round(self.servo.get_position()))
