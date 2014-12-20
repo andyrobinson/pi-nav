@@ -1,7 +1,9 @@
 # Pololu Maestro USB servo controller
 # see http://www.pololu.com/docs/0J40
-SET_POSITION_COMMAND = chr(0xaa) + chr(0x0c) + chr(0x04)
-GET_POSITION_COMMAND = chr(0xaa) + chr(0x0c) + chr(0x10)
+COMMAND_BASE = chr(0xaa) + chr(0x0c)
+SET_POSITION_COMMAND = COMMAND_BASE + chr(0x04)
+GET_POSITION_COMMAND = COMMAND_BASE + chr(0x10)
+GET_ERRORS_COMMAND = COMMAND_BASE + chr(0x21)
 
 class Servo():
     def __init__(self,serial,channel,min_pulse,min_angle,max_pulse,max_angle):
@@ -9,8 +11,6 @@ class Servo():
         self.channel = channel
         self.min_pulse = min_pulse
         self.min_angle = min_angle
-        self.max_pulse = max_pulse
-        self.max_angle = max_angle
         self.total_arc = max_angle - min_angle
         self.pulse_range = max_pulse-min_pulse
 
@@ -35,4 +35,8 @@ class Servo():
         position = (float(((position_high << 7) + position_low)/4 - self.min_pulse)/self.pulse_range) * self.total_arc + self.min_angle
         return position
 
-
+    def get_errors(self):
+        self.serial.write(GET_ERRORS_COMMAND)
+        error1 = ord(self.serial.read())
+        error2 = ord(self.serial.read())
+        return error1,error2    

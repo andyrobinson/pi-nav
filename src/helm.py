@@ -2,8 +2,6 @@ from math import copysign
 from nan import isNaN
 from bearing import angle_between
 
-WAIT_BETWEEN_STEERING_CORRECTION = 1
-
 class Helm():
     def __init__(self,sensors,rudder_servo,timer,config):
         self.sensors = sensors
@@ -12,13 +10,14 @@ class Helm():
         self.config = config
         self.timer = timer
         self.previous_track = 0
+        self.sleep_time = config['sleep time']
 
     def steer_course(self,requested_heading,for_seconds):
         remaining_seconds = for_seconds
         while remaining_seconds > 0:
             self.steer(requested_heading)
-            self.timer.wait_for(WAIT_BETWEEN_STEERING_CORRECTION)
-            remaining_seconds = remaining_seconds - WAIT_BETWEEN_STEERING_CORRECTION
+            self.timer.wait_for(self.sleep_time)
+            remaining_seconds = remaining_seconds - self.sleep_time
 
     def steer(self,requested_heading):
         track = self.sensors.track

@@ -4,7 +4,6 @@ import unittest
 from mock import Mock, call
 from servo import Servo
 
-
 class TestServo(unittest.TestCase):
 
     def setUp(self):
@@ -27,8 +26,6 @@ class TestServo(unittest.TestCase):
         self.assertEqual(servo.channel,self.channel)
         self.assertEqual(servo.min_pulse,self.min_pulse)
         self.assertEqual(servo.min_angle,self.min_angle)
-        self.assertEqual(servo.max_pulse,self.max_pulse)
-        self.assertEqual(servo.max_angle,self.max_angle)
 
     def test_should_set_the_angle_using_the_serial_object_provided(self):
         self.servo.set_position(10)
@@ -45,3 +42,13 @@ class TestServo(unittest.TestCase):
 
         self.assertEqual(expected_position,position)
         self.serial.write.assert_called_with(get_position_command + chr(self.channel))
+
+    def test_should_get_errors(self):
+        expected_errors = (50,51)
+        self.serial.read.side_effect = map(chr,expected_errors)
+        get_errors_command = chr(0xaa) + chr(0x0c) + chr(0x21)
+
+        errors = self.servo.get_errors()
+
+        self.assertEqual(expected_errors, errors)
+        self.serial.write.assert_called_with(get_errors_command)
