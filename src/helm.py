@@ -3,12 +3,13 @@ from nan import isNaN
 from bearing import angle_between
 
 class Helm():
-    def __init__(self,sensors,rudder_servo,timer,config):
+    def __init__(self,sensors,rudder_servo,timer,logger, config):
         self.sensors = sensors
         self.rudder_servo = rudder_servo
         self._set_rudder_angle(0)
         self.config = config
         self.timer = timer
+        self.logger = logger
         self.previous_track = 0
         self.sleep_time = config['sleep time']
 
@@ -32,7 +33,10 @@ class Helm():
             if abs(turn_angle) <  ignore_below and abs(rate_of_turn) < ignore_below:
                 return
 
-            self._set_rudder_angle(self._calculate_rudder_angle(turn_angle,rate_of_turn))
+            new_rudder_angle = self._calculate_rudder_angle(turn_angle,rate_of_turn)
+            self.logger.debug('Helm, steering {:.1f}, tracking {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
+                .format(requested_heading,track,rate_of_turn,self.rudder_angle,new_rudder_angle))
+            self._set_rudder_angle(new_rudder_angle)
             self.previous_track = track
 
     def _calculate_rudder_angle(self,turn_angle,rate_of_turn):

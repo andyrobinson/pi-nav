@@ -13,8 +13,9 @@ class TestHelm(unittest.TestCase):
     def setUp(self):
         self.sensors = Mock()
         self.servo = Mock()
+        self.logger = Mock()
         timer = Mock()
-        self.helm = Helm(self.sensors,self.servo,timer,CONFIG['helm'])
+        self.helm = Helm(self.sensors,self.servo,timer,self.logger, CONFIG['helm'])
         self.helm.previous_track = 180
 
     def currently_tracking(self,previous_track, current_track, rudder_angle=0):
@@ -88,3 +89,10 @@ class TestHelm(unittest.TestCase):
         self.helm.steer(57.23)
 
         self.servo.set_position.assert_called_with(0)
+
+    def test_should_log_steering_calculation_and_status_to_debug(self):
+        self.currently_tracking(20,10)
+        self.helm.steer(355)
+        self.logger.debug.assert_called_with("Helm, steering 355.0, tracking 10.0, rate of turn -10.0, rudder +0.0, new rudder -5.0")
+        self.servo.set_position.assert_called_with(-5)
+
