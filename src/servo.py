@@ -32,7 +32,12 @@ class Servo():
         self.serial.write(data)
         position_low = ord(self.serial.read())
         position_high = ord(self.serial.read())
+        print 'position high, low: ' + str(position_high) + ',' + str(position_low)
+        agg_position = (position_high << 7) + position_low
+        print 'aggregate position: ' + str(agg_position)
+        print 'corrected by 4 and for min_pulse: ' + str((agg_position/4) - self.min_pulse) 
         position = (float(((position_high << 7) + position_low)/4 - self.min_pulse)/self.pulse_range) * self.total_arc + self.min_angle
+        print 'final position: ' + str(position)
         return position
 
     def get_errors(self):
