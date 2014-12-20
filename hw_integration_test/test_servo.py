@@ -21,7 +21,7 @@ class TestServo(unittest.TestCase):
         servo = Servo(serial_port0,0,500,-90,2500,90)
 
         for position in [-90,-45,0,45,90,0]:
-            self.assertLess(percentage_diff(set_and_read_position(position),position),0.1)
+            self.assertLess(percentage_diff(set_and_read_position(servo,position),position),0.1)
 
     def test_for_errors(self):
         pass
