@@ -1,7 +1,6 @@
 Epic - steering using servo
 
 Current tasks
-- write hardware integration test
 - write servo simulator
 - hook up and test simulator; make it easy to change the turn rate
 - test steering algorithm against different turn rates
