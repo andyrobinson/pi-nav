@@ -4,8 +4,8 @@ Current tasks
 - write servo simulator
 - hook up and test simulator; make it easy to change the turn rate
 - test steering algorithm against different turn rates
-- wire up real follower to helm and servo controller
 - field test steering
+- set the rudder to position 0 on startup
 
 For later
 - use an average speed rather than instantaneous speed

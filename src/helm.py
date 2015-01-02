@@ -6,7 +6,7 @@ class Helm():
     def __init__(self,sensors,rudder_servo,timer,logger, config):
         self.sensors = sensors
         self.rudder_servo = rudder_servo
-        self._set_rudder_angle(0)
+        self.rudder_angle = 0
         self.config = config
         self.timer = timer
         self.logger = logger
