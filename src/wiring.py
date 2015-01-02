@@ -28,7 +28,7 @@ RUDDER_MAX_ANGLE = 30
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
         self._gps = gps
-        self._globe = Globe()
+        self.globe = Globe()
         self._servo_port = servo_port
         self._sensors = False
         self._rudder_servo = False
@@ -42,38 +42,38 @@ class Wiring():
         logger.setLevel( logging.INFO )
         return logger
 
+    @property
     def application_logger(self):
         return self._rotating_logger(APPLICATION_NAME)
 
-    def tracker(self):
-        return Tracker(self._rotating_logger("track"),self.gps(),self.timer())
-        
+    @property        
     def gps(self):
         if not self._gps:
             self._gps = GpsReader()
         return self._gps
+
+    def tracker(self):
+        return Tracker(self._rotating_logger("track"),self.gps,self.timer())
+
     
     def sensors(self):
         if not self._sensors:
-            self._sensors = Sensors(self.gps())
+            self._sensors = Sensors(self.gps)
         return self._sensors
 
     def timer(self):
         return Timer()
         
     def gps_console_writer(self):
-        return GpsConsoleWriter(self.gps())
+        return GpsConsoleWriter(self.gps)
         
     def showgps(self):
         try:
             self.timer().call(self.gps_console_writer().write).every(5)
         except (KeyboardInterrupt, SystemExit):
-            self.gps().running = False
-            self.gps().join() 
+            self.gps.running = False
+            self.gps.join() 
 
-    def globe(self):
-        return self._globe
-    
     def rudder_servo(self):
         if not self._rudder_servo:
             serial_port = serial.Serial(self._servo_port)
@@ -81,12 +81,12 @@ class Wiring():
         return self._rudder_servo
 
     def helm(self):
-        return Helm(self.sensors(),self.rudder_servo(),self.timer(),self.application_logger(),CONFIG['helm'])
+        return Helm(self.sensors(),self.rudder_servo(),self.timer(),self.application_logger,CONFIG['helm'])
 
     def follower(self):
-        return Follower(self.navigator(),self.application_logger()) 
+        return Follower(self.navigator(),self.application_logger)
 
     def navigator(self):
         if not self._navigator:
-            self._navigator = Navigator(self.sensors(),self.helm(),self.globe(),self.application_logger(),CONFIG['navigator'])
+            self._navigator = Navigator(self.sensors(),self.helm(),self.globe,self.application_logger,CONFIG['navigator'])
         return self._navigator

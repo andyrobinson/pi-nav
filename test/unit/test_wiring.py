@@ -20,23 +20,23 @@ class TestWiring(unittest.TestCase):
         self.wiring = Wiring(StubGPS(),None)
 
     def test_should_return_stub_gps_for_test_purposes(self):
-        gps = self.wiring.gps()
+        gps = self.wiring.gps
         self.assertTrue(isinstance(gps,StubGPS))
         
     def test_should_return_singleton_globe(self):
-        globe = self.wiring.globe()
-        self.assertEqual(globe, self.wiring.globe())
+        globe = self.wiring.globe
+        self.assertEqual(globe, self.wiring.globe)
         self.assertTrue(isinstance(globe, Globe))
 
     def test_should_return_singleton_application_logger(self):
-        logger = self.wiring.application_logger()
-        self.assertEqual(logger, self.wiring.application_logger())
+        logger = self.wiring.application_logger
+        self.assertEqual(logger, self.wiring.application_logger)
         self.assertTrue(isinstance(logger, logging.Logger))
 
     def test_should_return_sensors_with_gps(self):
         sensors = self.wiring.sensors()
         self.assertTrue(isinstance(sensors,Sensors))
-        self.assertEqual(sensors.gps,self.wiring.gps())
+        self.assertEqual(sensors.gps,self.wiring.gps)
 
     def test_should_return_rudder_servo_with_30_degree_movement(self):
         rudder_servo = self.wiring.rudder_servo()
@@ -51,7 +51,7 @@ class TestWiring(unittest.TestCase):
         helm = self.wiring.helm()
         self.assertTrue(isinstance(helm,Helm))
         self.assertEqual(helm.config,CONFIG['helm'])
-        self.assertEqual(helm.logger,self.wiring.application_logger())
+        self.assertEqual(helm.logger,self.wiring.application_logger)
         self.assertEqual(helm.sensors,self.wiring.sensors())
         self.assertEqual(helm.rudder_servo,self.wiring.rudder_servo())
 
@@ -66,6 +66,6 @@ class TestWiring(unittest.TestCase):
     def test_should_return_follower(self):
         follower = self.wiring.follower()
         self.assertTrue(isinstance(follower,Follower))
-        self.assertEqual(follower.logger,self.wiring.application_logger())
+        self.assertEqual(follower.logger,self.wiring.application_logger)
         self.assertEqual(follower.navigator, self.wiring.navigator())
 
