@@ -6,7 +6,6 @@ import logging
 
 from wiring import Wiring,RUDDER_SERVO_CHANNEL
 from globe import Globe
-from track import Tracker
 from sensors import Sensors
 from navigator import Navigator
 from follower import Follower
@@ -34,12 +33,12 @@ class TestWiring(unittest.TestCase):
         self.assertTrue(isinstance(logger, logging.Logger))
 
     def test_should_return_sensors_with_gps(self):
-        sensors = self.wiring.sensors()
+        sensors = self.wiring.sensors
         self.assertTrue(isinstance(sensors,Sensors))
         self.assertEqual(sensors.gps,self.wiring.gps)
 
     def test_should_return_rudder_servo_with_30_degree_movement(self):
-        rudder_servo = self.wiring.rudder_servo()
+        rudder_servo = self.wiring.rudder_servo
         self.assertEqual(rudder_servo.channel,0)
         self.assertEqual(rudder_servo.channel,RUDDER_SERVO_CHANNEL)
         self.assertEqual(rudder_servo.min_pulse,1160)
@@ -48,24 +47,24 @@ class TestWiring(unittest.TestCase):
         self.assertEqual(rudder_servo.pulse_range,340*2)
 
     def test_should_return_helm_with_all_dependencies(self):
-        helm = self.wiring.helm()
+        helm = self.wiring.helm
         self.assertTrue(isinstance(helm,Helm))
         self.assertEqual(helm.config,CONFIG['helm'])
         self.assertEqual(helm.logger,self.wiring.application_logger)
-        self.assertEqual(helm.sensors,self.wiring.sensors())
-        self.assertEqual(helm.rudder_servo,self.wiring.rudder_servo())
+        self.assertEqual(helm.sensors,self.wiring.sensors)
+        self.assertEqual(helm.rudder_servo,self.wiring.rudder_servo)
 
     def test_should_return_navigator(self):
-        navigator = self.wiring.navigator()
+        navigator = self.wiring.navigator
         self.assertTrue(isinstance(navigator, Navigator))
 
     def test_should_use_corrct_config_in_navigator(self):
-        navigator = self.wiring.navigator()
+        navigator = self.wiring.navigator
         self.assertEqual(navigator.config,CONFIG['navigator'])
 
     def test_should_return_follower(self):
-        follower = self.wiring.follower()
+        follower = self.wiring.follower
         self.assertTrue(isinstance(follower,Follower))
         self.assertEqual(follower.logger,self.wiring.application_logger)
-        self.assertEqual(follower.navigator, self.wiring.navigator())
+        self.assertEqual(follower.navigator, self.wiring.navigator)
 

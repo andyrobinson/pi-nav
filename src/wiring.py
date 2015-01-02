@@ -28,11 +28,17 @@ RUDDER_MAX_ANGLE = 30
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
         self._gps = gps
+
         self.globe = Globe()
-        self._servo_port = servo_port
-        self._sensors = False
-        self._rudder_servo = False
-        self._navigator = False
+        self.timer = Timer()
+        self.tracker = Tracker(self._rotating_logger("track"),self.gps,self.timer)
+        self.application_logger = self._rotating_logger(APPLICATION_NAME)
+        self.sensors = Sensors(self.gps)
+        self.gps_console_writer = GpsConsoleWriter(self.gps)
+        self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
+        self.helm = Helm(self.sensors,self.rudder_servo,self.timer,self.application_logger,CONFIG['helm'])
+        self.navigator = Navigator(self.sensors,self.helm,self.globe,self.application_logger,CONFIG['navigator'])
+        self.follower = Follower(self.navigator,self.application_logger)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
@@ -42,51 +48,15 @@ class Wiring():
         logger.setLevel( logging.INFO )
         return logger
 
-    @property
-    def application_logger(self):
-        return self._rotating_logger(APPLICATION_NAME)
-
     @property        
     def gps(self):
         if not self._gps:
             self._gps = GpsReader()
         return self._gps
 
-    def tracker(self):
-        return Tracker(self._rotating_logger("track"),self.gps,self.timer())
-
-    
-    def sensors(self):
-        if not self._sensors:
-            self._sensors = Sensors(self.gps)
-        return self._sensors
-
-    def timer(self):
-        return Timer()
-        
-    def gps_console_writer(self):
-        return GpsConsoleWriter(self.gps)
-        
     def showgps(self):
         try:
-            self.timer().call(self.gps_console_writer().write).every(5)
+            self.timer().call(self.gps_console_writer.write).every(5)
         except (KeyboardInterrupt, SystemExit):
             self.gps.running = False
             self.gps.join() 
-
-    def rudder_servo(self):
-        if not self._rudder_servo:
-            serial_port = serial.Serial(self._servo_port)
-            self._rudder_servo = Servo(serial_port,RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
-        return self._rudder_servo
-
-    def helm(self):
-        return Helm(self.sensors(),self.rudder_servo(),self.timer(),self.application_logger,CONFIG['helm'])
-
-    def follower(self):
-        return Follower(self.navigator(),self.application_logger)
-
-    def navigator(self):
-        if not self._navigator:
-            self._navigator = Navigator(self.sensors(),self.helm(),self.globe,self.application_logger,CONFIG['navigator'])
-        return self._navigator
