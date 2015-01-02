@@ -16,19 +16,19 @@ class TestSimWiring(unittest.TestCase):
         self.wiring = SimWiring()
         
     def test_should_return_singleton_globe(self):
-        globe = self.wiring.globe()
-        self.assertEqual(globe, self.wiring.globe())
+        globe = self.wiring.globe
+        self.assertEqual(globe, self.wiring.globe)
         self.assertTrue(isinstance(globe, Globe))
 
     def test_should_return_singleton_console_logger(self):
-        logger = self.wiring.console_logger()
-        self.assertEqual(logger, self.wiring.console_logger())
+        logger = self.wiring.console_logger
+        self.assertEqual(logger, self.wiring.console_logger)
         self.assertTrue(isinstance(logger, logging.Logger))
 
     def test_navigator_simulator_should_use_sensors(self):
-        navigator = self.wiring.navigator_simulator()
+        navigator = self.wiring.navigator_simulator
         self.assertTrue(isinstance(navigator.sensors,Sensors))
 
     def test_follower_simulator_should_use_navigator(self):
-        follower = self.wiring.follower_simulator()
+        follower = self.wiring.follower_simulator
         self.assertTrue(isinstance(follower.navigator,Navigator))

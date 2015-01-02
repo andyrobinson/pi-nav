@@ -25,34 +25,19 @@ ALTRINCHAM = Waypoint(Position(53.39018,-2.3509),5)
 
 class SimWiring():
     def __init__(self):
-        self._gps = False
-        self._globe = Globe()
-        self._console_logger = False
-        
-    def console_logger(self):
-        if not self._console_logger:
-            logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
-            self._console_logger = logging.getLogger("simulate")
-        return self._console_logger
-            
-    def globe(self):
-        return self._globe
+        self.globe = Globe()
+        self.timer = Timer()
+        self.console_logger = self._console_logger()
+        self.navigator_simulator = self._navigator_simulator()
+        self.follower_simulator =  Follower(self.navigator_simulator,self.console_logger)
+        self.manchester_tour = [CHORLTON, MANCHESTER, LOWRY, ALTRINCHAM, CHORLTON]
+        self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 
-    def navigator_simulator(self):
+    def _console_logger(self):
+        logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+        return logging.getLogger("simulate")
+
+    def _navigator_simulator(self):
         fake_gps = FakeVehicleGPS(CHORLTON.position,0,0.1,False)
-        fake_vehicle = FakeVehicle(fake_gps, self.globe(),self.console_logger())
-        return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe(),self.console_logger(),CONFIG['navigator'])
-
-    def follower_simulator(self):
-        return Follower(self.navigator_simulator(),self.console_logger())
-    
-    def manchester_tour(self):
-        return [CHORLTON, MANCHESTER, LOWRY, ALTRINCHAM, CHORLTON]
-        
-    def tracker_simulator(self):
-        gps = StubGPS()
-        return Tracker(self.console_logger(),gps,self.timer())
-
-    def timer(self):
-        return Timer()
-        
+        fake_vehicle = FakeVehicle(fake_gps, self.globe,self.console_logger)
+        return Navigator(Sensors(fake_vehicle.gps),fake_vehicle,self.globe,self.console_logger,CONFIG['navigator'])

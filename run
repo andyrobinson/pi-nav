@@ -9,7 +9,7 @@ DEFAULT_COMMAND = 'test'
 from src import wiring
 from test import sim_wiring
 
-def wiring():
+def wiring_inst():
     return wiring.Wiring()
 
 sim_wiring = sim_wiring.SimWiring()
@@ -27,19 +27,19 @@ if __name__ == '__main__':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','hw_integration_test'])
 
     if command == 'track':
-        wiring().tracker.track(30)
+        wiring_inst().tracker.track(30)
 
     if command == 'showgps':
-        wiring().showgps()
+        wiring_inst().showgps()
         
     if command == 'simtrack':
-        sim_wiring.tracker_simulator().track(3)
+        sim_wiring.tracker_simulator.track(3)
         
     if command == 'simnav':
-        sim_wiring.follower_simulator().follow_route(sim_wiring.manchester_tour())
+        sim_wiring.follower_simulator.follow_route(sim_wiring.manchester_tour)
         
     if command == 'nav':
-        wiring().follower.follow_route(sim_wiring.manchester_tour())
+        wiring_inst().follower.follow_route(sim_wiring.manchester_tour)
 
     if command == 'clean':
         for path,dirs,filenames in os.walk('.'):
