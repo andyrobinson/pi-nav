@@ -3,7 +3,7 @@ import sys
 import subprocess
 import os
 
-COMMANDS = ['test','track','hardware','simtrack','showgps', 'simnav','clean']
+COMMANDS = ['test','track','hardware','simtrack','showgps', 'simnav','nav','clean']
 DEFAULT_COMMAND = 'test'
 
 from src import wiring
