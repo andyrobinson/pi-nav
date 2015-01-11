@@ -4,6 +4,9 @@ from position import Position
 EARTH_RADIUS_METRES = 6371000
 
 # all calculations based on http://www.movable-type.co.uk/scripts/latlong.html
+# note one degree of latitude is about 111 km
+# Therefore the 5th decimal place is the one that represents metres
+
 class Globe():
 
     def distance_between(self,start,finish):
