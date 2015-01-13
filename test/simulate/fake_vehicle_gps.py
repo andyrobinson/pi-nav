@@ -8,10 +8,10 @@ class FakeVehicleGPS():
         self.lost_position = False
         self.reliable = reliable
         
-    def set_position(self,position,track,speed):
+    def set_position(self,position,track,speed, reliable = False):
         rand = random.randrange(1,101)
-        if self.reliable:
-            rand = 100
+        if self.reliable or reliable:
+            rand = 70
         if rand > 50:
             self.lost_position = False
 

@@ -32,3 +32,9 @@ class TestSimWiring(unittest.TestCase):
     def test_follower_simulator_should_use_navigator(self):
         follower = self.wiring.follower_simulator
         self.assertTrue(isinstance(follower.navigator,Navigator))
+
+    def test_helm_should_use_fake_servo_and_timer(self):
+        helm = self.wiring.helm
+        vehicle = self.wiring.vehicle
+        self.assertEqual(helm.rudder_servo,vehicle.rudder)
+        self.assertEqual(helm.timer,vehicle.timer)

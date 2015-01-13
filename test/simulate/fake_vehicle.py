@@ -58,7 +58,7 @@ class FakeVehicle():
                           .format(self.gps.position.latitude, self.gps.position.longitude, self.rudder.angle, self.gps.track))
 
     def _move_straight(self,distance):
-        new_position = self.globe.new_position(self.position,self.gps.track,distance)
+        new_position = self.globe.new_position(self.gps.position,self.gps.track,distance)
         self._set_position(new_position,self.gps.track)
 
     def _turn(self,distance):
@@ -67,7 +67,7 @@ class FakeVehicle():
         new_track = self.gps.track + track_delta
         move_bearing = self.gps.track + self._straightline_angle(track_delta)
         move_distance = self._straightline_distance(turn_radius,track_delta)
-        new_position = self.globe.new_position(self.position,move_bearing,move_distance)
+        new_position = self.globe.new_position(self.gps.position,move_bearing,move_distance)
         self._set_position(new_position,new_track)
 
     def _set_position(self,position,track):
