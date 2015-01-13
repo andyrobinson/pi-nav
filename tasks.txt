@@ -1,8 +1,12 @@
 Epic - steering using servo
 
 Current tasks
-- write servo simulator- IN PROGRESS
-- hook up and test simulator; make it easy to change the turn rate
+- multiple issues
+    - in fake vehicle, write test and make check for rudder angle use abs - should now flip flop
+    - seems to go too long before checking back with navigator - min time? But seems like other problem with Helm
+    - need to reverse rudder angle to make steering work in Helm
+    - the GPS or vehicle gets stuck in lost signal mode forever if GPS set to unreliable
+
 - test steering algorithm against different turn rates
 - field test steering
 - set the rudder to position 0 on startup
