@@ -60,11 +60,11 @@ class TestNavigationAndHelm(unittest.TestCase):
         navigator.to(destination)
 
         self.logger.debug.assert_has_calls(
-            [call('Helm, steering 44.6, tracking 55.9, rate of turn +55.9, rudder +0.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder -30.0, new rudder -30.0')])
+            [call('Helm, steering 44.6, tracking 55.9, rate of turn +55.9, rudder +0.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0')])
 

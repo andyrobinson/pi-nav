@@ -30,13 +30,19 @@ TEN_METRE_SQUARE = [Waypoint(Position(10,10),1),
                     Waypoint(Position(10,10.0001),1),
                     Waypoint(Position(10,10),1)]
 
+TWENTY_METRE_HOURGLASS = [Waypoint(Position(10,10),1),
+                    Waypoint(Position(10.0002,10.0002),1),
+                    Waypoint(Position(10,10.0002),1),
+                    Waypoint(Position(10.0002,10),1),
+                    Waypoint(Position(10,10),1)]
+
 class SimWiring():
     def __init__(self):
         self.globe = Globe()
         self.timer = Timer()
         self.console_logger = self._console_logger()
         self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1,True)
-        self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
+        self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger)
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.vehicle.timer,self.console_logger, CONFIG['helm'])
         self.navigator_simulator = Navigator(self.sensors,self.helm,self.globe,self.console_logger,CONFIG['navigator'])
@@ -48,5 +54,5 @@ class SimWiring():
         return logging.getLogger("simulate")
 
     def follow_route(self,waypoints):
-        self.gps.set_position(waypoints[0].position,0,0.1,True)
+        self.gps.set_position(waypoints[0].position,0,0.8,True)
         self.follower_simulator.follow_route(waypoints)

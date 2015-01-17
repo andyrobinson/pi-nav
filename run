@@ -36,7 +36,7 @@ if __name__ == '__main__':
         sim.tracker_simulator.track(3)
         
     if command == 'simnav':
-        sim.follow_route(sim_wiring.TEN_METRE_SQUARE)
+        sim.follow_route(sim_wiring.TWENTY_METRE_HOURGLASS)
         
     if command == 'nav':
         wiring_inst().follower.follow_route(sim_wiring.TEN_METRE_SQUARE)

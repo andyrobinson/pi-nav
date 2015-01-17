@@ -42,20 +42,33 @@ class TestFakeVehicle(unittest.TestCase):
     def test_should_turn_a_corner_if_the_rudder_is_deflected(self):
         bearing,time_s = 30,2
         starting_position = Position(53,-2)
+        rudder_deflection = 10
         gps = FakeVehicleGPS(starting_position,bearing,INITIAL_SPEED_IN_MS,True)
         vehicle = FakeVehicle(gps,self.globe,self.mock_logger)
-        turn_radius = vehicle._turn_radius(10)
+        turn_radius = vehicle._turn_radius(rudder_deflection)
         bearing_change = - vehicle._track_delta(INITIAL_SPEED_IN_MS*time_s,turn_radius)
         expected_track = bearing + bearing_change
         expected_position = self.globe.new_position(starting_position,bearing + (0.5 * bearing_change),vehicle._straightline_distance(turn_radius,bearing_change))
 
-        vehicle.rudder.set_position(10)
+        vehicle.rudder.set_position(rudder_deflection)
         vehicle.timer.wait_for(time_s)
         new_position = vehicle.gps.position
 
         self.assertEqual(new_position.longitude, expected_position.longitude)
         self.assertEqual(new_position.latitude, expected_position.latitude)
         self.assertEqual(vehicle.gps.track, expected_track)
+
+    def test_should_turn_right_if_rudder_deflection_is_negative(self):
+        bearing,time_s = 30,2
+        starting_position = Position(53,-2)
+        rudder_deflection = -10
+        gps = FakeVehicleGPS(starting_position,bearing,INITIAL_SPEED_IN_MS,True)
+        vehicle = FakeVehicle(gps,self.globe,self.mock_logger)
+
+        vehicle.rudder.set_position(rudder_deflection)
+        vehicle.timer.wait_for(time_s)
+
+        self.assertGreater(vehicle.gps.track,bearing)
 
     def test_straightline_angle_is_half_turn_angle(self):
         vehicle = FakeVehicle(self.reliable_gps,self.globe,self.mock_logger)

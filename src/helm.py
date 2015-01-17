@@ -40,7 +40,7 @@ class Helm():
             self.previous_track = track
 
     def _calculate_rudder_angle(self,turn_angle,rate_of_turn):
-        rate_adjusted_turn_angle = self.rudder_angle + (turn_angle - rate_of_turn)
+        rate_adjusted_turn_angle = self.rudder_angle - (turn_angle - rate_of_turn)
         unsigned_rudder_angle = min(self.config['full deflection'],abs(rate_adjusted_turn_angle))
         return copysign(unsigned_rudder_angle,rate_adjusted_turn_angle)
 

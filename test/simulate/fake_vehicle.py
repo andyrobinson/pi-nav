@@ -37,7 +37,7 @@ class FakeVehicle():
 
     def move(self,seconds):
         distance = self.speed * seconds
-        if self.rudder.angle <=1:
+        if abs(self.rudder.angle) <=1:
             self._move_straight(distance)
         else:
             self._turn(distance)

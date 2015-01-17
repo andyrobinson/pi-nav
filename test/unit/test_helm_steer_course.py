@@ -34,7 +34,7 @@ class TestHelmSteerCourse(unittest.TestCase):
 
         self.helm.steer_course(required_course,for_one_second)
 
-        self.servo.set_position.assert_called_with(-20)
+        self.servo.set_position.assert_called_with(20)
         self.timer.wait_for.assert_called_with(1)
 
     def test_should_steer_repeatedly_and_with_greater_deflection_to_max_until_time_has_expired(self):
@@ -45,5 +45,5 @@ class TestHelmSteerCourse(unittest.TestCase):
 
         self.helm.steer_course(required_course,for_three_seconds)
 
-        self.servo.set_position.assert_has_calls([call(-5),call(-15),call(-25),call(-30)])
+        self.servo.set_position.assert_has_calls([call(5),call(15),call(25),call(30)])
         self.timer.wait_for.assert_has_calls([call(1),call(1),call(1)])
