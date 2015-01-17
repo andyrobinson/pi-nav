@@ -41,8 +41,8 @@ class SimWiring():
         self.globe = Globe()
         self.timer = Timer()
         self.console_logger = self._console_logger()
-        self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1,True)
-        self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger)
+        self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1)
+        self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.vehicle.timer,self.console_logger, CONFIG['helm'])
         self.navigator_simulator = Navigator(self.sensors,self.helm,self.globe,self.console_logger,CONFIG['navigator'])
@@ -55,4 +55,5 @@ class SimWiring():
 
     def follow_route(self,waypoints):
         self.gps.set_position(waypoints[0].position,0,0.8,True)
+        self.vehicle.position = waypoints[0].position
         self.follower_simulator.follow_route(waypoints)

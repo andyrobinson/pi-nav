@@ -1,9 +1,6 @@
 Epic - steering using servo
 
 Current tasks
-- multiple issues
-    - the GPS or vehicle gets stuck in lost signal mode forever if GPS set to unreliable
-
 - test steering algorithm against different turn rates
 - field test steering
 - set the rudder to position 0 on startup

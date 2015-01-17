@@ -34,6 +34,8 @@ class FakeVehicle():
         self.gps.speed = INITIAL_SPEED_IN_MS
         self.rudder = FakeRudder()
         self.timer = FakeTimer(self.move)
+        self.position = self.gps.position
+        self.track = self.gps.track
 
     def move(self,seconds):
         distance = self.speed * seconds
@@ -43,19 +45,21 @@ class FakeVehicle():
             self._turn(distance)
 
         self.logger.debug("Vehicle at: {:+f},{:+f}, rudder: {:f}, track: {:f}"
-                          .format(self.gps.position.latitude, self.gps.position.longitude, self.rudder.angle, self.gps.track))
+                          .format(self.position.latitude, self.position.longitude, self.rudder.angle, self.track))
+        self.logger.debug("GPS reports {:+f},{:+f}, track: {:f}"
+                          .format(self.gps.position.latitude, self.gps.position.longitude, self.gps.track))
 
     def _move_straight(self,distance):
-        new_position = self.globe.new_position(self.gps.position,self.gps.track,distance)
-        self._set_position(new_position,self.gps.track)
+        new_position = self.globe.new_position(self.position,self.track,distance)
+        self._set_position(new_position,self.track)
 
     def _turn(self,distance):
         turn_radius = self._turn_radius(self.rudder.angle)
         track_delta = - copysign(self._track_delta(distance, turn_radius),self.rudder.angle)
-        new_track = self.gps.track + track_delta
-        move_bearing = self.gps.track + self._straightline_angle(track_delta)
+        new_track = self.track + track_delta
+        move_bearing = self.track + self._straightline_angle(track_delta)
         move_distance = self._straightline_distance(turn_radius,track_delta)
-        new_position = self.globe.new_position(self.gps.position,move_bearing,move_distance)
+        new_position = self.globe.new_position(self.position,move_bearing,move_distance)
         self._set_position(new_position,new_track)
 
     def _set_position(self,position,track):
@@ -65,6 +69,8 @@ class FakeVehicle():
         if self.single_step:
             sys.stdout.write('Enter to continue:')
             x = sys.stdin.readline()
+        self.position = position
+        self.track = track
         self.gps.set_position(position, track, self.speed)
 
     def _straightline_distance(self,radius,angle_in_deg):
