@@ -1,8 +1,7 @@
 from setup_test import setup_test
 setup_test()
 import unittest
-from mock import Mock
-from bearing import angle_between
+from bearing import angle_between,to_360
 
 class TestBearing(unittest.TestCase):
     
@@ -50,4 +49,12 @@ class TestBearing(unittest.TestCase):
         self.assertEqual(angle_between(179,359),180)
         self.assertEqual(angle_between(359,179),180)
 
+    def test_to_360_should_leave_alone_positive_values_less_than_360(self):
+        self.assertEqual(to_360(5),5)
+        self.assertEqual(to_360(177),177)
+        self.assertEqual(to_360(359),359)
 
+    def test_to_360_should_add_360_to_values_less_than_zero(self):
+        self.assertEqual(to_360(-5),355)
+        self.assertEqual(to_360(-89),271)
+        self.assertEqual(to_360(-177),183)

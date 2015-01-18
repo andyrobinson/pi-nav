@@ -1,7 +1,4 @@
-import traceback
-from position import Position
-from nan import NaN,isNaN
-from fake_vehicle_gps import FakeVehicleGPS
+from bearing import to_360
 from math import sqrt,cos,radians,degrees,copysign
 import sys
 
@@ -56,7 +53,7 @@ class FakeVehicle():
     def _turn(self,distance):
         turn_radius = self._turn_radius(self.rudder.angle)
         track_delta = - copysign(self._track_delta(distance, turn_radius),self.rudder.angle)
-        new_track = self.track + track_delta
+        new_track = to_360(self.track + track_delta)
         move_bearing = self.track + self._straightline_angle(track_delta)
         move_distance = self._straightline_distance(turn_radius,track_delta)
         new_position = self.globe.new_position(self.position,move_bearing,move_distance)
