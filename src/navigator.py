@@ -2,6 +2,7 @@ import math
 from nan import isNaN
 
 MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
+DISTANCE_FRACTION_TO_STEER = 0.75
 
 class Navigator():
     def __init__(self,sensors,helm,globe,logger,config):
@@ -36,8 +37,7 @@ class Navigator():
         max_time = self.config['max time to steer']
         speed = max(MIN_SPEED_FOR_STEER_TIME_CALCULATION,self.sensors.speed)
         #by some quirk max and min remove NaN if there is a real number in the first position
-        result = min(max_time, max(min_time, 0.75 * self._distance(position,destination_waypoint)/speed))
-        # print 'Steering for seconds: ' + str(result)
+        result = min(max_time, max(min_time, DISTANCE_FRACTION_TO_STEER * self._distance(position,destination_waypoint)/speed))
         return int(result)
 
     def _error_radius(self,position):

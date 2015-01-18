@@ -59,4 +59,8 @@ class Wiring():
             self.timer().call(self.gps_console_writer.write).every(5)
         except (KeyboardInterrupt, SystemExit):
             self.gps.running = False
-            self.gps.join() 
+            self.gps.join()
+
+    def follow(self,waypoints):
+        self.rudder_servo.set_position(0)
+        self.follower.follow_route(waypoints)

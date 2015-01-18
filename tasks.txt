@@ -2,8 +2,7 @@ Epic - steering using servo
 
 Current tasks
 - test steering algorithm against different turn rates
-- field test steering
-- set the rudder to position 0 on startup
+- field test steering - need a set of local waypoints
 
 For later
 - use an average speed rather than instantaneous speed

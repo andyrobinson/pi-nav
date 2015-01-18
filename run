@@ -39,7 +39,7 @@ if __name__ == '__main__':
         sim.follow_route(sim_wiring.TWENTY_METRE_HOURGLASS)
         
     if command == 'nav':
-        wiring_inst().follower.follow_route(sim_wiring.TEN_METRE_SQUARE)
+        wiring_inst().follow(sim_wiring.TEN_METRE_SQUARE)
 
     if command == 'clean':
         for path,dirs,filenames in os.walk('.'):
