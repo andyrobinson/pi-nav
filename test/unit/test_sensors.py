@@ -29,7 +29,7 @@ class TestSensors(unittest.TestCase):
 		self.gps.hasfix = 'blah'
 		self.assertEqual(self.sensors.hasfix,'blah')
 
-	def test_should_default_error_values_to_twenty_if_gps_returns_NaN(self):
+	def test_should_default_error_values_to_ten_if_gps_returns_NaN(self):
 		gps = StubGPS()
 		gps.position.lat_error = NaN
 		gps.position.long_error = NaN
@@ -38,7 +38,7 @@ class TestSensors(unittest.TestCase):
 
 		sensors = Sensors(gps)
 
-		self.assertEqual(sensors.position.lat_error,20)
-		self.assertEqual(sensors.position.long_error,20)
-		self.assertEqual(sensors.speed_error,20)
-		self.assertEqual(sensors.track_error,20)
+		self.assertEqual(sensors.position.lat_error,10)
+		self.assertEqual(sensors.position.long_error,10)
+		self.assertEqual(sensors.speed_error,10)
+		self.assertEqual(sensors.track_error,10)

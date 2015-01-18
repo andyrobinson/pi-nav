@@ -1,7 +1,7 @@
 from nan import isNaN
 from position import Position
 
-DEFAULT_ERROR = 20
+DEFAULT_ERROR = 10
 
 class Sensors():
     def __init__(self,gps):
