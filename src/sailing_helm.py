@@ -2,6 +2,7 @@ from bearing import angle_between
 from math import tan,radians,copysign
 
 NO_GO_ANGLE = 45
+MIN_TACK_DURATION = 5
 
 class SailingHelm:
 
@@ -16,8 +17,12 @@ class SailingHelm:
             deflection = self._initial_tack_deflection(wind_course_angle)
             leg1, leg2 = self._leg_times(deflection,for_seconds)
             first_tack_course = requested_heading + deflection
-            self.helm.steer_course(first_tack_course,leg1)
-            self.helm.steer_course(first_tack_course - copysign(2 * NO_GO_ANGLE,deflection),leg2)
+
+            if leg2 <= MIN_TACK_DURATION:
+                self.helm.steer_course(first_tack_course,for_seconds)
+            else:
+                self.helm.steer_course(first_tack_course,leg1)
+                self.helm.steer_course(first_tack_course - copysign(2 * NO_GO_ANGLE,deflection),leg2)
         else:
             self.helm.steer_course(requested_heading,for_seconds)
 
