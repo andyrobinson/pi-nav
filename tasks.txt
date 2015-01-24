@@ -1,10 +1,18 @@
 Epic - steering using servo
-
-Current tasks
-- test steering algorithm against different turn rates
 - field test steering - need a set of local waypoints
 
+Epic - sailing
+Current tasks
+- decide what to do about changes or differences in wind direction during tack
+- create class to control sail angle based on relative wind, give to helm (?callback to sailing helm)
+- plumb sailing helm into wiring
+- update sensors to include both relative (to boat) and absolute wind directions - adjust absolute for speed?
+- move constants into config for sailing_helm and navigator
+
 For later
+- get a wind sensor and attach to PI
 - use an average speed rather than instantaneous speed
     - circular array
     - record array of gps data in sensors class
+- dealing with tides/currents/drift; probably need a compass (may need compass for rate of turn anyway)
+
