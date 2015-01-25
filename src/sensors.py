@@ -40,5 +40,9 @@ class Sensors():
     def speed_error(self):
         return self._default(self.gps.speed_error,DEFAULT_ERROR)
 
+    @property
+    def wind_direction(self):
+        return 0 # TODO: replace with value from sensor
+
     def _default(self,  value,default):
         return default if isNaN(value) else value

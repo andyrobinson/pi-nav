@@ -5,6 +5,7 @@ class FakeMovingGPS():
         self.positions = positions
         self.globe = globe
         self.position_index = 0
+        self.wind_direction = 0
 
     @property        
     def position(self):

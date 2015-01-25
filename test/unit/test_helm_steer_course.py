@@ -11,6 +11,7 @@ class TestHelmSteerCourse(unittest.TestCase):
 
     def setUp(self):
         self.sensors = Mock()
+        self.sensors.wind_direction = 0
         self.servo = Mock()
         self.timer = Mock()
 
@@ -41,9 +42,35 @@ class TestHelmSteerCourse(unittest.TestCase):
         self.sensors.track = 190
         self.helm.previous_track = 195
         required_course = 180
-        for_three_seconds = 4
+        for_seconds = 4
 
-        self.helm.steer_course(required_course,for_three_seconds)
+        self.helm.steer_course(required_course,for_seconds)
 
         self.servo.set_position.assert_has_calls([call(5),call(15),call(25),call(30)])
         self.timer.wait_for.assert_has_calls([call(1),call(1),call(1)])
+
+    def test_should_not_steer_right_into_the_no_go_zone(self):
+        self.sensors.track = 180
+        self.sensors.wind_direction = 225
+        self.helm.previous_track = 180
+        required_course = 190
+        for_seconds = 2
+        no_go_angle = 45
+
+        self.helm.steer_course(required_course,for_seconds,no_go_angle)
+
+        self.assertEqual(self.servo.set_position.call_count,0)
+        self.timer.wait_for.assert_has_calls([call(1),call(1)])
+
+    def test_should_not_steer_left_into_the_no_go_zone(self):
+        self.sensors.track = 180
+        self.sensors.wind_direction = 135
+        self.helm.previous_track = 180
+        required_course = 170
+        for_seconds = 2
+        no_go_angle = 45
+
+        self.helm.steer_course(required_course,for_seconds,no_go_angle)
+
+        self.assertEqual(self.servo.set_position.call_count,0)
+        self.timer.wait_for.assert_has_calls([call(1),call(1)])

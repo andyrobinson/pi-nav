@@ -16,10 +16,7 @@ class SailingHelm:
         if abs(wind_course_angle) <= NO_GO_ANGLE:
             self._tack(requested_heading, wind_course_angle, for_seconds)
         else:
-            self._steer_straight(requested_heading, for_seconds)
-
-    def _steer_straight(self, requested_heading, for_seconds):
-        self.helm.steer_course(requested_heading, for_seconds)
+            self.helm.steer_course(requested_heading, for_seconds)
 
     def _tack(self, requested_heading, wind_course_angle, for_seconds):
         deflection = self._initial_tack_deflection(wind_course_angle)
@@ -27,7 +24,7 @@ class SailingHelm:
         first_tack_course = requested_heading + deflection
 
         if leg2 <= MIN_TACK_DURATION:
-            self._steer_course(first_tack_course, for_seconds)
+            self.helm.steer_course(first_tack_course, for_seconds)
         else:
             self.helm.steer_course(first_tack_course, leg1)
             self.helm.steer_course(first_tack_course - copysign(2 * NO_GO_ANGLE, deflection), leg2)
