@@ -20,24 +20,20 @@ class Helm():
             self.timer.wait_for(self.sleep_time)
             remaining_seconds = remaining_seconds - self.sleep_time
 
+
     def steer(self,requested_heading):
         track = self.sensors.track
 
         if isNaN(track):
             self._set_rudder_angle(0)
-        else:
-            turn_angle = angle_between(track,requested_heading)
-            rate_of_turn = angle_between(self.previous_track,track)
-            ignore_below = self.config['ignore deviation below']
+            return
 
-            if abs(turn_angle) <  ignore_below and abs(rate_of_turn) < ignore_below:
-                return
+        turn_angle = angle_between(track,requested_heading)
+        rate_of_turn = angle_between(self.previous_track,track)
+        ignore_below = self.config['ignore deviation below']
 
-            new_rudder_angle = self._calculate_rudder_angle(turn_angle,rate_of_turn)
-            self.logger.debug('Helm, steering {:.1f}, tracking {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
-                .format(requested_heading,track,rate_of_turn,self.rudder_angle,new_rudder_angle))
-            self._set_rudder_angle(new_rudder_angle)
-            self.previous_track = track
+        if abs(turn_angle) > ignore_below or abs(rate_of_turn) > ignore_below:
+            self._correct_steering(rate_of_turn, requested_heading, track, turn_angle)
 
     def _calculate_rudder_angle(self,turn_angle,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (turn_angle - rate_of_turn)
@@ -48,3 +44,10 @@ class Helm():
         self.rudder_angle = angle
         self.rudder_servo.set_position(angle)
 
+    def _correct_steering(self, rate_of_turn, requested_heading, track, turn_angle):
+        new_rudder_angle = self._calculate_rudder_angle(turn_angle, rate_of_turn)
+        self.logger.debug(
+            'Helm, steering {:.1f}, tracking {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
+            .format(requested_heading, track, rate_of_turn, self.rudder_angle, new_rudder_angle))
+        self._set_rudder_angle(new_rudder_angle)
+        self.previous_track = track

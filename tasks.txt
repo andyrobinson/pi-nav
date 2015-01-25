@@ -4,9 +4,10 @@ Epic - steering using servo
 Epic - sailing
 Current tasks
 - decide what to do about changes or differences in wind direction during tack
-- create class to control sail angle based on relative wind, give to helm (?callback to sailing helm)
+    - use thw lower level heml steer method (yippee)
+- create class to control sail angle based on relative wind, use in the sailing helm
 - plumb sailing helm into wiring
-- update sensors to include both relative (to boat) and absolute wind directions - adjust absolute for speed?
+- update sensors to include both relative (to boat) and absolute wind directions - adjust absolute for speed - think I need wind speed to do this
 - move constants into config for sailing_helm and navigator
 
 For later
