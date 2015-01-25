@@ -13,18 +13,6 @@ class Helm():
         self.previous_track = 0
         self.sleep_time = config['sleep time']
 
-    def steer_course(self,requested_heading,for_seconds, no_go_angle = 0):
-        remaining_seconds = for_seconds
-        while remaining_seconds > 0:
-            heading_wind_diff = angle_between(requested_heading, self.sensors.wind_direction)
-            if abs(heading_wind_diff) <= no_go_angle:
-                self.steer(requested_heading - copysign(no_go_angle - abs(heading_wind_diff),heading_wind_diff))
-            else:
-                self.steer(requested_heading)
-            self.timer.wait_for(self.sleep_time)
-            remaining_seconds = remaining_seconds - self.sleep_time
-
-
     def steer(self,requested_heading):
         track = self.sensors.track
 

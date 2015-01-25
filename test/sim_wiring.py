@@ -11,6 +11,7 @@ from timer import Timer
 from track import Tracker
 from config import CONFIG
 from helm import Helm
+from course_steerer import CourseSteerer
 
 from simulate.fake_vehicle import FakeVehicle
 from simulate.fake_vehicle_gps import FakeVehicleGPS
@@ -45,7 +46,8 @@ class SimWiring():
         self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.vehicle.timer,self.console_logger, CONFIG['helm'])
-        self.navigator_simulator = Navigator(self.sensors,self.helm,self.globe,self.console_logger,CONFIG['navigator'])
+        self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer)
+        self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.console_logger,CONFIG['navigator'])
         self.follower_simulator =  Follower(self.navigator_simulator,self.console_logger)
         self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 

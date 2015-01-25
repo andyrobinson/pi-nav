@@ -3,6 +3,7 @@ setup_test()
 import unittest
 from mock import Mock, call
 from helm import Helm
+from course_steerer import CourseSteerer
 from config import CONFIG
 
 FULL_DEFLECTION = CONFIG['helm']['full deflection']
@@ -16,6 +17,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         self.timer = Mock()
 
         self.helm = Helm(self.sensors,self.servo,self.timer,Mock(),CONFIG['helm'])
+        self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer)
         self.servo.reset_mock()
 
     def test_should_return_immediately_if_time_has_expired(self):
@@ -23,7 +25,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         required_course = 180
         for_zero_seconds = 0
 
-        self.helm.steer_course(required_course,for_zero_seconds)
+        self.course_steerer.steer_course(required_course,for_zero_seconds)
 
         self.assertEqual(self.servo.set_position.call_count,0)
 
@@ -33,7 +35,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         required_course = 180
         for_one_second = 1
 
-        self.helm.steer_course(required_course,for_one_second)
+        self.course_steerer.steer_course(required_course,for_one_second)
 
         self.servo.set_position.assert_called_with(20)
         self.timer.wait_for.assert_called_with(1)
@@ -44,7 +46,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         required_course = 180
         for_seconds = 4
 
-        self.helm.steer_course(required_course,for_seconds)
+        self.course_steerer.steer_course(required_course,for_seconds)
 
         self.servo.set_position.assert_has_calls([call(5),call(15),call(25),call(30)])
         self.timer.wait_for.assert_has_calls([call(1),call(1),call(1)])
@@ -57,7 +59,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         for_seconds = 2
         no_go_angle = 45
 
-        self.helm.steer_course(required_course,for_seconds,no_go_angle)
+        self.course_steerer.steer_course(required_course,for_seconds,no_go_angle)
 
         self.assertEqual(self.servo.set_position.call_count,0)
         self.timer.wait_for.assert_has_calls([call(1),call(1)])
@@ -70,7 +72,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         for_seconds = 2
         no_go_angle = 45
 
-        self.helm.steer_course(required_course,for_seconds,no_go_angle)
+        self.course_steerer.steer_course(required_course,for_seconds,no_go_angle)
 
         self.assertEqual(self.servo.set_position.call_count,0)
         self.timer.wait_for.assert_has_calls([call(1),call(1)])

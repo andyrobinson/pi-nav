@@ -8,7 +8,7 @@ from sim_wiring import SimWiring
 from globe import Globe
 from sensors import Sensors
 from navigator import Navigator
-from helm import Helm
+from course_steerer import CourseSteerer
 
 class TestSimWiring(unittest.TestCase):
 
@@ -29,9 +29,9 @@ class TestSimWiring(unittest.TestCase):
         navigator = self.wiring.navigator_simulator
         self.assertTrue(isinstance(navigator.sensors,Sensors))
 
-    def test_navigator_should_use_real_heml(self):
+    def test_navigator_should_use_course_steerer(self):
         navigator = self.wiring.navigator_simulator
-        self.assertTrue(isinstance(navigator.helm,Helm))
+        self.assertTrue(isinstance(navigator.helm,CourseSteerer))
 
     def test_follower_simulator_should_use_navigator(self):
         follower = self.wiring.follower_simulator
