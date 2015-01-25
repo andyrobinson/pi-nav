@@ -49,7 +49,7 @@ class TestWiring(unittest.TestCase):
     def test_should_return_helm_with_all_dependencies(self):
         helm = self.wiring.helm
         self.assertTrue(isinstance(helm,Helm))
-        self.assertEqual(helm.config,CONFIG['helm'])
+        self.assertEqual(helm.full_deflection,CONFIG['helm']['full deflection'])
         self.assertEqual(helm.logger,self.wiring.application_logger)
         self.assertEqual(helm.sensors,self.wiring.sensors)
         self.assertEqual(helm.rudder_servo,self.wiring.rudder_servo)

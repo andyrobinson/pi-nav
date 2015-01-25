@@ -37,8 +37,12 @@ class TestSimWiring(unittest.TestCase):
         follower = self.wiring.follower_simulator
         self.assertTrue(isinstance(follower.navigator,Navigator))
 
-    def test_helm_should_use_fake_servo_and_timer(self):
+    def test_helm_should_use_fake_servo(self):
         helm = self.wiring.helm
         vehicle = self.wiring.vehicle
         self.assertEqual(helm.rudder_servo,vehicle.rudder)
-        self.assertEqual(helm.timer,vehicle.timer)
+
+    def test_course_steerer_should_use_vehicle_timer(self):
+        vehicle = self.wiring.vehicle
+        course_steerer = self.wiring.course_steerer
+        self.assertEqual(course_steerer.timer,vehicle.timer)

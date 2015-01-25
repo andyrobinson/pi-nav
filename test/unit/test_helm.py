@@ -14,8 +14,7 @@ class TestHelm(unittest.TestCase):
         self.sensors = Mock()
         self.servo = Mock()
         self.logger = Mock()
-        timer = Mock()
-        self.helm = Helm(self.sensors,self.servo,timer,self.logger, CONFIG['helm'])
+        self.helm = Helm(self.sensors,self.servo,self.logger, CONFIG['helm'])
         self.helm.previous_track = 180
 
     def currently_tracking(self,previous_track, current_track, rudder_angle=0):

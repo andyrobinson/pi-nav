@@ -3,15 +3,14 @@ from nan import isNaN
 from bearing import angle_between
 
 class Helm():
-    def __init__(self,sensors,rudder_servo,timer,logger, config):
+    def __init__(self,sensors,rudder_servo,logger,config):
         self.sensors = sensors
         self.rudder_servo = rudder_servo
         self.rudder_angle = 0
-        self.config = config
-        self.timer = timer
         self.logger = logger
         self.previous_track = 0
-        self.sleep_time = config['sleep time']
+        self.ignore_below = config['ignore deviation below']
+        self.full_deflection = config['full deflection']
 
     def steer(self,requested_heading):
         track = self.sensors.track
@@ -22,14 +21,13 @@ class Helm():
 
         turn_angle = angle_between(track,requested_heading)
         rate_of_turn = angle_between(self.previous_track,track)
-        ignore_below = self.config['ignore deviation below']
 
-        if abs(turn_angle) > ignore_below or abs(rate_of_turn) > ignore_below:
+        if abs(turn_angle) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
             self._correct_steering(rate_of_turn, requested_heading, track, turn_angle)
 
     def _calculate_rudder_angle(self,turn_angle,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (turn_angle - rate_of_turn)
-        unsigned_rudder_angle = min(self.config['full deflection'],abs(rate_adjusted_turn_angle))
+        unsigned_rudder_angle = min(self.full_deflection,abs(rate_adjusted_turn_angle))
         return copysign(unsigned_rudder_angle,rate_adjusted_turn_angle)
 
     def _set_rudder_angle(self,angle):

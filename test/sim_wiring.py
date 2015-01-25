@@ -45,7 +45,7 @@ class SimWiring():
         self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1)
         self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
         self.sensors = Sensors(self.vehicle.gps)
-        self.helm = Helm(self.sensors,self.vehicle.rudder,self.vehicle.timer,self.console_logger, CONFIG['helm'])
+        self.helm = Helm(self.sensors,self.vehicle.rudder,self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.console_logger,CONFIG['navigator'])
         self.follower_simulator =  Follower(self.navigator_simulator,self.console_logger)
