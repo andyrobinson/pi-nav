@@ -5,9 +5,9 @@ MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
 DISTANCE_FRACTION_TO_STEER = 0.75
 
 class Navigator():
-    def __init__(self,sensors,helm,globe,logger,config):
+    def __init__(self,sensors,course_steerer,globe,logger,config):
+        self.course_steerer = course_steerer
         self.sensors = sensors
-        self.helm = helm
         self.globe = globe
         self.logger = logger
         self.bearing = 0.0
@@ -27,7 +27,7 @@ class Navigator():
                 self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
                     .format(destination_waypoint.latitude,destination_waypoint.longitude, bearing, self._distance(current_position,destination_waypoint)))
 
-            self.helm.steer_course(self.bearing, time_to_steer)
+            self.course_steerer.steer_course(self.bearing, time_to_steer)
             current_position = self.sensors.position
 
         self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(destination_waypoint.latitude,destination_waypoint.longitude))
@@ -36,7 +36,7 @@ class Navigator():
         min_time = self.config['min time to steer']
         max_time = self.config['max time to steer']
         speed = max(MIN_SPEED_FOR_STEER_TIME_CALCULATION,self.sensors.speed)
-        #by some quirk max and min remove NaN if there is a real number in the first position
+        #by some quirk max and min remove NaN if tNhere is a real number in the first position
         result = min(max_time, max(min_time, DISTANCE_FRACTION_TO_STEER * self._distance(position,destination_waypoint)/speed))
         return int(result)
 

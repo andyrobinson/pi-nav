@@ -2,11 +2,11 @@ from bearing import angle_between
 from math import copysign
 
 class CourseSteerer:
-    def __init__(self,sensors, helm, timer):
+    def __init__(self,sensors, helm, timer,config):
         self.timer = timer
         self.helm = helm
         self.sensors = sensors
-        self.sleep_time = 1
+        self.sleep_time = config['sleep time']
 
     def steer_course(self, heading, duration, no_go_angle = 0):
         remaining_seconds = duration

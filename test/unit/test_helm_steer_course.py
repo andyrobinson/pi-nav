@@ -17,7 +17,7 @@ class TestHelmSteerCourse(unittest.TestCase):
         self.timer = Mock()
 
         self.helm = Helm(self.sensors,self.servo,self.timer,Mock(),CONFIG['helm'])
-        self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer)
+        self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.servo.reset_mock()
 
     def test_should_return_immediately_if_time_has_expired(self):

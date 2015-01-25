@@ -7,14 +7,13 @@ from timer import Timer
 from gps_reader import GpsReader
 from gps_console_writer import GpsConsoleWriter
 from globe import Globe
-from position import Position
-from waypoint import Waypoint
 from navigator import Navigator
 from follower import Follower
 from sensors import Sensors
 from config import CONFIG
 from servo import Servo
 from helm import Helm
+from course_steerer import CourseSteerer
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -37,7 +36,8 @@ class Wiring():
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.sensors,self.rudder_servo,self.timer,self.application_logger,CONFIG['helm'])
-        self.navigator = Navigator(self.sensors,self.helm,self.globe,self.application_logger,CONFIG['navigator'])
+        self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
+        self.navigator = Navigator(self.sensors,self.course_steerer,self.globe,self.application_logger,CONFIG['navigator'])
         self.follower = Follower(self.navigator,self.application_logger)
 
     def _rotating_logger(self,appname):

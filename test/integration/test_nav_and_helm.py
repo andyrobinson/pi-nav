@@ -30,7 +30,7 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.02,10.02),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,Mock(),self.logger, CONFIG['helm'])
-        course_steerer = CourseSteerer(gps,helm,Mock())
+        course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
         navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
 
         navigator.to(destination)
@@ -44,7 +44,7 @@ class TestNavigationAndHelm(unittest.TestCase):
     def test_should_steer_to_next_waypoint_with_kink_in_route(self):
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,Mock(),self.logger, CONFIG['helm'])
-        course_steerer = CourseSteerer(gps,helm,Mock())
+        course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
         navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
         destination = Waypoint(Position(10.03,10.03),10)
         navigator.to(destination)
@@ -58,7 +58,7 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.0003,10.0003),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         helm = Helm(gps,self.servo,Mock(),self.logger, CONFIG['helm'])
-        course_steerer = CourseSteerer(gps,helm,Mock())
+        course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
         navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
 
         navigator.to(destination)
