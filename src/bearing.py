@@ -9,4 +9,4 @@ def angle_between(bearing1,bearing2):
 def to_360(bearing):
     if bearing < 0:
         return bearing + 360
-    return bearing
+    return bearing % 360

@@ -3,6 +3,7 @@ Epic - steering using servo
 
 Epic - sailing
 Current tasks
+- make sure that Course Steerer gives the helm a bearing between 0 and 360 to steer
 - decide what to do about changes or differences in wind direction during tack
     - use thw lower level heml steer method (yippee)
 - create class to control sail angle based on relative wind, use in the sailing helm

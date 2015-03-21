@@ -36,7 +36,7 @@ class Navigator():
         min_time = self.config['min time to steer']
         max_time = self.config['max time to steer']
         speed = max(MIN_SPEED_FOR_STEER_TIME_CALCULATION,self.sensors.speed)
-        #by some quirk max and min remove NaN if tNhere is a real number in the first position
+        #by some quirk max and min remove NaN if there is a real number in the first position
         result = min(max_time, max(min_time, DISTANCE_FRACTION_TO_STEER * self._distance(position,destination_waypoint)/speed))
         return int(result)
 
