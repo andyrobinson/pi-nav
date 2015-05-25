@@ -8,7 +8,8 @@ apt-get install git gpsd gpsd-clients python-gps python-serial
 mv /boot/cmdline.txt /boot/cmdlinetxt_$(date +"%Y%m%d").bak
 echo dwc_otg.lpm_enable=0console=tty1root=/dev/mmcblk0p2rootfstype=ext4elevator=deadlinerootwait > /boot/cmdline.txt
 
-# Disable tty listener in /etc/inittab
+# Disable tty listener in /etc/inittab, bit crude, stop double # comments after
+sed -e 's/T0/#T0/;s/##/#/' -i.bak /etc/inittab
 # ADD COMMENT HASH TO THIS LINE - T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
 
 # setup GPSD and make it start on reboot
