@@ -58,3 +58,12 @@ class TestBearing(unittest.TestCase):
         self.assertEqual(to_360(-5),355)
         self.assertEqual(to_360(-89),271)
         self.assertEqual(to_360(-177),183)
+
+    def test_to_360_should_make_360_zero_as_they_are_the_same(self):
+        self.assertEqual(to_360(0),0)
+        self.assertEqual(to_360(360),0)
+
+    def test_to_360_should_subtract_360_from_values_greater_than_360(self):
+        self.assertEqual(to_360(380),20)
+        self.assertEqual(to_360(800),80)
+        self.assertEqual(to_360(719),359)
