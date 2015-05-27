@@ -56,7 +56,7 @@ class Wiring():
 
     def showgps(self):
         try:
-            self.timer().call(self.gps_console_writer.write).every(5)
+            self.timer.call(self.gps_console_writer.write).every(5)
         except (KeyboardInterrupt, SystemExit):
             self.gps.running = False
             self.gps.join()
