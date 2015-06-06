@@ -52,6 +52,8 @@ class Wiring():
     def gps(self):
         if not self._gps:
             self._gps = GpsReader()
+            self._gps.setDaemon(True)
+            self._gps.start()
         return self._gps
 
     def showgps(self):
