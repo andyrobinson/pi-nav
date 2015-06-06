@@ -8,6 +8,7 @@ DEFAULT_COMMAND = 'test'
 
 from src import wiring
 from test import sim_wiring
+from src import routes
 
 def wiring_inst():
     return wiring.Wiring()
@@ -39,7 +40,7 @@ if __name__ == '__main__':
         sim.follow_route(sim_wiring.TWENTY_METRE_HOURGLASS)
         
     if command == 'nav':
-        wiring_inst().follow(sim_wiring.TEN_METRE_SQUARE)
+        wiring_inst().follow(routes.CHORLTON_TOUR)
 
     if command == 'clean':
         for path,dirs,filenames in os.walk('.'):

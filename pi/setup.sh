@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # Install all required packages
 apt-get update
@@ -21,4 +22,4 @@ update-rc.d /etc/init.d/gpsd defaults
 mv /etc/rc.local /etc/rclocal__$(date +"%Y%m%d").bak
 cp -f ./etc/rc.local /etc
 
-sudo reboot
+echo 'if there were no errors, reboot to finish set up'
