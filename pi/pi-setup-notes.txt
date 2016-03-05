@@ -58,4 +58,24 @@ Install the pyserial library
 sudo apt-get install python-serial
 
 
+Enabling I2C Support
+====================
 
+Easy way is to use raspi-config, but also you can:
+
+Do the following installs:
+
+sudo apt-get install python-smbus python-dev i2c-tools
+
+add the following line to /boot/config.txt
+
+dtparam=i2c_arm=on
+
+add the following lines to /etc/modules:
+
+i2c_bcm2708
+i2c_dev
+
+Note: that a lot of instructions seem to mistakenly use a hyphen rather than an underscore... does this matter?
+sudo adduser pi i2c
+...I'm not convinced any of the other stuff is necessary
