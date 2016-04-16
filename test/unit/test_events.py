@@ -1,6 +1,7 @@
 from setup_test import setup_test
 setup_test()
 import unittest
+from mock import Mock, call
 from events import Event,Exchange
 
 class TestSubscriber:
@@ -32,63 +33,63 @@ class TestSubscriber:
         self.exchange.signal_secondary_event(name)
 
 class TestEvents(unittest.TestCase):
+    def setUp(self):
+        self.mock_logger = Mock()
+        self.exchange = Exchange(self.mock_logger)
 
     def test_should_return_nil_event_if_not_called(self):
         ts = TestSubscriber()
         self.assertEqual(ts.last_event_called.name,"nil")
 
     def test_should_call_back(self):
-        exchange = Exchange()
-        ts = TestSubscriber(exchange)
+        ts = TestSubscriber(self.exchange)
 
-        exchange.subscribe("thing",ts.callme)
-        exchange.publish(Event("thing"))
+        self.exchange.subscribe("thing",ts.callme)
+        self.exchange.publish(Event("thing"))
 
-        self.assertEqual(ts.last_event_called.name,"thing")
+    def test_should_ignore_events_with_no_subscribers_and_log_warning(self):
+        self.exchange.publish(Event("doesnotexist"))
+        self.mock_logger.warn.assert_called_with("Event(doesnotexist) published but no subscribers")
 
     def test_should_signal_events_to_multiple_subscribers(self):
-        exchange = Exchange()
-        ts1 = TestSubscriber(exchange)
-        ts2 = TestSubscriber(exchange)
+        ts1 = TestSubscriber(self.exchange)
+        ts2 = TestSubscriber(self.exchange)
 
-        exchange.subscribe("boo",ts1.callme)
-        exchange.subscribe("boo",ts2.callme)
-        exchange.publish(Event("boo"))
+        self.exchange.subscribe("boo",ts1.callme)
+        self.exchange.subscribe("boo",ts2.callme)
+        self.exchange.publish(Event("boo"))
 
         self.assertEqual(ts1.last_event_called.name,"boo")
         self.assertEqual(ts2.last_event_called.name,"boo")
 
     def test_should_be_able_to_chain_events(self):
-        exchange = Exchange()
-        ts1 = TestSubscriber(exchange)
-        ts2 = TestSubscriber(exchange)
+        ts1 = TestSubscriber(self.exchange)
+        ts2 = TestSubscriber(self.exchange)
 
-        exchange.subscribe("chain",ts1.callme)
-        exchange.subscribe("secondevent",ts2.callme)
-        exchange.publish(Event("chain"))
+        self.exchange.subscribe("chain",ts1.callme)
+        self.exchange.subscribe("secondevent",ts2.callme)
+        self.exchange.publish(Event("chain"))
 
         self.assertEqual(ts2.last_event_called.name,"secondevent")
 
     def test_should_chain_a_few_events(self):
-        exchange = Exchange()
-        ts = TestSubscriber(exchange)
-        ts2 = TestSubscriber(exchange)
+        ts = TestSubscriber(self.exchange)
+        ts2 = TestSubscriber(self.exchange)
 
-        exchange.subscribe("chain",ts.callme)
-        exchange.subscribe("secondevent",ts.callme)
-        exchange.subscribe("secondevent",ts2.callme)
-        exchange.publish(Event("chain"))
+        self.exchange.subscribe("chain",ts.callme)
+        self.exchange.subscribe("secondevent",ts.callme)
+        self.exchange.subscribe("secondevent",ts2.callme)
+        self.exchange.publish(Event("chain"))
 
         self.assertEqual(ts.event_call_count("secondevent"),1)
         self.assertEqual(ts2.event_call_count("secondevent"),1)
 
     def test_should_call_events_again_if_we_signal_primary_event_again(self):
-        exchange = Exchange()
-        ts = TestSubscriber(exchange)
+        ts = TestSubscriber(self.exchange)
         event = Event("bing")
-        exchange.subscribe("bing",ts.callme)
-        exchange.publish(event)
-        exchange.publish(event)
-        exchange.publish(event)
+        self.exchange.subscribe("bing",ts.callme)
+        self.exchange.publish(event)
+        self.exchange.publish(event)
+        self.exchange.publish(event)
 
         self.assertEqual(ts.event_call_count("bing"),3)

@@ -12,6 +12,7 @@ from track import Tracker
 from config import CONFIG
 from helm import Helm
 from course_steerer import CourseSteerer
+from events import Exchange
 
 from simulate.fake_vehicle import FakeVehicle
 from simulate.fake_vehicle_gps import FakeVehicleGPS
@@ -42,13 +43,14 @@ class SimWiring():
         self.globe = Globe()
         self.timer = Timer()
         self.console_logger = self._console_logger()
+        self.exchange = Exchange(self.console_logger)
         self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1)
         self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.console_logger,CONFIG['navigator'])
-        self.follower_simulator =  Follower(self.navigator_simulator,self.console_logger)
+        self.follower_simulator =  Follower(self.exchange,self.navigator_simulator,self.console_logger)
         self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 
     def _console_logger(self):

@@ -1,10 +1,12 @@
 class Event:
-    def __init__(self,name):
+    def __init__(self,name,waypoint = None):
         self.name = name
+        self.waypoint = waypoint
 
 class Exchange:
 
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.register = {}
         self.events = []
         self.processing = False
@@ -21,8 +23,11 @@ class Exchange:
             self._process_events()
 
     def _send_event(self,event):
-        for callback in self.register[event.name]:
-            callback(event)
+        if event.name in self.register:
+            for callback in self.register[event.name]:
+                callback(event)
+        else:
+            self.logger.warn("Event({}) published but no subscribers".format(event.name))
 
     def _process_events(self):
         self.processing = True

@@ -14,6 +14,7 @@ from config import CONFIG
 from servo import Servo
 from helm import Helm
 from course_steerer import CourseSteerer
+from events import Exchange
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -32,13 +33,14 @@ class Wiring():
         self.timer = Timer()
         self.tracker = Tracker(self._rotating_logger("track"),self.gps,self.timer)
         self.application_logger = self._rotating_logger(APPLICATION_NAME)
+        self.exchange = Exchange(self.application_logger)
         self.sensors = Sensors(self.gps)
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.navigator = Navigator(self.sensors,self.course_steerer,self.globe,self.application_logger,CONFIG['navigator'])
-        self.follower = Follower(self.navigator,self.application_logger)
+        self.follower = Follower(self.exchange,self.navigator,self.application_logger)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
@@ -48,7 +50,7 @@ class Wiring():
         logger.setLevel( logging.INFO )
         return logger
 
-    @property        
+    @property
     def gps(self):
         if not self._gps:
             self._gps = GpsReader()

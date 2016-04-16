@@ -13,20 +13,22 @@ from navigator import Navigator
 from waypoint import Waypoint
 from globe import Globe
 from config import CONFIG
+from events import Exchange
 
 def print_msg(msg):
     print msg
 
 class TestFollower(unittest.TestCase):
-    
+
     def setUp(self):
         self.mock_logger = Mock()
         self.mock_logger.error = Mock(side_effect=print_msg)
+        self.exchange = Exchange(self.mock_logger)
         self.mock_helm = Mock()
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
         navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger, CONFIG['navigator'])
-        self.follower = Follower(navigator, self.mock_logger)
-    
+        self.follower = Follower(self.exchange,navigator,self.mock_logger)
+
     def test_should_navigate_along_list_of_waypoints_with_logging(self):
         waypoint1 = Waypoint(Position(11,11),10)
         waypoint2 = Waypoint(Position(13,13),10)
@@ -47,5 +49,5 @@ class TestFollower(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(11,11)])
 
         self.follower.follow_route([waypoint])
-        
+
         self.mock_helm.steer_course.assert_has_calls([call(44.42621683500943,CONFIG['navigator']['max time to steer'])])
