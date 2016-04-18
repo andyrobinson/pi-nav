@@ -25,21 +25,21 @@ class TestFollower(unittest.TestCase):
         self.exchange.subscribe(event_name,self.event_recorder)
 
     def test_should_signal_a_navigate_event_using_the_first_waypoint(self):
-        self.listen("navigate")
+        self.listen(Event.navigate)
 
         firstwaypoint = Waypoint(Position(1,1),5)
 
         self.follower.follow([firstwaypoint])
-        self.assertEqual(self.last_event.name,"navigate")
+        self.assertEqual(self.last_event.name,Event.navigate)
         self.assertEqual(self.last_event.waypoint,firstwaypoint)
 
     def test_should_navigate_to_the_next_waypoint_when_a_waypoint_is_reached(self):
-        self.listen("navigate")
+        self.listen(Event.navigate)
 
         waypoint1 = Waypoint(Position(1,1),5)
         waypoint2 = Waypoint(Position(2,2),5)
         self.follower.follow([waypoint1,waypoint2])
-        self.exchange.publish(Event("arrived",waypoint1))
+        self.exchange.publish(Event(Event.arrived,waypoint1))
 
         self.assertEqual(self.last_event.waypoint,waypoint2)
 
@@ -49,8 +49,8 @@ class TestFollower(unittest.TestCase):
 
         self.follower.follow([waypoint1,waypoint2])
 
-        self.exchange.publish(Event("arrived",waypoint1))
-        self.exchange.publish(Event("arrived",waypoint2))
+        self.exchange.publish(Event(Event.arrived,waypoint1))
+        self.exchange.publish(Event(Event.arrived,waypoint2))
 
         self.mock_logger.info.assert_has_calls(
             [call('Follower, next waypoint {:+f},{:+f}'.format(waypoint1.longitude, waypoint1.latitude)),
