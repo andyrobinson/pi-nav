@@ -33,17 +33,18 @@ write_byte(0, 0b01110000) # Set to 8 samples @ 15Hz
 write_byte(1, 0b00100000) # 1.3 gain LSb / Gauss 1090 (default)
 write_byte(2, 0b00000000) # Continuous sampling
 
-scale = 0.92
-
 while True:
     try:     
-        x_out = read_word_2c(3) * scale
-        y_out = read_word_2c(7) * scale
-        z_out = read_word_2c(5) * scale
-        bearing  = math.atan2(y_out, x_out) 
+        x_out = read_word_2c(3) * 1.01
+        y_out = read_word_2c(7) * 0.9
+        z_out = read_word_2c(5)
+        y_adj = y_out * 1.1 + 335
+        x_adj = x_out - 215
+        bearing  = math.atan2(y_adj, x_adj) 
         if (bearing < 0):
             bearing += 2 * math.pi
-        print x_out,y_out,z_out, " bearing: ", math.degrees(bearing)
-        time.sleep(1)
+        print x_adj,y_adj,z_out, " bearing: ", math.degrees(bearing)
+        #print x_adj,",",y_adj
+        time.sleep(0.1)
     except(KeyboardInterrupt):
         quit()
