@@ -1,3 +1,5 @@
+import sys
+
 class Event:
     tick = 1
     start = 2
@@ -31,9 +33,22 @@ class Exchange:
     def _send_event(self,event):
         if event.name in self.register:
             for callback in self.register[event.name]:
-                callback(event)
+                self._safely_callback(callback,event)
         else:
             self.logger.warn("Event({}) published but no subscribers".format(event.name))
+
+    def _safely_callback(self,callback,event):
+        try:
+            callback(event)
+        except(KeyboardInterrupt):
+            quit()
+        except:
+            try:
+                etype,e,traceback = sys.exc_info()
+                self.logger.error('Exchange, {0}: {1}'.format(etype.__name__,', '.join(str(x) for x in e.args)))
+                self.logger.error('Caused by event {0}, callback {1}'.format(event.name,str(callback)))
+            except:
+                pass
 
     def _process_events(self):
         self.processing = True
@@ -41,6 +56,7 @@ class Exchange:
         while i < len(self.events):
             self._send_event(self.events[i])
             i = i + 1
+
         self._end_processing()
 
     def _end_processing(self):

@@ -42,6 +42,11 @@ LSM303_MAGGAIN_4_7 = 0xA0 # +/- 4.7
 LSM303_MAGGAIN_5_6 = 0xC0 # +/- 5.6
 LSM303_MAGGAIN_8_1 = 0xE0 # +/- 8.1
 
+import smbus
+import time
+import math
+
+bus = smbus.SMBus(1)
 
 class LSM303(object):
     """LSM303 accelerometer & magnetometer."""

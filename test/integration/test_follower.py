@@ -26,14 +26,14 @@ class TestFollower(unittest.TestCase):
         self.exchange = Exchange(self.mock_logger)
         self.mock_helm = Mock()
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
-        navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger, CONFIG['navigator'])
-        self.follower = Follower(self.exchange,navigator,self.mock_logger)
+        self.navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger, CONFIG['navigator'])
 
     def test_should_navigate_along_list_of_waypoints_with_logging(self):
         waypoint1 = Waypoint(Position(11,11),10)
         waypoint2 = Waypoint(Position(13,13),10)
+        follower = Follower(self.exchange,self.navigator,[waypoint1,waypoint2],self.mock_logger)
 
-        self.follower.follow_route([waypoint1,waypoint2])
+        follower.follow_route()
 
         self.mock_logger.info.assert_has_calls(
             [call('Follower, next waypoint +11.000000,+11.000000'),
@@ -47,7 +47,8 @@ class TestFollower(unittest.TestCase):
     def test_should_steer_towards_waypoints(self):
         waypoint = Waypoint(Position(11,11),10)
         gps = FakeMovingGPS([Position(10,10),Position(11,11)])
+        follower = Follower(self.exchange,self.navigator,[waypoint],self.mock_logger)
 
-        self.follower.follow_route([waypoint])
+        follower.follow_route()
 
         self.mock_helm.steer_course.assert_has_calls([call(44.42621683500943,CONFIG['navigator']['max time to steer'])])

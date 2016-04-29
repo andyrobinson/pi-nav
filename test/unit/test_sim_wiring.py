@@ -1,4 +1,4 @@
-from setup_test import setup_test 
+from setup_test import setup_test
 setup_test()
 
 import unittest
@@ -9,12 +9,14 @@ from globe import Globe
 from sensors import Sensors
 from navigator import Navigator
 from course_steerer import CourseSteerer
+from waypoint import Waypoint
+from position import Position
 
 class TestSimWiring(unittest.TestCase):
 
     def setUp(self):
         self.wiring = SimWiring()
-        
+
     def test_should_return_singleton_globe(self):
         globe = self.wiring.globe
         self.assertEqual(globe, self.wiring.globe)
@@ -34,7 +36,7 @@ class TestSimWiring(unittest.TestCase):
         self.assertTrue(isinstance(navigator.course_steerer,CourseSteerer))
 
     def test_follower_simulator_should_use_navigator(self):
-        follower = self.wiring.follower_simulator
+        follower = self.wiring._follower([])
         self.assertTrue(isinstance(follower.navigator,Navigator))
 
     def test_helm_should_use_fake_servo(self):

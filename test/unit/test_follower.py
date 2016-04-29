@@ -16,7 +16,7 @@ class TestFollower(unittest.TestCase):
         self.mock_navigator = Mock()
         self.mock_logger = Mock()
         self.exchange = Exchange(self.mock_logger)
-        self.follower = Follower(self.exchange,self.mock_navigator, self.mock_logger)
+        self.last_event = Event("no event fired")
 
     def event_recorder(self,event):
         self.last_event = event
@@ -26,29 +26,38 @@ class TestFollower(unittest.TestCase):
 
     def test_should_signal_a_navigate_event_using_the_first_waypoint(self):
         self.listen(Event.navigate)
-
         firstwaypoint = Waypoint(Position(1,1),5)
+        follower = Follower(self.exchange,self.mock_navigator, [firstwaypoint],self.mock_logger)
 
-        self.follower.follow([firstwaypoint])
+        self.exchange.publish(Event(Event.start))
         self.assertEqual(self.last_event.name,Event.navigate)
         self.assertEqual(self.last_event.waypoint,firstwaypoint)
 
     def test_should_navigate_to_the_next_waypoint_when_a_waypoint_is_reached(self):
         self.listen(Event.navigate)
-
         waypoint1 = Waypoint(Position(1,1),5)
         waypoint2 = Waypoint(Position(2,2),5)
-        self.follower.follow([waypoint1,waypoint2])
+        follower = Follower(self.exchange,self.mock_navigator, [waypoint1,waypoint2],self.mock_logger)
+
+        self.exchange.publish(Event(Event.start))
         self.exchange.publish(Event(Event.arrived,waypoint1))
 
         self.assertEqual(self.last_event.waypoint,waypoint2)
+
+    def test_should_signal_end_when_all_waypoints_exhausted(self):
+        self.listen(Event.end)
+        follower = Follower(self.exchange,self.mock_navigator, [],self.mock_logger)
+
+        self.exchange.publish(Event(Event.start))
+        self.assertEqual(self.last_event.name,Event.end)
 
     def test_should_navigate_along_list_of_waypoints_with_logging(self):
         waypoint1 = Waypoint(Position(1,1),5)
         waypoint2 = Waypoint(Position(2,2),5)
 
-        self.follower.follow([waypoint1,waypoint2])
+        follower = Follower(self.exchange,self.mock_navigator, [waypoint1,waypoint2],self.mock_logger)
 
+        self.exchange.publish(Event(Event.start))
         self.exchange.publish(Event(Event.arrived,waypoint1))
         self.exchange.publish(Event(Event.arrived,waypoint2))
 
@@ -56,49 +65,3 @@ class TestFollower(unittest.TestCase):
             [call('Follower, next waypoint {:+f},{:+f}'.format(waypoint1.longitude, waypoint1.latitude)),
              call('Follower, next waypoint {:+f},{:+f}'.format(waypoint2.longitude, waypoint2.latitude)),
              call('Follower, all waypoints reached, navigation complete')])
-
-#  Interestingly errors are no longer handled at this level.  We need something that
-#  Feeds the (timer based) event stream higher up, and can catch all errors
-#  Maybe we add this to the follow method; not sure
-
-    # def test_errors_should_be_logged_and_navigation_continues(self):
-    #     position1 = Position(11,11)
-    #     position2 = Position(12,12)
-    #
-    #     TestFollower.raise_error = True
-    #
-    #     def fail_first_time(self):
-    #         if TestFollower.raise_error:
-    #             TestFollower.raise_error = False
-    #             raise RuntimeError('oops')
-    #
-    #     mock_nav = Mock()
-    #     mock_nav.configure_mock(**{'to.side_effect': fail_first_time})
-    #
-    #     follower = Follower(mock_nav, self.mock_logger)
-    #
-    #     follower.follow_route([position1,position2])
-    #     mock_nav.to.assert_has_calls([call(position1),call(position2)])
-    #     self.mock_logger.error.assert_called_with('Follower, RuntimeError: oops')
-    #
-    # def test_errors_during_error_logging_should_be_skipped_and_navigation_continues(self):
-    #     position1 = Position(11,11)
-    #     position2 = Position(12,12)
-    #
-    #     TestFollower.raise_error = True
-    #
-    #     def fail_first_time(self):
-    #         if TestFollower.raise_error:
-    #             TestFollower.raise_error = False
-    #             raise RuntimeError('oops')
-    #
-    #     mock_nav = Mock()
-    #     mock_nav.configure_mock(**{'to.side_effect': fail_first_time})
-    #
-    #     mock_logger = Mock()
-    #     mock_logger.configure_mock(**{'error.side_effect': RuntimeError})
-    #
-    #     follower = Follower(mock_nav, mock_logger)
-    #
-    #     follower.follow_route([position1,position2])
-    #     mock_nav.to.assert_has_calls([call(position1),call(position2)])

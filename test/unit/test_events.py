@@ -17,6 +17,9 @@ class TestSubscriber:
         if event.name == "chain":
             self.exchange.publish(Event("secondevent"))
 
+    def bad_call(self,event):
+        raise RuntimeError('oops')
+
     def event_call_count(self,name):
         return self.event_count[name]
 
@@ -93,3 +96,55 @@ class TestEvents(unittest.TestCase):
         self.exchange.publish(event)
 
         self.assertEqual(ts.event_call_count("bing"),3)
+
+    def test_errors_should_be_logged_and_event_processing_continues(self):
+        ts_error = TestSubscriber(self.exchange)
+        ts_after_error = TestSubscriber(self.exchange)
+        event = Event("bong")
+        self.exchange.subscribe("bong",ts_error.bad_call)
+        self.exchange.subscribe("bong",ts_after_error.callme)
+
+        self.exchange.publish(event)
+
+        self.mock_logger.error.assert_has_calls([call('Exchange, RuntimeError: oops')])
+        self.assertEqual(ts_after_error.event_call_count("bong"),1)
+
+
+    def test_errors_during_logging_should_be_ignored_and_event_processing_continues(self):
+        failing_logger = Mock()
+        failing_logger.configure_mock(**{'error.side_effect': RuntimeError})
+
+        exchange = Exchange(failing_logger)
+        ts_error = TestSubscriber(exchange)
+        ts_after_error = TestSubscriber(exchange)
+
+        event = Event("bong")
+        exchange.subscribe("bong",ts_error.bad_call)
+        exchange.subscribe("bong",ts_after_error.callme)
+
+        exchange.publish(event)
+
+        failing_logger.error.assert_has_calls([call('Exchange, RuntimeError: oops')])
+        self.assertEqual(ts_after_error.event_call_count("bong"),1)
+
+            # def test_errors_during_error_logging_should_be_skipped_and_navigation_continues(self):
+            #     position1 = Position(11,11)
+            #     position2 = Position(12,12)
+            #
+            #     TestFollower.raise_error = True
+            #
+            #     def fail_first_time(self):
+            #         if TestFollower.raise_error:
+            #             TestFollower.raise_error = False
+            #             raise RuntimeError('oops')
+            #
+            #     mock_nav = Mock()
+            #     mock_nav.configure_mock(**{'to.side_effect': fail_first_time})
+            #
+            #     mock_logger = Mock()
+            #     mock_logger.configure_mock(**{'error.side_effect': RuntimeError})
+            #
+            #     follower = Follower(mock_nav, mock_logger)
+            #
+            #     follower.follow_route([position1,position2])
+            #     mock_nav.to.assert_has_calls([call(position1),call(position2)])

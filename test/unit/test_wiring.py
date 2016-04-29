@@ -1,4 +1,4 @@
-from setup_test import setup_test 
+from setup_test import setup_test
 setup_test()
 
 import unittest
@@ -21,7 +21,7 @@ class TestWiring(unittest.TestCase):
     def test_should_return_stub_gps_for_test_purposes(self):
         gps = self.wiring.gps
         self.assertTrue(isinstance(gps,StubGPS))
-        
+
     def test_should_return_singleton_globe(self):
         globe = self.wiring.globe
         self.assertEqual(globe, self.wiring.globe)
@@ -62,10 +62,3 @@ class TestWiring(unittest.TestCase):
     def test_should_use_corrct_config_in_navigator(self):
         navigator = self.wiring.navigator
         self.assertEqual(navigator.config,CONFIG['navigator'])
-
-    def test_should_return_follower(self):
-        follower = self.wiring.follower
-        self.assertTrue(isinstance(follower,Follower))
-        self.assertEqual(follower.logger,self.wiring.application_logger)
-        self.assertEqual(follower.navigator, self.wiring.navigator)
-
