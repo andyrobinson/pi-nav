@@ -1,11 +1,11 @@
 import sys
 
 class Event:
-    tick = 1
-    start = 2
-    end = 3
-    navigate = 4
-    arrived = 5
+    tick = "tick"
+    start = "start"
+    end = "end"
+    navigate = "navigate"
+    arrived = "arrived"
 
     def __init__(self,name,waypoint = None):
         self.name = name

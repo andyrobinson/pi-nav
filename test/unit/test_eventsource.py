@@ -18,6 +18,11 @@ class TestEventSource(unittest.TestCase):
         self.last_listened_event = event
         self.event_count += 1
 
+    def intercept_publish(self,event):
+        self.exchange.original_publish(event)
+        if event.name == Event.tick:
+            raise RuntimeError("oops")
+
     def listen(self,event_name):
         self.event_count = 0
         self.exchange.subscribe(event_name,self.event_recorder)
@@ -38,7 +43,7 @@ class TestEventSource(unittest.TestCase):
         self.listen(Event.start)
         self.timer.wait_for = Mock(side_effect=self.finish)
 
-        event_source = EventSource(self.exchange,self.timer)
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
         event_source.start()
 
         self.assertEqual(self.last_listened_event.name,Event.start)
@@ -47,7 +52,7 @@ class TestEventSource(unittest.TestCase):
         self.listen(Event.tick)
         self.timer.wait_for = Mock(side_effect=self.finish)
 
-        event_source = EventSource(self.exchange,self.timer)
+        event_source = EventSource(self.exchange, self.timer, self.mock_logger)
         event_source.start()
 
         self.assertEqual(self.last_listened_event.name,Event.tick)
@@ -57,7 +62,38 @@ class TestEventSource(unittest.TestCase):
         self.after(5,Event.end)
         self.timer.wait_for = Mock(side_effect=self.count_down_ticks)
 
-        event_source = EventSource(self.exchange,self.timer)
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
         event_source.start()
 
         self.assertEqual(self.event_count,5)
+
+    def test_errors_should_be_logged_and_events_continue(self):
+        self.listen(Event.tick)
+        self.after(2,Event.end)
+        self.timer.wait_for = Mock(side_effect=self.count_down_ticks)
+
+        self.exchange.original_publish = self.exchange.publish
+        self.exchange.publish = self.intercept_publish
+
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
+        event_source.start()
+
+        self.mock_logger.error.assert_has_calls([call('EventSource, RuntimeError: oops')])
+        self.assertEqual(self.event_count,2)
+
+    def test_errors_during_logging_should_be_ignored_and_event_processing_continues(self):
+        failing_logger = Mock()
+        failing_logger.configure_mock(**{'error.side_effect': RuntimeError})
+
+        self.listen(Event.tick)
+        self.after(2,Event.end)
+        self.timer.wait_for = Mock(side_effect=self.count_down_ticks)
+
+        self.exchange.original_publish = self.exchange.publish
+        self.exchange.publish = self.intercept_publish
+
+        event_source = EventSource(self.exchange,self.timer, failing_logger)
+        event_source.start()
+
+        failing_logger.error.assert_has_calls([call('EventSource, RuntimeError: oops')])
+        self.assertEqual(self.event_count,2)

@@ -126,25 +126,3 @@ class TestEvents(unittest.TestCase):
 
         failing_logger.error.assert_has_calls([call('Exchange, RuntimeError: oops')])
         self.assertEqual(ts_after_error.event_call_count("bong"),1)
-
-            # def test_errors_during_error_logging_should_be_skipped_and_navigation_continues(self):
-            #     position1 = Position(11,11)
-            #     position2 = Position(12,12)
-            #
-            #     TestFollower.raise_error = True
-            #
-            #     def fail_first_time(self):
-            #         if TestFollower.raise_error:
-            #             TestFollower.raise_error = False
-            #             raise RuntimeError('oops')
-            #
-            #     mock_nav = Mock()
-            #     mock_nav.configure_mock(**{'to.side_effect': fail_first_time})
-            #
-            #     mock_logger = Mock()
-            #     mock_logger.configure_mock(**{'error.side_effect': RuntimeError})
-            #
-            #     follower = Follower(mock_nav, mock_logger)
-            #
-            #     follower.follow_route([position1,position2])
-            #     mock_nav.to.assert_has_calls([call(position1),call(position2)])
