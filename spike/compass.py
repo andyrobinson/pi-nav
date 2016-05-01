@@ -14,14 +14,17 @@ class I2C:
     def read8(self,register):
         return self.bus.read_byte_data(self.address, register)
 
-    def read16(self, register):
-        high = self.bus.read_byte_data(self.address, register)
-        low = self.bus.read_byte_data(self.address, register+1)
-        val = (high << 8) + low
+    def read16(self, register, high_low):
+        first = self.bus.read_byte_data(self.address, register)
+        second = self.bus.read_byte_data(self.address, register+1)
+        if high_low:
+           val = (first << 8) + second
+        else:
+           val = (second << 8) + first
         return val
 
-    def read16_2s_comp(self,register):
-        val = self.read16(register)
+    def read16_2s_comp(self,register,high_low=True):
+        val = self.read16(register,high_low)
         if (val >= 0x8000):
             return -((65535 - val) + 1)
         else:
@@ -34,6 +37,17 @@ compass = I2C(0x1e)
 compass.write8(0, 0b01110000) # Set to 8 samples @ 15Hz
 compass.write8(1, 0b00100000) # 1.3 gain LSb / Gauss 1090 (default)
 compass.write8(2, 0b00000000) # Continuous sampling
+
+accel = I2C(0x19)
+accel.write8(0x20,0b00110111) # Enable accelerometer, 25Hz, normal mode, all axes enabled
+accel.write8(0x23,0b00000000) # Low res (10 bit) mode, LSB at lower address, default serial interface
+
+def print_accel():
+    x_acc = accel.read16_2s_comp(0x28,False) >> 4
+    y_acc = accel.read16_2s_comp(0x2a,False) >> 4
+    z_acc = accel.read16_2s_comp(0x2c,False) >> 4
+    print (x_acc, y_acc, z_acc)
+
 
 def print_compass():
     x_out = compass.read16_2s_comp(3) 
@@ -52,8 +66,9 @@ def print_compass():
 
 while True:
     try:
-        print_compass()
-        time.sleep(0.1)
+        #print_compass()
+        print_accel()
+        time.sleep(0.5)
     except(KeyboardInterrupt):
         quit()
 
