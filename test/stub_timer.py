@@ -6,6 +6,9 @@ class StubTimer():
         self.method = method
         self.args = args
         return self
-    
+
+    def wait_for(self,seconds):
+        pass
+        
     def signal_time_elapsed(self):
         self.method(*self.args)

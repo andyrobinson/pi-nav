@@ -1,12 +1,13 @@
 import sys
 
-class Event:
+class EventName:
     tick = "tick"
     start = "start"
     end = "end"
     navigate = "navigate"
     arrived = "arrived"
 
+class Event:
     def __init__(self,name,waypoint = None):
         self.name = name
         self.waypoint = waypoint

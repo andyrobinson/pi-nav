@@ -1,5 +1,5 @@
 import sys
-from events import Event
+from events import Event,EventName
 
 class EventSource:
 
@@ -8,14 +8,16 @@ class EventSource:
         self.timer = timer
         self.exchange = exchange
         self.ticking = True
-        exchange.subscribe(Event.end,self.finish)
+        exchange.subscribe(EventName.end,self.finish)
 
     def start(self):
         self._safely(self._signal_start)
 
-        while self.ticking:
+        ticks = 0
+        while self.ticking and ticks < 10:
             self._safely(self._tick)
             self.timer.wait_for(0.2)
+            ticks += 1
 
     def finish(self,event):
         self.ticking = False
@@ -31,7 +33,7 @@ class EventSource:
                 pass
 
     def _signal_start(self):
-        self.exchange.publish(Event(Event.start))
+        self.exchange.publish(Event(EventName.start))
 
     def _tick(self):
-        self.exchange.publish(Event(Event.tick))
+        self.exchange.publish(Event(EventName.tick))

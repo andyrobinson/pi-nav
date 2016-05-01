@@ -12,6 +12,8 @@ from follower import Follower
 from simulate.stub_gps import StubGPS
 from config import CONFIG
 from helm import Helm
+from event_source import EventSource
+from events import Exchange
 
 class TestWiring(unittest.TestCase):
 
@@ -62,3 +64,7 @@ class TestWiring(unittest.TestCase):
     def test_should_use_corrct_config_in_navigator(self):
         navigator = self.wiring.navigator
         self.assertEqual(navigator.config,CONFIG['navigator'])
+
+    def test_should_return_event_source(self):
+        event_source = self.wiring.event_source
+        self.assertTrue(isinstance(event_source,EventSource))
