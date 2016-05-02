@@ -70,7 +70,6 @@ def print_compass():
     #print x_adj,",",y_adj,",",z_out
     #print x_out,",",y_out,",",z_out
 
-
 def print_both():
     x_acc = accel.read12_2s_comp(0x28)
     y_acc = accel.read12_2s_comp(0x2a)
@@ -82,12 +81,34 @@ def print_both():
 
     print("{0},{1},{2},{3},{4},{5}".format(x_out,y_out,z_out,x_acc,y_acc,z_acc))
 
+def tilt_adjust():
+    x_acc = accel.read12_2s_comp(0x28)
+    y_acc = accel.read12_2s_comp(0x2a)
+    z_acc = accel.read12_2s_comp(0x2c)
+
+    x_m = compass.read16_2s_comp(3) 
+    y_m = compass.read16_2s_comp(7) 
+    z_m = compass.read16_2s_comp(5)
+
+    roll = math.atan2(y_acc,z_acc)
+    pitch = math.atan2(x_acc,z_acc)
+    sin_roll = math.sin(roll)
+    cos_roll = math.cos(roll)
+    sin_pitch = math.sin(pitch)
+    cos_pitch = math.cos(pitch)
+
+    x_final = x_m*cos_pitch + y_m*sin_roll*sin_pitch+z_m*cos_roll*sin_pitch
+    y_final = y_m*cos_roll-z_m*sin_roll
+    bearing = math.atan2(-y_final,x_final)
+    print("{0},{1},{2},{3},{4},{5},{6}".format(round(math.degrees(bearing),0),x_m,y_m,z_m,x_acc,y_acc,z_acc))
+
 while True:
     try:
         #print_compass()
         #print_accel()
-        print_both()
-        time.sleep(0.1)
+        #print_both()
+        tilt_adjust()
+        time.sleep(2)
     except(KeyboardInterrupt):
         quit()
 
