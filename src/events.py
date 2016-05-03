@@ -6,11 +6,13 @@ class EventName:
     end = "end"
     navigate = "navigate"
     arrived = "arrived"
+    steer = "steer"
 
 class Event:
-    def __init__(self,name,waypoint = None):
+    def __init__(self,name,waypoint = None, heading = None):
         self.name = name
         self.waypoint = waypoint
+        self.heading = heading
 
 class Exchange:
 

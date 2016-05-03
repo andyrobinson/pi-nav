@@ -31,7 +31,7 @@ class TestFollower(unittest.TestCase):
         self.event_source = EventSource(self.exchange,self.timer,self.mock_logger)
         self.mock_helm = Mock()
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
-        self.navigator = Navigator(gps,self.mock_helm,Globe(),self.mock_logger, CONFIG['navigator'])
+        self.navigator = Navigator(gps,self.mock_helm,Globe(),self.exchange,self.mock_logger, CONFIG['navigator'])
 
     def temp_signal_arrived(self,event):
         self.exchange.publish(Event(EventName.arrived))
