@@ -54,7 +54,6 @@ def print_accel():
     pitch = round(math.degrees(math.atan2(x_acc,z_acc)),0)
     roll = round(math.degrees(math.atan2(y_acc,z_acc)),0)
     print ("pitch (nose +up,-down), roll(+R,-L): {0},{1}".format(pitch,roll))
-<<<<<<< Updated upstream
 
 def print_compass():
     x_out = compass.read16_2s_comp(3) 
@@ -76,29 +75,6 @@ def print_both():
     y_acc = accel.read12_2s_comp(0x2a)
     z_acc = accel.read12_2s_comp(0x2c)
 
-=======
-
-def print_compass():
-    x_out = compass.read16_2s_comp(3) 
-    y_out = compass.read16_2s_comp(7) 
-    z_out = compass.read16_2s_comp(5)
-    #y_adj = y_out*0.95 + 13
-    y_adj = y_out
-    #x_adj = x_out - 23
-    x_adj = x_out
-    bearing  = math.atan2(y_adj, x_adj) 
-    if (bearing < 0):
-        bearing += 2 * math.pi
-    print x_adj,y_adj,z_out, " bearing: ", round(math.degrees(bearing),0)
-    #print x_adj,",",y_adj,",",z_out
-    #print x_out,",",y_out,",",z_out
-
-def print_both():
-    x_acc = accel.read12_2s_comp(0x28)
-    y_acc = accel.read12_2s_comp(0x2a)
-    z_acc = accel.read12_2s_comp(0x2c)
-
->>>>>>> Stashed changes
     x_out = compass.read16_2s_comp(3) 
     y_out = compass.read16_2s_comp(7) 
     z_out = compass.read16_2s_comp(5)
@@ -115,11 +91,7 @@ def tilt_adjust():
     z_m = compass.read16_2s_comp(5)
 
     roll = math.atan2(y_acc,z_acc)
-<<<<<<< Updated upstream
-    pitch = math.atan2(x_acc,z_acc)
-=======
     pitch = math.atan2(-x_acc,z_acc) # reversing x accel makes it work
->>>>>>> Stashed changes
     sin_roll = math.sin(roll)
     cos_roll = math.cos(roll)
     sin_pitch = math.sin(pitch)
@@ -127,16 +99,11 @@ def tilt_adjust():
 
     x_final = x_m*cos_pitch + y_m*sin_roll*sin_pitch+z_m*cos_roll*sin_pitch
     y_final = y_m*cos_roll-z_m*sin_roll
-<<<<<<< Updated upstream
-    bearing = math.atan2(-y_final,x_final)
-=======
     bearing = math.atan2(y_final,x_final)
 
     if bearing < 0:
         bearing = bearing + 2*math.pi
 
-    #bearing = 2*math.pi - bearing
->>>>>>> Stashed changes
     print("{0},{1},{2},{3},{4},{5},{6}".format(round(math.degrees(bearing),0),x_m,y_m,z_m,x_acc,y_acc,z_acc))
 
 while True:
@@ -145,11 +112,7 @@ while True:
         #print_accel()
         #print_both()
         tilt_adjust()
-<<<<<<< Updated upstream
-        time.sleep(2)
-=======
         time.sleep(0.5)
->>>>>>> Stashed changes
     except(KeyboardInterrupt):
         quit()
 
