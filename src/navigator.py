@@ -5,15 +5,17 @@ MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
 DISTANCE_FRACTION_TO_STEER = 0.75
 
 class Navigator():
-    def __init__(self,sensors,course_steerer,globe,logger,config):
+    def __init__(self,sensors,course_steerer,globe,exchange,logger,config):
         self.course_steerer = course_steerer
         self.sensors = sensors
         self.globe = globe
         self.logger = logger
         self.bearing = 0.0
         self.config = config
-        
-    def to(self,destination_waypoint):
+        self.exchange = exchange
+
+    def to(self,event):
+        destination_waypoint = event.waypoint
         current_position = self.sensors.position
 
         while not self._arrived(current_position,destination_waypoint):
@@ -42,7 +44,7 @@ class Navigator():
 
     def _error_radius(self,position):
         return math.sqrt(position.lat_error * position.lat_error + position.long_error * position.long_error)
-        
+
     def _arrived(self,position,destination_waypoint):
         tolerance = self._error_radius(position) + float(destination_waypoint.tolerance)
         return self._distance(position,destination_waypoint) <= tolerance

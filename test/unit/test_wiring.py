@@ -1,4 +1,4 @@
-from setup_test import setup_test 
+from setup_test import setup_test
 setup_test()
 
 import unittest
@@ -12,6 +12,8 @@ from follower import Follower
 from simulate.stub_gps import StubGPS
 from config import CONFIG
 from helm import Helm
+from event_source import EventSource
+from events import Exchange
 
 class TestWiring(unittest.TestCase):
 
@@ -21,7 +23,7 @@ class TestWiring(unittest.TestCase):
     def test_should_return_stub_gps_for_test_purposes(self):
         gps = self.wiring.gps
         self.assertTrue(isinstance(gps,StubGPS))
-        
+
     def test_should_return_singleton_globe(self):
         globe = self.wiring.globe
         self.assertEqual(globe, self.wiring.globe)
@@ -63,9 +65,6 @@ class TestWiring(unittest.TestCase):
         navigator = self.wiring.navigator
         self.assertEqual(navigator.config,CONFIG['navigator'])
 
-    def test_should_return_follower(self):
-        follower = self.wiring.follower
-        self.assertTrue(isinstance(follower,Follower))
-        self.assertEqual(follower.logger,self.wiring.application_logger)
-        self.assertEqual(follower.navigator, self.wiring.navigator)
-
+    def test_should_return_event_source(self):
+        event_source = self.wiring.event_source
+        self.assertTrue(isinstance(event_source,EventSource))

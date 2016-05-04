@@ -15,6 +15,7 @@ from servo import Servo
 from helm import Helm
 from course_steerer import CourseSteerer
 from events import Exchange
+from event_source import EventSource
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -39,8 +40,8 @@ class Wiring():
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
-        self.navigator = Navigator(self.sensors,self.course_steerer,self.globe,self.application_logger,CONFIG['navigator'])
-        self.follower = Follower(self.exchange,self.navigator,self.application_logger)
+        self.navigator = Navigator(self.sensors,self.course_steerer,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])
+        self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
@@ -67,4 +68,5 @@ class Wiring():
 
     def follow(self,waypoints):
         self.rudder_servo.set_position(0)
-        self.follower.follow_route(waypoints)
+        self.follower = Follower(self.exchange,self.navigator,waypoints,self.application_logger)
+        self.event_source.start()

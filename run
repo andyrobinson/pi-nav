@@ -32,13 +32,13 @@ if __name__ == '__main__':
 
     if command == 'showgps':
         wiring_inst().showgps()
-        
+
     if command == 'simtrack':
         sim.tracker_simulator.track(3)
-        
+
     if command == 'simnav':
-        sim.follow_route(sim_wiring.TWENTY_METRE_HOURGLASS)
-        
+        sim.follow(sim_wiring.TWENTY_METRE_HOURGLASS)
+
     if command == 'nav':
         wiring_inst().follow(routes.CHORLTON_TOUR)
 

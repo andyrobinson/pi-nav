@@ -49,15 +49,19 @@ class SimWiring():
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
-        self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.console_logger,CONFIG['navigator'])
-        self.follower_simulator =  Follower(self.exchange,self.navigator_simulator,self.console_logger)
+        self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
         self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 
     def _console_logger(self):
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
         return logging.getLogger("simulate")
 
-    def follow_route(self,waypoints):
+    def _follower(self,waypoints):
+        self.follower_simulator =  Follower(self.exchange,self.navigator_simulator,waypoints,self.console_logger)
+        return self.follower_simulator
+
+    def follow(self,waypoints):
         self.gps.set_position(waypoints[0].position,0,0.8,True)
         self.vehicle.position = waypoints[0].position
-        self.follower_simulator.follow_route(waypoints)
+        self.follower_simulator =  self._follower(waypoints)
+        self.follower_simulator.follow_route()

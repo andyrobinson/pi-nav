@@ -13,25 +13,27 @@ from waypoint import Waypoint
 from position import Position
 from globe import Globe
 from config import CONFIG
+from events import Event,Exchange,EventName
 
 def print_msg(msg):
     print msg
 
 class TestNavigationAndHelm(unittest.TestCase):
-    
+
     def setUp(self):
         self.logger = Mock()
         self.logger.error = Mock(side_effect=print_msg)
         self.servo = Mock()
-    
+        self.exchange = Exchange(self.logger)
+
     def test_should_steer_to_next_waypoint(self):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.02,10.02),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])
         course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
-        navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
+        navigator = Navigator(gps,course_steerer,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
-        navigator.to(destination)
+        navigator.to(Event(EventName.navigate,destination))
 
         self.logger.info.assert_has_calls(
             [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m'),
@@ -43,9 +45,9 @@ class TestNavigationAndHelm(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])
         course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
-        navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
+        navigator = Navigator(gps,course_steerer,Globe(),self.exchange,self.logger, CONFIG['navigator'])
         destination = Waypoint(Position(10.03,10.03),10)
-        navigator.to(destination)
+        navigator.to(Event(EventName.navigate,destination))
         self.logger.info.assert_has_calls(
             [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m'),
             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 3121.2m'),
@@ -57,9 +59,9 @@ class TestNavigationAndHelm(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])
         course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
-        navigator = Navigator(gps,course_steerer,Globe(),self.logger, CONFIG['navigator'])
+        navigator = Navigator(gps,course_steerer,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
-        navigator.to(destination)
+        navigator.to(Event(EventName.navigate,destination))
 
         self.logger.debug.assert_has_calls(
             [call('Helm, steering 44.6, tracking 55.9, rate of turn +55.9, rudder +0.0, new rudder +30.0'),
@@ -69,4 +71,3 @@ class TestNavigationAndHelm(unittest.TestCase):
             call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
             call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
             call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0')])
-
