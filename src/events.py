@@ -65,3 +65,6 @@ class Exchange:
     def _end_processing(self):
         self.processing = False
         self.events = []
+
+    def __repr__(self):
+        return str(self.register)

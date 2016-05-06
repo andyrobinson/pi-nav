@@ -1,5 +1,6 @@
 import math
 from nan import isNaN
+from events import Event,EventName
 
 MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
 DISTANCE_FRACTION_TO_STEER = 0.75
@@ -13,6 +14,17 @@ class Navigator():
         self.bearing = 0.0
         self.config = config
         self.exchange = exchange
+        exchange.subscribe(EventName.navigate,self.navigate)
+
+    def navigate(self,event):
+        self.destination_waypoint = event.waypoint
+        self.review_progress(event)
+
+    def review_progress(self,event):
+        current_position = self.sensors.position
+        if self._arrived(current_position, self.destination_waypoint):
+            self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(self.destination_waypoint.latitude,self.destination_waypoint.longitude))
+            self.exchange.publish(Event(EventName.arrived,self.destination_waypoint))
 
     def to(self,event):
         destination_waypoint = event.waypoint

@@ -30,7 +30,7 @@ class TestNavigator(unittest.TestCase):
 
     def event_recorder(self,event):
         self.last_listened_event = event
-        self.event_count[event.name] += 1
+        self.event_count[event.name] = self.event_count[event.name] + 1
 
     def listen(self,event_name):
         self.event_count[event_name] = 0
@@ -51,21 +51,24 @@ class TestNavigator(unittest.TestCase):
         self.listen(EventName.steer)
         navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, self.exchange, self.mock_logger, self.config)
 
-        navigator.to(Event(EventName.navigate,Waypoint(self.current_position,0)))
+        self.exchange.publish(Event(EventName.navigate,Waypoint(self.current_position,0)))
 
         self.assertEqual(self.event_count[EventName.steer],0,"expected no event to steer course if we have arrived")
         self.assertEqual(self.event_count[EventName.arrived],1,"expected arrived event if we have arrived")
         self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(self.current_position.latitude,self.current_position.longitude))
 
-    # def test_should_allow_a_tolerance_and_consider_errors_when_calculating_if_we_have_reached_waypoint(self):
-    #     waypoint = Waypoint(Position(53.0001,-1.9999),10)
-    #     navigator = Navigator(self.mock_gps,Mock(),self.globe, self.mock_logger, self.config)
-    #
-    #     navigator.to(waypoint)
-    #
-    #     self.assertEqual(self.mock_helm.call_count,0,"expected no call to steer course if we have arrived")
-    #     self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(waypoint.latitude,waypoint.longitude))
-    #
+    def test_should_allow_a_tolerance_and_consider_errors_when_calculating_if_we_have_reached_waypoint(self):
+        self.listen(EventName.arrived)
+        self.listen(EventName.steer)
+        waypoint = Waypoint(Position(53.0001,-1.9999),10)
+        navigator = Navigator(self.mock_gps,self.mock_helm,self.globe, self.exchange, self.mock_logger, self.config)
+
+        self.exchange.publish(Event(EventName.navigate,waypoint))
+
+        self.assertEqual(self.mock_helm.call_count,0,"expected no call to steer course if we have arrived")
+        self.assertEqual(self.event_count[EventName.arrived],1,"expected arrived event if we have arrived")
+        self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(waypoint.latitude,waypoint.longitude))
+
     # def test_should_steer_from_current_position_to_next_and_log_until_point_is_reached(self):
     #     waypoint = Waypoint(Position(53.5,-1.5),0)
     #     fake_gps = FakeMovingGPS([self.current_position, waypoint.position])
