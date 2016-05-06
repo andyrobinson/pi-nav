@@ -5,6 +5,7 @@ class EventName:
     start = "start"
     end = "end"
     navigate = "navigate"
+    navigate_review = "navigate_review"
     arrived = "arrived"
     steer = "steer"
 

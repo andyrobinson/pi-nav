@@ -15,6 +15,7 @@ class Navigator():
         self.config = config
         self.exchange = exchange
         exchange.subscribe(EventName.navigate,self.navigate)
+        exchange.subscribe(EventName.navigate_review,self.review_progress)
 
     def navigate(self,event):
         self.destination_waypoint = event.waypoint
@@ -22,9 +23,18 @@ class Navigator():
 
     def review_progress(self,event):
         current_position = self.sensors.position
+
         if self._arrived(current_position, self.destination_waypoint):
             self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(self.destination_waypoint.latitude,self.destination_waypoint.longitude))
             self.exchange.publish(Event(EventName.arrived,self.destination_waypoint))
+        else:
+            bearing = self.globe.bearing(current_position, self.destination_waypoint.position)
+            if isNaN(bearing):
+                self.logger.warn('Navigator, no information from sensors, continuing on current course')
+            else:
+                self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
+                    .format(self.destination_waypoint.latitude,self.destination_waypoint.longitude, bearing, self._distance(current_position,self.destination_waypoint)))
+                self.exchange.publish(Event(EventName.steer,heading=bearing))
 
     def to(self,event):
         destination_waypoint = event.waypoint

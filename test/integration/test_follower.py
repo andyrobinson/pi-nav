@@ -46,10 +46,11 @@ class TestFollower(unittest.TestCase):
         self.mock_logger.info.assert_has_calls(
             [call('Follower, next waypoint +11.000000,+11.000000'),
             # Ignored until navigator is also using events, when we can remove the temp_signal_arrived
-            # call('Navigator, steering to +11.000000,+11.000000, bearing  44.4, distance 155941.2m'),
+            call('Navigator, steering to +11.000000,+11.000000, bearing  44.4, distance 155941.2m'),
             # call('Navigator, arrived at +11.000000,+11.000000'),
             call('Follower, next waypoint +13.000000,+13.000000'),
-            # call('Navigator, steering to +13.000000,+13.000000, bearing  44.2, distance 155399.6m'),
+            # Note that distance is not correct here, until we have something that moves.....
+            call('Navigator, steering to +13.000000,+13.000000, bearing  44.2, distance 311080.3m'),
             # call('Navigator, arrivedz at +13.000000,+13.000000'),
             call('Follower, all waypoints reached, navigation complete')])
 
