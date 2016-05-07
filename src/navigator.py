@@ -3,7 +3,7 @@ from nan import isNaN
 from events import Event,EventName
 
 MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
-DISTANCE_FRACTION_TO_STEER = 0.75
+DISTANCE_FRACTION_TO_STEER = 0.5
 
 class Navigator():
     def __init__(self,sensors,course_steerer,globe,exchange,logger,config):
@@ -23,6 +23,7 @@ class Navigator():
 
     def review_progress(self,event):
         current_position = self.sensors.position
+        time_to_next_review = self._time_to_review(current_position,self.destination_waypoint)
 
         if self._arrived(current_position, self.destination_waypoint):
             self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(self.destination_waypoint.latitude,self.destination_waypoint.longitude))
@@ -36,12 +37,14 @@ class Navigator():
                     .format(self.destination_waypoint.latitude,self.destination_waypoint.longitude, bearing, self._distance(current_position,self.destination_waypoint)))
                 self.exchange.publish(Event(EventName.steer,heading=bearing))
 
+            self.exchange.publish(Event(EventName.after,seconds=time_to_next_review,next_event=Event(EventName.navigate_review)))
+
     def to(self,event):
         destination_waypoint = event.waypoint
         current_position = self.sensors.position
 
         while not self._arrived(current_position,destination_waypoint):
-            time_to_steer = self._time_to_waypoint(current_position,destination_waypoint)
+            time_to_steer = self._time_to_review(current_position,destination_waypoint)
             bearing = self.globe.bearing(current_position, destination_waypoint.position)
 
             if isNaN(bearing):
@@ -56,7 +59,7 @@ class Navigator():
 
         self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(destination_waypoint.latitude,destination_waypoint.longitude))
 
-    def _time_to_waypoint(self, position, destination_waypoint):
+    def _time_to_review(self, position, destination_waypoint):
         min_time = self.config['min time to steer']
         max_time = self.config['max time to steer']
         speed = max(MIN_SPEED_FOR_STEER_TIME_CALCULATION,self.sensors.speed)

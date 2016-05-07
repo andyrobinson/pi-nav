@@ -8,12 +8,15 @@ class EventName:
     navigate_review = "navigate_review"
     arrived = "arrived"
     steer = "steer"
+    after = "after"
 
 class Event:
-    def __init__(self,name,waypoint = None, heading = None):
+    def __init__(self,name,waypoint = None, heading = None, seconds = 0, next_event = None):
         self.name = name
         self.waypoint = waypoint
         self.heading = heading
+        self.seconds = seconds
+        self.next_event = next_event
 
 class Exchange:
 
