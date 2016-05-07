@@ -49,7 +49,7 @@ class SimWiring():
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
-        self.navigator_simulator = Navigator(self.sensors,self.course_steerer,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
+        self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
         self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 
     def _console_logger(self):

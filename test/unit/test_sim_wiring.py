@@ -31,10 +31,6 @@ class TestSimWiring(unittest.TestCase):
         navigator = self.wiring.navigator_simulator
         self.assertTrue(isinstance(navigator.sensors,Sensors))
 
-    def test_navigator_should_use_course_steerer(self):
-        navigator = self.wiring.navigator_simulator
-        self.assertTrue(isinstance(navigator.course_steerer,CourseSteerer))
-
     def test_follower_simulator_should_use_navigator(self):
         follower = self.wiring._follower([])
         self.assertTrue(isinstance(follower.navigator,Navigator))

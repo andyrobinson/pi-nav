@@ -6,8 +6,7 @@ MIN_SPEED_FOR_STEER_TIME_CALCULATION = 0.01
 DISTANCE_FRACTION_TO_STEER = 0.5
 
 class Navigator():
-    def __init__(self,sensors,course_steerer,globe,exchange,logger,config):
-        self.course_steerer = course_steerer
+    def __init__(self,sensors,globe,exchange,logger,config):
         self.sensors = sensors
         self.globe = globe
         self.logger = logger
@@ -38,26 +37,6 @@ class Navigator():
                 self.exchange.publish(Event(EventName.steer,heading=bearing))
 
             self.exchange.publish(Event(EventName.after,seconds=time_to_next_review,next_event=Event(EventName.navigate_review)))
-
-    def to(self,event):
-        destination_waypoint = event.waypoint
-        current_position = self.sensors.position
-
-        while not self._arrived(current_position,destination_waypoint):
-            time_to_steer = self._time_to_review(current_position,destination_waypoint)
-            bearing = self.globe.bearing(current_position, destination_waypoint.position)
-
-            if isNaN(bearing):
-                self.logger.warn('Navigator, no information from sensors, continuing on bearing {:5.1f}'.format(self.bearing))
-            else:
-                self.bearing = bearing
-                self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
-                    .format(destination_waypoint.latitude,destination_waypoint.longitude, bearing, self._distance(current_position,destination_waypoint)))
-
-            self.course_steerer.steer_course(self.bearing, time_to_steer)
-            current_position = self.sensors.position
-
-        self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(destination_waypoint.latitude,destination_waypoint.longitude))
 
     def _time_to_review(self, position, destination_waypoint):
         min_time = self.config['min time to steer']

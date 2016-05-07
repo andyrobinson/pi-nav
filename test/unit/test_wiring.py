@@ -59,7 +59,6 @@ class TestWiring(unittest.TestCase):
     def test_should_return_navigator(self):
         navigator = self.wiring.navigator
         self.assertTrue(isinstance(navigator, Navigator))
-        self.assertEqual(navigator.course_steerer,self.wiring.course_steerer)
 
     def test_should_use_corrct_config_in_navigator(self):
         navigator = self.wiring.navigator
