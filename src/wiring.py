@@ -16,6 +16,7 @@ from helm import Helm
 from course_steerer import CourseSteerer
 from events import Exchange
 from event_source import EventSource
+from timeshift import TimeShift
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -35,13 +36,15 @@ class Wiring():
         self.tracker = Tracker(self._rotating_logger("track"),self.gps,self.timer)
         self.application_logger = self._rotating_logger(APPLICATION_NAME)
         self.exchange = Exchange(self.application_logger)
+        self.timeshift = TimeShift(self.exchange,self.timer.time)
+        self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
+
         self.sensors = Sensors(self.gps)
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.navigator = Navigator(self.sensors,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])
-        self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)

@@ -13,6 +13,7 @@ from config import CONFIG
 from helm import Helm
 from course_steerer import CourseSteerer
 from events import Exchange
+from timeshift import TimeShift
 
 from simulate.fake_vehicle import FakeVehicle
 from simulate.fake_vehicle_gps import FakeVehicleGPS
@@ -46,6 +47,7 @@ class SimWiring():
         self.exchange = Exchange(self.console_logger)
         self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1)
         self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
+        self.timeshift = TimeShift(self.exchange,self.vehicle.timer)
         self.sensors = Sensors(self.vehicle.gps)
         self.helm = Helm(self.sensors,self.vehicle.rudder,self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])

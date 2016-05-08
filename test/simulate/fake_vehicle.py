@@ -15,11 +15,19 @@ class FakeRudder():
         self.angle = angle
 
 class FakeTimer():
+
     def __init__(self,callback):
         self.callback = callback
+        self.fake_time = 0
 
     def wait_for(self,seconds):
         self.callback(seconds)
+
+    def timer(self):
+        return self.fake_time
+
+    def tick(self):
+        self.fake_time += 0.2
 
 class FakeVehicle():
     def __init__(self,gps, globe, logger, single_step = False):
