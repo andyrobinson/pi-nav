@@ -9,20 +9,15 @@ from follower import Follower
 from position import Position
 from events import Exchange, Event, EventName
 from waypoint import Waypoint
+from test_utils import EventTestCase
 
-class TestFollower(unittest.TestCase):
+
+class TestFollower(EventTestCase):
 
     def setUp(self):
+        super(TestFollower, self).setUp()
         self.mock_navigator = Mock()
         self.mock_logger = Mock()
-        self.exchange = Exchange(self.mock_logger)
-        self.last_event = Event("no event fired")
-
-    def event_recorder(self,event):
-        self.last_event = event
-
-    def listen(self,event_name):
-        self.exchange.subscribe(event_name,self.event_recorder)
 
     def test_should_signal_a_navigate_event_using_the_first_waypoint(self):
         self.listen(EventName.navigate)
