@@ -1,9 +1,12 @@
-import smbus
+try:
+    import smbus
+except ImportError, e:
+    if e.message != 'No module named smbus':
+        raise
 
 class I2C:
     def __init__(self,address):
         self.address = address
-        self.bus = smbus.SMBus(1)
 
     def read8(self,register):
         return self.bus.read_byte_data(self.address, register)
@@ -29,3 +32,9 @@ class I2C:
 
     def write8(self,register, value):
         self.bus.write_byte_data(self.address, register, value)
+
+    @property
+    def bus(self):
+        if not self._bus:
+            self._bus = smbus.SMBus(1)
+        return self._bus

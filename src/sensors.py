@@ -1,12 +1,18 @@
 from nan import isNaN
 from position import Position
+from events import EventName
 
 DEFAULT_ERROR = 10
 
 class Sensors():
-    def __init__(self,gps):
+    def __init__(self,gps,windsensor,exchange,config):
         self.gps = gps
+        self.exchange = exchange
+        self.windsensor = windsensor
         self._position = Position(gps.position.latitude,gps.position.longitude)
+        self.config = config
+        self._wind_relative = 0.0
+        exchange.subscribe(EventName.tick,self.update_averages)
 
     @property
     def hasfix(self):
@@ -30,19 +36,27 @@ class Sensors():
 
     @property
     def speed(self):
-        return self.gps.speed   
+        return self.gps.speed
 
     @property
     def track_error(self):
         return self._default(self.gps.track_error,DEFAULT_ERROR)
-    
+
     @property
     def speed_error(self):
         return self._default(self.gps.speed_error,DEFAULT_ERROR)
 
     @property
-    def wind_direction(self):
-        return 0 # TODO: replace with value from sensor
+    def wind_direction_relative_instant(self):
+        return self.windsensor.angle()
+
+    @property
+    def wind_direction_relative(self):
+        return self._wind_relative
+
+    def update_averages(self,tick_event):
+        avg_samples = self.config['avg samples']
+        self._wind_relative = (self._wind_relative * (avg_samples - 1) + self.windsensor.angle())/(avg_samples)
 
     def _default(self,  value,default):
         return default if isNaN(value) else value

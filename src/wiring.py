@@ -17,6 +17,8 @@ from course_steerer import CourseSteerer
 from events import Exchange
 from event_source import EventSource
 from timeshift import TimeShift
+from i2c import I2C
+from windsensor import WindSensor
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -26,10 +28,12 @@ RUDDER_MIN_PULSE = 1500 - 340
 RUDDER_MAX_PULSE = 1500 + 340
 RUDDER_MIN_ANGLE = -30
 RUDDER_MAX_ANGLE = 30
+WINDSENSOR_I2C_ADDRESS = 0x40
 
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
-        self._gps = gps
+        self.injected_gps = gps
+        self.windsensor = WindSensor(I2C(WINDSENSOR_I2C_ADDRESS))
 
         self.globe = Globe()
         self.timer = Timer()
@@ -39,7 +43,7 @@ class Wiring():
         self.timeshift = TimeShift(self.exchange,self.timer.time)
         self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
 
-        self.sensors = Sensors(self.gps)
+        self.sensors = Sensors(self.gps,self.windsensor,self.exchange,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])
@@ -56,11 +60,11 @@ class Wiring():
 
     @property
     def gps(self):
-        if not self._gps:
+        if not self.injected_gps:
             self._gps = GpsReader()
             self._gps.setDaemon(True)
             self._gps.start()
-        return self._gps
+        return self.injected_gps
 
     def showgps(self):
         try:

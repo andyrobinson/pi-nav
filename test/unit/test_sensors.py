@@ -3,16 +3,20 @@ from setup_test import setup_test
 setup_test()
 
 import unittest
+from mock import Mock
 
 from simulate.stub_gps import StubGPS
 from sensors import Sensors
 from nan import NaN
+from events import Exchange,EventName,Event
 
 
 class TestSensors(unittest.TestCase):
     def setUp(self):
         self.gps = StubGPS()
-        self.sensors = Sensors(self.gps)
+        self.windsensor = Mock()
+        self.exchange = Exchange(Mock())
+        self.sensors = Sensors(self.gps,self.windsensor,self.exchange,{'avg samples' : 3})
 
     def test_should_pass_through_gps_values(self):
         self.assertEqual(self.sensors.hasfix, self.gps.hasfix)
@@ -26,11 +30,9 @@ class TestSensors(unittest.TestCase):
         self.assertEqual(self.sensors.speed_error, self.gps.speed_error)
         self.assertEqual(self.sensors.track_error, self.gps.track_error)
 
-
     def test_should_reflect_changes_in_gps_values(self):
         self.gps.hasfix = 'blah'
         self.assertEqual(self.sensors.hasfix, 'blah')
-
 
     def test_should_default_error_values_to_ten_if_gps_returns_NaN(self):
         gps = StubGPS()
@@ -39,14 +41,27 @@ class TestSensors(unittest.TestCase):
         gps.speed_error = NaN
         gps.track_error = NaN
 
-        sensors = Sensors(gps)
+        sensors = Sensors(gps,Mock(),self.exchange,{'avg samples' : 3})
 
         self.assertEqual(sensors.position.lat_error, 10)
         self.assertEqual(sensors.position.long_error, 10)
         self.assertEqual(sensors.speed_error, 10)
         self.assertEqual(sensors.track_error, 10)
 
+    def test_should_pass_through_wind_drection(self):
+        windsensor = Mock()
+        windsensor.angle.side_effect = [10.0,20.0]
+        sensors = Sensors(StubGPS(),windsensor,self.exchange,{'avg samples' : 3})
+        self.assertEqual(sensors.wind_direction_relative_instant, 10.0)
+        self.assertEqual(sensors.wind_direction_relative_instant, 20.0)
 
-    def test_should_have_fixed_wind_drection(self):
-        sensors = Sensors(StubGPS())
-        self.assertEqual(sensors.wind_direction, 0)
+    def test_should_return_wind_relative_as_zero_initially(self):
+        self.assertEqual(self.sensors.wind_direction_relative, 0.0)
+
+    def test_should_return_wind_relative_average_after_several_ticks(self):
+        windsensor = Mock()
+        windsensor.angle.side_effect = [10.0,20.0]
+        sensors = Sensors(StubGPS(),windsensor,self.exchange,{'avg samples' : 2})
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.tick))
+        self.assertEqual(sensors.wind_direction_relative, ((0.0 + 10)/2 + 20)/2)

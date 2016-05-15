@@ -7,6 +7,16 @@ TIME_INCREMENT_IN_SEC = 5
 TURN_FACTOR = 30
 MIN_TURN_RADIUS = 1
 
+class FakeWindSensor():
+    def __init__(self):
+        self.angle = 0
+
+    def angle(self):
+        return self.angle
+
+    def set_angle(self,new_angle):
+        self.angle = new_angle
+
 class FakeRudder():
     def __init__(self):
         self.angle = 0
@@ -39,6 +49,7 @@ class FakeVehicle():
         self.gps.speed = INITIAL_SPEED_IN_MS
         self.rudder = FakeRudder()
         self.timer = FakeTimer(self.move)
+        self.windsensor = FakeWindSensor()
         self.position = self.gps.position
         self.track = self.gps.track
 
