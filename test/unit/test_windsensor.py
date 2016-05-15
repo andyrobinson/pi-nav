@@ -6,7 +6,7 @@ from windsensor import WindSensor
 
 class TestWindSensor(unittest.TestCase):
 
-    def test_reads_values_correctly(self):
+    def test_reads_14_bit_values_correctly(self):
         i2c  = Mock()
         i2c.read8.side_effect = [0x00,0x00,0x3F,0x3F,0x80,0x00,0xFF,0x00,0xFF,0x3F]
         windsensor = WindSensor(i2c)
