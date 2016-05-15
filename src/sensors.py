@@ -51,7 +51,7 @@ class Sensors():
         return self.windsensor.angle()
 
     @property
-    def wind_direction_relative(self):
+    def wind_direction_relative_average(self):
         return self._wind_relative
 
     def update_averages(self,tick_event):

@@ -56,7 +56,7 @@ class TestSensors(unittest.TestCase):
         self.assertEqual(sensors.wind_direction_relative_instant, 20.0)
 
     def test_should_return_wind_relative_as_zero_initially(self):
-        self.assertEqual(self.sensors.wind_direction_relative, 0.0)
+        self.assertEqual(self.sensors.wind_direction_relative_average, 0.0)
 
     def test_should_return_wind_relative_average_after_several_ticks(self):
         windsensor = Mock()
@@ -64,4 +64,4 @@ class TestSensors(unittest.TestCase):
         sensors = Sensors(StubGPS(),windsensor,self.exchange,{'avg samples' : 2})
         self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.tick))
-        self.assertEqual(sensors.wind_direction_relative, ((0.0 + 10)/2 + 20)/2)
+        self.assertEqual(sensors.wind_direction_relative_average, ((0.0 + 10)/2 + 20)/2)
