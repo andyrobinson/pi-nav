@@ -10,3 +10,7 @@ def to_360(bearing):
     if bearing < 0:
         return bearing + 360
     return bearing % 360
+
+def moving_avg(avg,next_sample,smoothing):
+    diff = angle_between(avg,next_sample)
+    return to_360(avg + (diff/smoothing))

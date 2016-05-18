@@ -1,6 +1,7 @@
 from nan import isNaN
 from position import Position
 from events import EventName
+from bearing import moving_avg
 
 DEFAULT_ERROR = 10
 
@@ -55,8 +56,7 @@ class Sensors():
         return self._wind_relative
 
     def update_averages(self,tick_event):
-        avg_samples = self.config['avg samples']
-        self._wind_relative = (self._wind_relative * (avg_samples - 1) + self.windsensor.angle())/(avg_samples)
+        self._wind_relative = moving_avg(self._wind_relative,self.windsensor.angle(),self.config['smoothing'])
 
     def _default(self,  value,default):
         return default if isNaN(value) else value
