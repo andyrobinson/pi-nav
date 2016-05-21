@@ -7,6 +7,7 @@ class EventName:
     navigate = "navigate"
     navigate_review = "navigate_review"
     arrived = "arrived"
+    set_course = "set course"
     steer = "steer"
     after = "after"
 

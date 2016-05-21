@@ -34,7 +34,7 @@ class Navigator():
             else:
                 self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
                     .format(self.destination_waypoint.latitude,self.destination_waypoint.longitude, bearing, self._distance(current_position,self.destination_waypoint)))
-                self.exchange.publish(Event(EventName.steer,heading=bearing))
+                self.exchange.publish(Event(EventName.set_course,heading=bearing))
 
             self.exchange.publish(Event(EventName.after,seconds=time_to_next_review,next_event=Event(EventName.navigate_review)))
 

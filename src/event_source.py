@@ -13,11 +13,9 @@ class EventSource:
     def start(self):
         self._safely(self._signal_start)
 
-        ticks = 0
-        while self.ticking and ticks < 10:
+        while self.ticking:
             self._safely(self._tick)
             self.timer.wait_for(0.2)
-            ticks += 1
 
     def finish(self,event):
         self.ticking = False

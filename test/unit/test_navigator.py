@@ -42,18 +42,18 @@ class TestNavigator(EventTestCase):
 
     def test_should_not_steer_and_log_arrival_if_arrived(self):
         self.listen(EventName.arrived)
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         navigator = self.new_navigator(self.mock_gps)
 
         self.exchange.publish(Event(EventName.navigate,Waypoint(self.current_position,0)))
 
-        self.assertEqual(self.event_count(EventName.steer),0,"expected no event to steer course if we have arrived")
+        self.assertEqual(self.event_count(EventName.set_course),0,"expected no event to set course if we have arrived")
         self.assertEqual(self.event_count(EventName.arrived),1,"expected arrived event if we have arrived")
         self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(self.current_position.latitude,self.current_position.longitude))
 
     def test_should_allow_a_tolerance_and_consider_errors_when_calculating_if_we_have_reached_waypoint(self):
         self.listen(EventName.arrived)
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         waypoint = Waypoint(Position(53.0001,-1.9999),10)
         navigator = self.new_navigator(self.mock_gps)
 
@@ -63,7 +63,7 @@ class TestNavigator(EventTestCase):
         self.mock_logger.info.assert_called_with('Navigator, arrived at {:+f},{:+f}'.format(waypoint.latitude,waypoint.longitude))
 
     def test_should_steer_along_the_bearing_to_the_next_waypoint(self):
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         waypoint = Waypoint(Position(53.5,-1.5),0)
         expected_distance = self.globe.distance_between(self.current_position,waypoint.position)
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
@@ -71,24 +71,24 @@ class TestNavigator(EventTestCase):
         navigator = self.new_navigator(self.mock_gps)
         self.exchange.publish(Event(EventName.navigate,waypoint))
 
-        self.assertEqual(self.event_count(EventName.steer),1,"expected steer event following navigate")
+        self.assertEqual(self.event_count(EventName.set_course),1,"expected set course event following navigate")
         self.assertEqual(self.last_event.heading,expected_bearing)
         self.mock_logger.info.assert_any_call('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
             .format(waypoint.latitude,waypoint.longitude,expected_bearing,expected_distance))
 
     def test_should_steer_to_waypoint_if_outside_tolerance(self):
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         waypoint = Waypoint(Position(53.0001,-1.9999),5)
         expected_bearing = self.globe.bearing(self.current_position,waypoint.position)
 
         navigator = self.new_navigator(self.mock_gps)
         self.exchange.publish(Event(EventName.navigate,waypoint))
 
-        self.assertEqual(self.event_count(EventName.steer),1,"expected steer event following navigate")
+        self.assertEqual(self.event_count(EventName.set_course),1,"expected set course event following navigate")
         self.assertEqual(self.last_event.heading,expected_bearing)
 
     def test_at_intermediate_point_should_adjust_heading(self):
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         waypoint = Waypoint(Position(11,11),0)
         intermediate_position = Position(12,12)
         fake_gps = FakeMovingGPS([self.current_position, intermediate_position, waypoint.position])
@@ -101,11 +101,11 @@ class TestNavigator(EventTestCase):
         self.assertEqual(self.last_event.heading,bearing1)
 
         self.exchange.publish(Event(EventName.navigate_review))
-        self.assertEqual(self.event_count(EventName.steer),2,"expected 2 steer events")
+        self.assertEqual(self.event_count(EventName.set_course),2,"expected 2 set course events")
         self.assertEqual(self.last_event.heading,bearing2)
 
     def test_should_not_fire_a_steer_event_if_no_GPS_signal(self):
-        self.listen(EventName.steer)
+        self.listen(EventName.set_course)
         waypoint = Waypoint(Position(-60,22),0)
         no_position = Position(NaN,NaN,NaN,NaN)
         first_bearing = self.globe.bearing(self.current_position,waypoint.position)
@@ -115,8 +115,8 @@ class TestNavigator(EventTestCase):
         self.exchange.publish(Event(EventName.navigate,waypoint))
         self.exchange.publish(Event(EventName.navigate_review))
 
-        steer_events = self.event_count(EventName.steer)
-        self.assertEqual(steer_events,1,"expected only 1 steer event, got {0}".format(steer_events))
+        steer_events = self.event_count(EventName.set_course)
+        self.assertEqual(steer_events,1,"expected only 1 set course event, got {0}".format(steer_events))
         self.assertEqual(self.last_event.heading,first_bearing)
 
     def test_should_signal_review_after_half_way_to_way_point_based_on_speed(self):
