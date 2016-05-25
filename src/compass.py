@@ -2,10 +2,9 @@
 # compass = I2C(0x1e)
 # accel = I2C(0x19)
 from bearing import to_360
-
+import math
 class Compass:
     def __init__(self,i2c_compass,i2c_accel):
-        self.address = address
         self.compass = i2c_compass
         self.accel = i2c_accel
         self.initialised = False
@@ -40,6 +39,6 @@ class Compass:
 
         x_final = x_m*cos_pitch + y_m*sin_roll*sin_pitch+z_m*cos_roll*sin_pitch
         y_final = y_m*cos_roll-z_m*sin_roll
-        bearing = math.atan2(y_final,x_final)
-
+        bearing = round(math.degrees(math.atan2(y_final,x_final)),0)
+        
         return to_360(bearing)
