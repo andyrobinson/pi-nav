@@ -6,10 +6,11 @@ from bearing import moving_avg
 DEFAULT_ERROR = 10
 
 class Sensors():
-    def __init__(self,gps,windsensor,exchange,config):
+    def __init__(self,gps,windsensor,compass,exchange,config):
         self.gps = gps
         self.exchange = exchange
         self.windsensor = windsensor
+        self.compass = compass
         self._position = Position(gps.position.latitude,gps.position.longitude)
         self.config = config
         self._wind_relative = 0.0
@@ -55,6 +56,10 @@ class Sensors():
     def wind_direction_relative_average(self):
         return self._wind_relative
 
+    @property
+    def compass_heading_instant(self):
+        return self.compass.bearing()
+        
     def update_averages(self,tick_event):
         self._wind_relative = moving_avg(self._wind_relative,self.windsensor.angle(),self.config['smoothing'])
 

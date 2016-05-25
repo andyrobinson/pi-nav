@@ -19,6 +19,7 @@ from event_source import EventSource
 from timeshift import TimeShift
 from i2c import I2C
 from windsensor import WindSensor
+from compass import Compass
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -29,11 +30,14 @@ RUDDER_MAX_PULSE = 1500 + 340
 RUDDER_MIN_ANGLE = -30
 RUDDER_MAX_ANGLE = 30
 WINDSENSOR_I2C_ADDRESS = 0x40
+COMPASS_I2C_ADDRESS = 0x1E
+ACCELEROMETER_I2C_ADDRESS = 0x19
 
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
         self.injected_gps = gps
         self.windsensor = WindSensor(I2C(WINDSENSOR_I2C_ADDRESS))
+        self.compass = Compass(I2C(COMPASS_I2C_ADDRESS),I2C(ACCELEROMETER_I2C_ADDRESS))
 
         self.globe = Globe()
         self.timer = Timer()
@@ -43,7 +47,7 @@ class Wiring():
         self.timeshift = TimeShift(self.exchange,self.timer.time)
         self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
 
-        self.sensors = Sensors(self.gps,self.windsensor,self.exchange,CONFIG['sensors'])
+        self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.exchange,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.exchange,self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])

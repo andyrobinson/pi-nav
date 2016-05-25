@@ -7,6 +7,16 @@ TIME_INCREMENT_IN_SEC = 5
 TURN_FACTOR = 30
 MIN_TURN_RADIUS = 1
 
+class FakeCompass():
+    def __init__(self):
+        self.bearing = 0
+
+    def bearing(self):
+        return self.bearing
+
+    def set_bearing(self,new_bearing):
+        self.bearing = new_bearing
+
 class FakeWindSensor():
     def __init__(self):
         self.angle = 0
@@ -50,6 +60,7 @@ class FakeVehicle():
         self.rudder = FakeRudder()
         self.timer = FakeTimer(self.move)
         self.windsensor = FakeWindSensor()
+        self.compass = FakeCompass()
         self.position = self.gps.position
         self.track = self.gps.track
 
