@@ -1,22 +1,27 @@
 Epic - steering using servo
+- Add avg heading and abs wind direction
+- Finish helm with turn and steady
+- Add logging to a different file to sensors
+- Fix tracking mode
+Add power-on self test
+- Field test tracking including compass and windsensor
 - field test steering - need a set of local waypoints
+
+Epic - simulation
+- Fix simulator
+- Add wind and tides to simulation
+- Add a bit of randomness to simulation
 
 Epic - sailing
 Current tasks
-- make sure that Course Steerer gives the helm a bearing between 0 and 360 to steer
+- Add avoiding no go - when changing course and while steering (bearing off)
+- Add becalmed and in irons
 - write an integration test for the sailing helm
 - consider if we need to break out a bearing class to encapsulate the 360 behaviour of bearings (of course we do)
 - decide what to do about changes or differences in wind direction during tack
-    - use thw lower level heml steer method (yippee)
 - create class to control sail angle based on relative wind, use in the sailing helm
 - plumb sailing helm into wiring
-- update sensors to include both relative (to boat) and absolute wind directions - adjust absolute for speed - think I need wind speed to do this
 - move constants into config for sailing_helm and navigator
 
 For later
-- get a wind sensor and attach to PI
-- use an average speed rather than instantaneous speed
-    - circular array
-    - record array of gps data in sensors class
 - dealing with tides/currents/drift; probably need a compass (may need compass for rate of turn anyway)
-
