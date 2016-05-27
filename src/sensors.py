@@ -1,7 +1,7 @@
 from nan import isNaN
 from position import Position
 from events import EventName
-from bearing import moving_avg
+from bearing import moving_avg, to_360
 
 DEFAULT_ERROR = 10
 
@@ -13,7 +13,8 @@ class Sensors():
         self.compass = compass
         self._position = Position(gps.position.latitude,gps.position.longitude)
         self.config = config
-        self._wind_relative = 0.0
+        self._wind_relative_avg = 0.0
+        self._compass_avg = 0.0
         exchange.subscribe(EventName.tick,self.update_averages)
 
     @property
@@ -54,14 +55,25 @@ class Sensors():
 
     @property
     def wind_direction_relative_average(self):
-        return self._wind_relative
+        return round(self._wind_relative_avg,0)
+
+    @property
+    def wind_direction_abs_average(self):
+        return round(to_360(self._compass_avg + self._wind_relative_avg),0)
 
     @property
     def compass_heading_instant(self):
         return self.compass.bearing()
-        
+
+    @property
+    def compass_heading_average(self):
+        return round(self._compass_avg,0)
+
     def update_averages(self,tick_event):
-        self._wind_relative = moving_avg(self._wind_relative,self.windsensor.angle(),self.config['smoothing'])
+        wind = self.windsensor.angle()
+        compass = self.compass.bearing()
+        self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,self.config['smoothing'])
+        self._compass_avg = moving_avg(self._compass_avg,compass,self.config['smoothing'])
 
     def _default(self,  value,default):
         return default if isNaN(value) else value

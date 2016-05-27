@@ -1,11 +1,14 @@
-Epic - steering using servo
-- Add avg heading and abs wind direction
+Epic - steering using servo based on new event design
 - Finish helm with turn and steady
 - Add logging to a different file to sensors
 - Fix tracking mode
-Add power-on self test
+
+Epic - power-on self test
+- Blinking red then green light
+
+Epic - field test
 - Field test tracking including compass and windsensor
-- field test steering - need a set of local waypoints
+- field test steering without sailing
 
 Epic - simulation
 - Fix simulator
@@ -22,6 +25,11 @@ Current tasks
 - create class to control sail angle based on relative wind, use in the sailing helm
 - plumb sailing helm into wiring
 - move constants into config for sailing_helm and navigator
+- field test
 
 For later
 - dealing with tides/currents/drift; probably need a compass (may need compass for rate of turn anyway)
+
+
+Done
+- Add avg heading and abs wind direction

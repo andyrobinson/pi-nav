@@ -109,7 +109,6 @@ class TestEvents(unittest.TestCase):
         self.mock_logger.error.assert_has_calls([call('Exchange, RuntimeError: oops')])
         self.assertEqual(ts_after_error.event_call_count("bong"),1)
 
-
     def test_errors_during_logging_should_be_ignored_and_event_processing_continues(self):
         failing_logger = Mock()
         failing_logger.configure_mock(**{'error.side_effect': RuntimeError})

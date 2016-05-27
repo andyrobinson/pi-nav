@@ -1,8 +1,12 @@
 from setup_test import setup_test
 setup_test()
+
+import sys
 import unittest
 import logging
 from events import Exchange,EventName,Event
+
+
 
 def percentage_diff(original,to_compare):
     return abs(to_compare-original)*100/abs(original)
