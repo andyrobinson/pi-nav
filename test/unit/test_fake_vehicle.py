@@ -56,7 +56,7 @@ class TestFakeVehicle(unittest.TestCase):
 
         self.assertEqual(new_position.longitude, expected_position.longitude)
         self.assertEqual(new_position.latitude, expected_position.latitude)
-        self.assertEqual(vehicle.gps.track, expected_track)
+        self.assertEqual(round(vehicle.gps.track,5), round(expected_track,5))
 
     def test_should_turn_right_if_rudder_deflection_is_negative(self):
         bearing,time_s = 30,2
