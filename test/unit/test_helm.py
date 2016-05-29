@@ -1,7 +1,7 @@
 from setup_test import setup_test
 setup_test()
 import unittest
-from mock import Mock, call
+from mock import Mock, PropertyMock, call
 from helm import Helm
 from config import CONFIG
 from nan import NaN
@@ -31,15 +31,39 @@ class TestHelm(EventTestCase):
         self.exchange.publish(Event(EventName.set_course,heading=90))
         self.servo.set_position.assert_called_with(-30)
 
-    def test_should_review_and_change_steering_when_steer_event_called(self):
+    def test_should_review_and_change_steering_when_steer_event_called_via_tick(self):
         self.currently_tracking(204,200)
         self.exchange.publish(Event(EventName.set_course,heading=196))
-        self.assertEqual(self.servo.set_position.call_count,0)
+        self.assertFalse(self.servo.set_position.called)
 
         self.sensors.track = 200
         self.helm.previous_track = 220
         self.exchange.publish(Event(EventName.tick))
         self.servo.set_position.assert_called_with(-16)
+
+    def test_should_review_the_course_every_tick_using_instant_values_when_turning(self):
+        self.currently_tracking(80,90)
+        self.exchange.publish(Event(EventName.set_course,heading=180))
+
+        self.exchange.publish(Event(EventName.tick))
+        self.servo.set_position.assert_called_with(-30)
+
+    def test_should_review_the_course_every_10_seconds_using_average_values_when_on_course(self):
+        self.currently_tracking(90,90)
+        self.exchange.publish(Event(EventName.set_course,heading=90))
+
+        self.exchange.publish(Event(EventName.tick))
+        self.assertFalse(self.servo.set_position.called)
+
+
+    def ignore_should_switch_to_on_course_once_pointing_in_the_right_direction(self):
+        pass
+
+    def ignore_should_switch_to_turning_if_suddenly_thrown_off_course(self):
+        pass
+
+    def ignore_should_immediately_change_to_turning_when_course_is_set(self):
+        pass
 
     def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rate_of_turn_less_that_five_degrees(self):
         self.currently_tracking(204,200)

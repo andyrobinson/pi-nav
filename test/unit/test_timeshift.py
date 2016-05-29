@@ -32,7 +32,22 @@ class TestTimeShift(EventTestCase):
         self.assertEqual(self.event_count(EventName.start),1,"start should have been called")
         self.assertEqual(self.last_event.name,EventName.start)
 
-    def test_should_only_fire_events_once(self):
+    def test_should_fire_every_events_repeatedly(self):
+        self.listen(EventName.start)
+
+        # Note that time() is called on register, then on tick, awkwardness only during test
+        mock_time = Mock(side_effect=[145.6, 155.4, 155.7, 166.2, 166.3, 188.3, 188.4])
+        timeshift = TimeShift(self.exchange,mock_time)
+
+        self.exchange.publish(Event(EventName.every,seconds = 5,next_event=Event(EventName.start)))
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.tick))
+
+        event_count = self.event_count(EventName.start)
+        self.assertEqual(event_count,3,"turn should have been called three times, but was called {0} times".format(event_count))
+
+    def test_should_only_fire_after_events_once(self):
         self.listen(EventName.start)
         mock_time = Mock(side_effect=[145.6, 155.4, 166.2])
         timeshift = TimeShift(self.exchange,mock_time)

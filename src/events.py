@@ -5,11 +5,14 @@ class EventName:
     start = "start"
     end = "end"
     navigate = "navigate"
-    navigate_review = "navigate_review"
+    navigate_review = "navigate review"
     arrived = "arrived"
     set_course = "set course"
-    steer = "steer"
+    turn = "turn"
+    check_course = "check course"
     after = "after"
+    every = "every"
+    steer = "steer - deprecated"
 
 class Event:
     def __init__(self,name,waypoint = None, heading = None, seconds = 0, next_event = None):

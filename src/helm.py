@@ -15,11 +15,15 @@ class Helm():
         self.ignore_below = config['ignore deviation below']
         self.full_deflection = config['full deflection']
         self.exchange.subscribe(EventName.set_course,self.set_course)
+        self.exchange.subscribe(EventName.check_course,self.check_course)
         self.exchange.subscribe(EventName.tick,self.steer)
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading
         self.steer(Event(EventName.tick))
+
+    def check_course(self,check_course_event):
+        pass
 
     def steer(self,tick_event):
         track = self.sensors.track
