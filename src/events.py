@@ -32,9 +32,13 @@ class Exchange:
 
     def subscribe(self,name,callback):
         if name in self.register:
-            self.register[name].append(callback)
+            self.register[name].add(callback)
         else:
-            self.register[name] = [callback]
+            self.register[name] = set([callback])
+
+    def unsubscribe(self,name,callback):
+        if name in self.register:
+            self.register[name].remove(callback)
 
     def publish(self,event):
         self.events.append(event)
@@ -42,7 +46,7 @@ class Exchange:
             self._process_events()
 
     def _send_event(self,event):
-        if event.name in self.register:
+        if event.name in self.register and len(self.register[event.name]) > 0:
             for callback in self.register[event.name]:
                 self._safely_callback(callback,event)
         else:
