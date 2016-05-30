@@ -26,7 +26,7 @@ class TestHelm(EventTestCase):
         self.helm.previous_heading = previous_heading
         self.servo.set_position.reset_mock()
 
-    def ignore_should_review_and_change_steering_when_steer_event_called_via_tick(self):
+    def ignore_should_review_and_change_steering_based_on_instant_heading_when_turning(self):
         self.currently_tracking(204,200)
         self.exchange.publish(Event(EventName.set_course,heading=196))
         self.assertFalse(self.servo.set_position.called)
@@ -36,32 +36,22 @@ class TestHelm(EventTestCase):
         self.exchange.publish(Event(EventName.tick))
         self.servo.set_position.assert_called_with(-16)
 
-    def ignore_should_review_the_course_every_tick_using_instant_values_when_turning(self):
-        self.currently_tracking(80,90)
-        self.exchange.publish(Event(EventName.set_course,heading=180))
+    def ignore_should_use_instant_heading_when_turning(self):
+        pass
 
-        self.exchange.publish(Event(EventName.tick))
-        self.servo.set_position.assert_called_with(-30)
-
-    def ignore_should_review_the_course_when_check_course_fired_using_average_values_when_on_course(self):
-        self.currently_tracking(90,90)
-        self.exchange.publish(Event(EventName.set_course,heading=90))
-
-        self.currently_tracking(90,100)
-        self.exchange.publish(Event(EventName.tick))
-        self.assertFalse(self.servo.set_position.called)
-
-        self.exchange.publish(Event(EventName.check_course))
-        self.servo.set_position.assert_called_with(-30)
-
-
-    def ignore_should_switch_to_on_course_once_pointing_in_the_right_direction(self):
+    def ignore_should_use_average_heading_when_checking_course(self):
         pass
 
     def ignore_should_switch_to_turning_if_suddenly_thrown_off_course(self):
         pass
 
     def ignore_should_immediately_change_to_turning_when_course_is_set(self):
+        pass
+
+    def ignore_should_unsubscribe_turn_to_tick_event_when_on_course(self):
+        pass
+
+    def ignore_should_subscribe_check_course_every_10_seconds(self):
         pass
 
     def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rate_of_turn_less_that_five_degrees(self):
