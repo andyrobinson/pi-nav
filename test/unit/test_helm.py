@@ -18,12 +18,12 @@ class TestHelm(EventTestCase):
         self.servo = Mock()
         self.logger = Mock()
         self.helm = Helm(self.exchange, self.sensors,self.servo,self.logger, CONFIG['helm'])
-        self.helm.previous_track = 180
+        self.helm.previous_heading = 180
 
-    def currently_tracking(self,previous_track, current_track, rudder_angle=0):
+    def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
         self.helm.rudder_angle = rudder_angle
         self.sensors.track = current_track
-        self.helm.previous_track = previous_track
+        self.helm.previous_heading = previous_heading
         self.servo.set_position.reset_mock()
 
     def test_should_save_the_new_course_and_start_steering_in_that_direction(self):
@@ -37,7 +37,7 @@ class TestHelm(EventTestCase):
         self.assertFalse(self.servo.set_position.called)
 
         self.sensors.track = 200
-        self.helm.previous_track = 220
+        self.helm.previous_heading = 220
         self.exchange.publish(Event(EventName.tick))
         self.servo.set_position.assert_called_with(-16)
 
@@ -48,12 +48,16 @@ class TestHelm(EventTestCase):
         self.exchange.publish(Event(EventName.tick))
         self.servo.set_position.assert_called_with(-30)
 
-    def test_should_review_the_course_every_10_seconds_using_average_values_when_on_course(self):
+    def ignore_should_review_the_course_when_check_course_fired_using_average_values_when_on_course(self):
         self.currently_tracking(90,90)
         self.exchange.publish(Event(EventName.set_course,heading=90))
 
+        self.currently_tracking(90,100)
         self.exchange.publish(Event(EventName.tick))
         self.assertFalse(self.servo.set_position.called)
+
+        self.exchange.publish(Event(EventName.check_course))
+        self.servo.set_position.assert_called_with(-30)
 
 
     def ignore_should_switch_to_on_course_once_pointing_in_the_right_direction(self):

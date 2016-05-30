@@ -12,7 +12,6 @@ class EventName:
     check_course = "check course"
     after = "after"
     every = "every"
-    steer = "steer - deprecated"
 
 class Event:
     def __init__(self,name,waypoint = None, heading = None, seconds = 0, next_event = None):
