@@ -1,10 +1,10 @@
 Epic - steering using servo based on new event design
 - Finish helm with turn and steady
 - Add logging to a different file to sensors
-- Fix tracking mode
 
 Epic - power-on self test
 - Blinking red then green light
+- Note that failure in self-check does NOT stop navigation from beginning
 
 Epic - field test
 - Field test tracking including compass and windsensor
@@ -29,7 +29,10 @@ Current tasks
 
 For later
 - dealing with tides/currents/drift; probably need a compass (may need compass for rate of turn anyway)
-
+- falling back when sensors fail (for instance tracking to compass and vice-versa)
+- navigate to nearest next waypoint on reboot, NOT first in list
+- software autoreboot
+- hardware autoreboot (n.b. problems with self-check)
 
 Done
 - Add avg heading and abs wind direction
