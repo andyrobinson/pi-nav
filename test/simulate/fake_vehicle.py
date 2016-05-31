@@ -41,9 +41,10 @@ class FakeTimer():
         self.fake_time = 0
 
     def wait_for(self,seconds):
+        self.fake_time += seconds
         self.callback(seconds)
 
-    def timer(self):
+    def time(self):
         return self.fake_time
 
     def tick(self):

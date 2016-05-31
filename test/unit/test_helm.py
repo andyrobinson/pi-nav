@@ -89,9 +89,11 @@ class TestHelm(EventTestCase):
 
         self.assertNotIn(self.helm.turn,self.exchange.register[EventName.tick])
 
-    @unittest.skip("in dev")
     def test_should_subscribe_check_course_every_10_seconds(self):
-        pass
+        self.listen(EventName.every)
+        helm = Helm(self.exchange, self.sensors,self.servo,self.logger, CONFIG['helm'])
+
+        self.assertEqual(len(self.events[EventName.every]),1)
 
     def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rate_of_turn_less_that_five_degrees(self):
         self.currently_tracking(204,200)

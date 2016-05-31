@@ -19,6 +19,7 @@ class Helm():
         self.turn_on_course_min_count = config['turn on course min count']
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
+        self.exchange.publish(Event(EventName.every,seconds=10,next_event=Event(EventName.check_course)))
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading
