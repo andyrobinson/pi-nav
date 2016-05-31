@@ -79,5 +79,5 @@ class Wiring():
 
     def follow(self,waypoints):
         self.rudder_servo.set_position(0)
-        self.follower = Follower(self.exchange,self.navigator,waypoints,self.application_logger)
+        self.follower = Follower(self.exchange,waypoints,self.application_logger)
         self.event_source.start()

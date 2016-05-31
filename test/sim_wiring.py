@@ -59,7 +59,7 @@ class SimWiring():
         return logging.getLogger("simulate")
 
     def _follower(self,waypoints):
-        self.follower_simulator =  Follower(self.exchange,self.navigator_simulator,waypoints,self.console_logger)
+        self.follower_simulator =  Follower(self.exchange,waypoints,self.console_logger)
         return self.follower_simulator
 
     def follow(self,waypoints):

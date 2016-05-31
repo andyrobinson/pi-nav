@@ -26,7 +26,8 @@ class TestNavigationAndHelm(unittest.TestCase):
         self.servo = Mock()
         self.exchange = Exchange(self.logger)
 
-    def ignore_should_steer_to_next_waypoint(self):
+    @unittest.skip("fix after events refactor")
+    def test_should_steer_to_next_waypoint(self):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.02,10.02),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])
@@ -41,7 +42,8 @@ class TestNavigationAndHelm(unittest.TestCase):
             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 1560.6m'),
             call('Navigator, arrived at +10.030000,+10.030000')])
 
-    def ignore_should_steer_to_next_waypoint_with_kink_in_route(self):
+    @unittest.skip("fix after events refactor")
+    def test_should_steer_to_next_waypoint_with_kink_in_route(self):
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])
         course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
@@ -56,7 +58,8 @@ class TestNavigationAndHelm(unittest.TestCase):
             call('Navigator, steering to +10.030000,+10.030000, bearing  71.3, distance 1734.0m'),
             call('Navigator, arrived at +10.030000,+10.030000')])
 
-    def ignore_should_steer_repeatedly_during_navigation(self):
+    @unittest.skip("fix after events refactor")
+    def test_should_steer_repeatedly_during_navigation(self):
         destination = Waypoint(Position(10.0003,10.0003),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         helm = Helm(gps,self.servo,self.logger, CONFIG['helm'])

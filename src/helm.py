@@ -11,24 +11,32 @@ class Helm():
         self.logger = logger
         self.previous_heading = 0
         self.requested_heading = 0
+        self.on_course_count = 0
         self.exchange = exchange
         self.ignore_below = config['ignore deviation below']
         self.full_deflection = config['full deflection']
+        self.on_course_threshold = config['on course threshold']
+        self.turn_on_course_min_count = config['turn on course min count']
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
-        self.exchange.subscribe(EventName.tick,self.turn)
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading
+        self._start_turning()
         self.turn(Event(EventName.tick))
 
     def turn(self,tick_event):
-        self.steer(self.sensors.compass_heading_instant)
+        heading = self.sensors.compass_heading_instant
+        self._check_on_course(heading)
+        self._steer(heading)
 
     def check_course(self,check_course_event):
-        pass
+        heading = self.sensors.compass_heading_average
+        if abs(angle_between(heading,self.requested_heading)) > self.on_course_threshold:
+            self._start_turning()
+        self._steer(heading)
 
-    def steer(self,current_heading):
+    def _steer(self,current_heading):
         if isNaN(current_heading):
             self._set_rudder_angle(0)
             return
@@ -38,6 +46,21 @@ class Helm():
 
         if abs(deviation) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
             self._correct_steering(rate_of_turn, self.requested_heading, current_heading, deviation)
+
+    def _start_turning(self):
+        self.exchange.subscribe(EventName.tick,self.turn)
+        self.on_course_count = 0
+
+    def _on_course(self):
+        self.exchange.unsubscribe(EventName.tick,self.turn)
+
+    def _check_on_course(self,heading):
+        if abs(angle_between(heading,self.requested_heading)) < self.on_course_threshold:
+            self.on_course_count += 1
+            if self.on_course_count >= 3:
+                self._on_course()
+        else:
+            self.on_course_count = 0
 
     def _calculate_rudder_angle(self,deviation,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (deviation - rate_of_turn)

@@ -46,7 +46,8 @@ class Exchange:
 
     def _send_event(self,event):
         if event.name in self.register and len(self.register[event.name]) > 0:
-            for callback in self.register[event.name]:
+            immutable_events_to_call = self.register[event.name].copy()
+            for callback in immutable_events_to_call:
                 self._safely_callback(callback,event)
         else:
             self.logger.warn("Event({}) published but no subscribers".format(event.name))

@@ -63,6 +63,14 @@ class TestEvents(unittest.TestCase):
         self.assertEqual(ts1.last_event_called.name,"nil")
         self.mock_logger.warn.assert_called_with("Event(never) published but no subscribers")
 
+    def test_should_accept_unsubscribe_without_subscribe(self):
+        ts1 = TestSubscriber(self.exchange)
+        self.exchange.unsubscribe("never",ts1.callme)
+        self.exchange.publish(Event("never"))
+
+        self.assertEqual(ts1.last_event_called.name,"nil")
+        self.mock_logger.warn.assert_called_with("Event(never) published but no subscribers")
+
     def test_should_signal_events_to_multiple_subscribers(self):
         ts1 = TestSubscriber(self.exchange)
         ts2 = TestSubscriber(self.exchange)

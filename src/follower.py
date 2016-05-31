@@ -2,8 +2,7 @@ import sys
 from events import Event,EventName
 
 class Follower():
-    def __init__(self,exchange,navigator,waypoints,logger):
-        self.navigator = navigator
+    def __init__(self,exchange,waypoints,logger):
         self.logger = logger
         self.exchange = exchange
         self.waypoints = waypoints

@@ -1,4 +1,8 @@
 class StubTimer():
+
+    def __init__(self):
+        self._time = 1000
+
     def every(self,seconds):
         self.seconds = seconds
 
@@ -8,7 +12,11 @@ class StubTimer():
         return self
 
     def wait_for(self,seconds):
-        pass
-        
+        self._time += seconds
+
     def signal_time_elapsed(self):
+        self._time += self.seconds
         self.method(*self.args)
+
+    def time(self):
+        return self._time

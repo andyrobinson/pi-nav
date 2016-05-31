@@ -16,13 +16,12 @@ class TestFollower(EventTestCase):
 
     def setUp(self):
         super(TestFollower, self).setUp()
-        self.mock_navigator = Mock()
         self.mock_logger = Mock()
 
     def test_should_signal_a_navigate_event_using_the_first_waypoint(self):
         self.listen(EventName.navigate)
         firstwaypoint = Waypoint(Position(1,1),5)
-        follower = Follower(self.exchange,self.mock_navigator, [firstwaypoint],self.mock_logger)
+        follower = Follower(self.exchange,[firstwaypoint],self.mock_logger)
 
         self.exchange.publish(Event(EventName.start))
         self.assertEqual(self.last_event.name,EventName.navigate)
@@ -32,7 +31,7 @@ class TestFollower(EventTestCase):
         self.listen(EventName.navigate)
         waypoint1 = Waypoint(Position(1,1),5)
         waypoint2 = Waypoint(Position(2,2),5)
-        follower = Follower(self.exchange,self.mock_navigator, [waypoint1,waypoint2],self.mock_logger)
+        follower = Follower(self.exchange,[waypoint1,waypoint2],self.mock_logger)
 
         self.exchange.publish(Event(EventName.start))
         self.exchange.publish(Event(EventName.arrived,waypoint1))
@@ -41,7 +40,7 @@ class TestFollower(EventTestCase):
 
     def test_should_signal_end_when_all_waypoints_exhausted(self):
         self.listen(EventName.end)
-        follower = Follower(self.exchange,self.mock_navigator, [],self.mock_logger)
+        follower = Follower(self.exchange,[],self.mock_logger)
 
         self.exchange.publish(Event(EventName.start))
         self.assertEqual(self.last_event.name,EventName.end)
@@ -50,7 +49,7 @@ class TestFollower(EventTestCase):
         waypoint1 = Waypoint(Position(1,1),5)
         waypoint2 = Waypoint(Position(2,2),5)
 
-        follower = Follower(self.exchange,self.mock_navigator, [waypoint1,waypoint2],self.mock_logger)
+        follower = Follower(self.exchange,[waypoint1,waypoint2],self.mock_logger)
 
         self.exchange.publish(Event(EventName.start))
         self.exchange.publish(Event(EventName.arrived,waypoint1))
