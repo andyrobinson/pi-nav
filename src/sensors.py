@@ -11,7 +11,8 @@ class Sensors():
         self.exchange = exchange
         self.windsensor = windsensor
         self.compass = compass
-        self._position = Position(gps.position.latitude,gps.position.longitude)
+        position = gps.position
+        self._position = Position(position.latitude,position.longitude)
         self.config = config
         self._wind_relative_avg = 0.0
         self._compass_avg = 0.0
@@ -23,10 +24,11 @@ class Sensors():
 
     @property
     def position(self):
-        self._position.latitude = self.gps.position.latitude
-        self._position.longitude = self.gps.position.longitude
-        self._position.lat_error = self._default(self.gps.position.lat_error,DEFAULT_ERROR)
-        self._position.long_error = self._default(self.gps.position.long_error,DEFAULT_ERROR)
+        gps_position = self.gps.position
+        self._position.latitude = gps_position.latitude
+        self._position.longitude = gps_position.longitude
+        self._position.lat_error = self._default(gps_position.lat_error,DEFAULT_ERROR)
+        self._position.long_error = self._default(gps_position.long_error,DEFAULT_ERROR)
         return self._position
 
     @property

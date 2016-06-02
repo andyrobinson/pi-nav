@@ -6,7 +6,9 @@ import unittest
 import logging
 from events import Exchange,EventName,Event
 
-
+def test_logger(log_level):
+    logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s', level=logging.ERROR)
+    return logging.getLogger("test")
 
 def percentage_diff(original,to_compare):
     return abs(to_compare-original)*100/abs(original)
@@ -16,8 +18,7 @@ class EventTestCase(unittest.TestCase):
     def setUp(self):
         self.last_event = Event("None")
         self.events = {}
-        logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s', level=logging.ERROR)
-        self.exchange = Exchange(logging.getLogger("test"))
+        self.exchange = Exchange(test_logger(logging.ERROR))
 
     def event_recorder(self,event):
         self.last_event = event

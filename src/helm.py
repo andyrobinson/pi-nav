@@ -37,17 +37,6 @@ class Helm():
             self._start_turning()
         self._steer(heading)
 
-    def _steer(self,current_heading):
-        if isNaN(current_heading):
-            self._set_rudder_angle(0)
-            return
-
-        deviation = angle_between(current_heading,self.requested_heading)
-        rate_of_turn = angle_between(self.previous_heading,current_heading)
-
-        if abs(deviation) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
-            self._correct_steering(rate_of_turn, self.requested_heading, current_heading, deviation)
-
     def _start_turning(self):
         self.exchange.subscribe(EventName.tick,self.turn)
         self.on_course_count = 0
@@ -62,6 +51,17 @@ class Helm():
                 self._on_course()
         else:
             self.on_course_count = 0
+
+    def _steer(self,current_heading):
+        if isNaN(current_heading):
+            self._set_rudder_angle(0)
+            return
+
+        deviation = angle_between(current_heading,self.requested_heading)
+        rate_of_turn = angle_between(self.previous_heading,current_heading)
+
+        if abs(deviation) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
+            self._correct_steering(rate_of_turn, self.requested_heading, current_heading, deviation)
 
     def _calculate_rudder_angle(self,deviation,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (deviation - rate_of_turn)

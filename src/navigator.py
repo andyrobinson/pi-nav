@@ -22,12 +22,12 @@ class Navigator():
 
     def review_progress(self,event):
         current_position = self.sensors.position
-        time_to_next_review = self._time_to_review(current_position,self.destination_waypoint)
 
         if self._arrived(current_position, self.destination_waypoint):
             self.logger.info('Navigator, arrived at {:+f},{:+f}'.format(self.destination_waypoint.latitude,self.destination_waypoint.longitude))
             self.exchange.publish(Event(EventName.arrived,self.destination_waypoint))
         else:
+            time_to_next_review = self._time_to_review(current_position,self.destination_waypoint)
             bearing = self.globe.bearing(current_position, self.destination_waypoint.position)
             if isNaN(bearing):
                 self.logger.warn('Navigator, no information from sensors, continuing on current course')

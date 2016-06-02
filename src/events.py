@@ -30,16 +30,19 @@ class Exchange:
         self.processing = False
 
     def subscribe(self,name,callback):
+        self.logger.debug("subscribe to event {}, callback {}".format(name,callback))
         if name in self.register:
             self.register[name].add(callback)
         else:
             self.register[name] = set([callback])
 
     def unsubscribe(self,name,callback):
+        self.logger.debug("unsubscribe to event {}, callback {}".format(name,callback))
         if name in self.register:
             self.register[name].remove(callback)
 
     def publish(self,event):
+        self.logger.debug("publishing event " + event.name)
         self.events.append(event)
         if not(self.processing):
             self._process_events()
