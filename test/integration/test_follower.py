@@ -33,7 +33,6 @@ class TestFollower(unittest.TestCase):
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
         self.navigator = Navigator(gps,Globe(),self.exchange,self.mock_logger, {'min time to steer': 5,'max time to steer': 20})
 
-    @unittest.skip("temp disabled while fixing other test")
     def test_should_navigate_along_list_of_waypoints_with_logging(self):
         waypoint1 = Waypoint(Position(11,11),10)
         waypoint2 = Waypoint(Position(13,13),10)

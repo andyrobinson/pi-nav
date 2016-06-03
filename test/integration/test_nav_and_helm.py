@@ -82,15 +82,15 @@ class TestNavigationAndHelm(unittest.TestCase):
             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 1560.6m'),
             call('Navigator, arrived at +10.030000,+10.030000')])
 
-    @unittest.skip("fix after events refactor")
     def test_should_steer_to_next_waypoint_with_kink_in_route(self):
-        gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
-        helm = Helm(self.exchange,gps,self.servo,self.logger, CONFIG['helm'])
-        course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
-        navigator = Navigator(gps,Globe(),self.exchange,self.logger, CONFIG['navigator'])
         destination = Waypoint(Position(10.03,10.03),10)
+        gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
+        sensors = FakeSensors(gps,1,45)
+        helm = Helm(self.exchange,sensors,self.servo,self.logger, CONFIG['helm'])
+        navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
-        self.exchange.publish(Event(EventName.navigate))
+        self.exchange.publish(Event(EventName.navigate,waypoint = destination))
+        self.ticks(number = 14,duration=200)
 
         self.logger.info.assert_has_calls(
             [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m'),
@@ -98,25 +98,30 @@ class TestNavigationAndHelm(unittest.TestCase):
             call('Navigator, steering to +10.030000,+10.030000, bearing  71.3, distance 1734.0m'),
             call('Navigator, arrived at +10.030000,+10.030000')])
 
-    @unittest.skip("fix after events refactor")
     def test_should_steer_repeatedly_during_navigation(self):
+        logger = Mock()
         destination = Waypoint(Position(10.0003,10.0003),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
-        helm = Helm(self.exchange,gps,self.servo,self.logger, CONFIG['helm'])
-        course_steerer = CourseSteerer(gps,helm,Mock(),CONFIG['course steerer'])
-        navigator = Navigator(gps,Globe(),self.exchange,self.logger, CONFIG['navigator'])
+        sensors = FakeSensors(gps,1,45)
+        helm = Helm(self.exchange,sensors,self.servo,logger, CONFIG['helm'])
+        navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
-        self.exchange.publish(Event(EventName.navigate))
+        self.exchange.publish(Event(EventName.navigate,waypoint = destination))
+        self.ticks(number = 10,duration=20)
 
-        self.logger.debug.assert_has_calls(
-            [call('Helm, steering 44.6, tracking 55.9, rate of turn +55.9, rudder +0.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
-            call('Helm, steering 44.6, tracking 55.9, rate of turn +0.0, rudder +30.0, new rudder +30.0')])
-
+        logger.debug.assert_has_calls(
+            [call('Helm, steering 44.6, heading 45.0, rate of turn +45.0, rudder +0.0, new rudder +30.0'),
+             call('Helm, steering 36.4, heading 45.0, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+             call('Helm, steering 36.4, heading 45.0, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+             call('Helm, steering 36.4, heading 45.0, rate of turn +0.0, rudder +30.0, new rudder +30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder +30.0, new rudder +11.9'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder +11.9, new rudder -6.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -6.2, new rudder -24.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -24.2, new rudder -30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -30.0, new rudder -30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +0.0, rudder -30.0, new rudder -30.0')])
 
 if __name__ == "__main__":
     unittest.main()
