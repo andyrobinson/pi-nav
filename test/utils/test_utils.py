@@ -7,9 +7,11 @@ import logging
 from events import Exchange,EventName,Event
 
 def test_logger(log_level):
-    logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s', level=logging.ERROR)
-    return logging.getLogger("test")
-
+    logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s')
+    logger = logging.getLogger("test")
+    logger.setLevel(log_level)
+    return logger
+    
 def percentage_diff(original,to_compare):
     return abs(to_compare-original)*100/abs(original)
 

@@ -55,7 +55,7 @@ class SimWiring():
         self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
 
     def _console_logger(self):
-        logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
+        logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
         return logging.getLogger("simulate")
 
     def _follower(self,waypoints):
