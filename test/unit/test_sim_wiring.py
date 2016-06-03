@@ -4,7 +4,7 @@ setup_test()
 import unittest
 import logging
 
-from sim_wiring import SimWiring
+from simulate.sim_wiring import SimWiring
 from globe import Globe
 from sensors import Sensors
 from navigator import Navigator

@@ -1,5 +1,5 @@
-from setup_test import setup_test
-setup_test()
+from test import setup_test
+setup_test.setup_test()
 import logging
 from position import Position
 from waypoint import Waypoint
@@ -15,10 +15,10 @@ from course_steerer import CourseSteerer
 from events import Exchange
 from timeshift import TimeShift
 
-from simulate.fake_vehicle import FakeVehicle
-from simulate.fake_vehicle_gps import FakeVehicleGPS
+from simulated_vehicle import SimulatedVehicle
+from simulated_gps import SimulatedGPS
 
-from simulate.stub_gps import StubGPS
+from test.utils import stub_gps
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 
@@ -45,14 +45,14 @@ class SimWiring():
         self.timer = Timer()
         self.console_logger = self._console_logger()
         self.exchange = Exchange(self.console_logger)
-        self.gps = FakeVehicleGPS(CHORLTON.position,0,0.1)
-        self.vehicle = FakeVehicle(self.gps, self.globe,self.console_logger,True)
+        self.gps = SimulatedGPS(CHORLTON.position,0,0.1)
+        self.vehicle = SimulatedVehicle(self.gps, self.globe,self.console_logger,True)
         self.timeshift = TimeShift(self.exchange,self.vehicle.timer.time)
         self.sensors = Sensors(self.vehicle.gps, self.vehicle.windsensor,self.vehicle.compass,self.exchange,CONFIG['sensors'])
         self.helm = Helm(self.exchange, self.sensors, self.vehicle.rudder, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
-        self.tracker_simulator = Tracker(self.console_logger,StubGPS(),self.timer)
+        self.tracker_simulator = Tracker(self.console_logger,stub_gps.StubGPS(),self.timer)
 
     def _console_logger(self):
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)

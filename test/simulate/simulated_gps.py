@@ -2,12 +2,12 @@ import random
 from position import Position
 from nan import NaN
 
-class FakeVehicleGPS():
+class SimulatedGPS():
     def __init__(self, position, track, speed, reliable = False):
         self._set_position(position,track,speed)
         self.lost_position = False
         self.reliable = reliable
-        
+
     def set_position(self,position,track,speed, reliable = False):
         rand = random.randrange(1,101)
         if self.reliable or reliable:

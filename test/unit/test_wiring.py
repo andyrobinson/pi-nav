@@ -9,7 +9,7 @@ from globe import Globe
 from sensors import Sensors
 from navigator import Navigator
 from follower import Follower
-from simulate.stub_gps import StubGPS
+from utils.stub_gps import StubGPS
 from config import CONFIG
 from helm import Helm
 from event_source import EventSource

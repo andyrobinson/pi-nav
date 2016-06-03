@@ -7,7 +7,7 @@ COMMANDS = ['test','track','hardware','simtrack','showgps', 'simnav','nav','clea
 DEFAULT_COMMAND = 'test'
 
 from src import wiring
-from test import sim_wiring
+from test.simulate import sim_wiring
 from src import routes
 
 def wiring_inst():

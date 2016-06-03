@@ -5,7 +5,7 @@ setup_test()
 import unittest
 from mock import Mock
 
-from simulate.stub_gps import StubGPS
+from utils.stub_gps import StubGPS
 from sensors import Sensors
 from nan import NaN
 from events import Exchange,EventName,Event
@@ -70,7 +70,7 @@ class TestSensors(EventTestCase):
         self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.tick))
         self.assertEqual(sensors.wind_direction_relative_average, round(((0.0 + 10)/2 + 20)/2),0)
-        
+
     def test_should_provide_a_rounded_average_for_values_either_side_of_zero(self):
         windsensor = Mock()
         windsensor.angle.side_effect = [350.0,0.0,10.0]

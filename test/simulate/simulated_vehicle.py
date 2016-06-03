@@ -7,7 +7,7 @@ TIME_INCREMENT_IN_SEC = 5
 TURN_FACTOR = 30
 MIN_TURN_RADIUS = 1
 
-class FakeCompass():
+class SimulatedCompass():
     def __init__(self):
         self.bearing = 0
 
@@ -17,7 +17,7 @@ class FakeCompass():
     def set_bearing(self,new_bearing):
         self.bearing = new_bearing
 
-class FakeWindSensor():
+class SimulatedWindSensor():
     def __init__(self):
         self.angle = 0
 
@@ -27,14 +27,14 @@ class FakeWindSensor():
     def set_angle(self,new_angle):
         self.angle = new_angle
 
-class FakeRudder():
+class SimulatedRudder():
     def __init__(self):
         self.angle = 0
 
     def set_position(self,angle):
         self.angle = angle
 
-class FakeTimer():
+class SimulatedTimer():
 
     def __init__(self,callback):
         self.callback = callback
@@ -50,7 +50,7 @@ class FakeTimer():
     def tick(self):
         self.fake_time += 0.2
 
-class FakeVehicle():
+class SimulatedVehicle():
     def __init__(self,gps, globe, logger, single_step = False):
         self.single_step = single_step
         self.gps = gps
@@ -58,10 +58,10 @@ class FakeVehicle():
         self.logger = logger
         self.speed = INITIAL_SPEED_IN_MS
         self.gps.speed = INITIAL_SPEED_IN_MS
-        self.rudder = FakeRudder()
-        self.timer = FakeTimer(self.move)
-        self.windsensor = FakeWindSensor()
-        self.compass = FakeCompass()
+        self.rudder = SimulatedRudder()
+        self.timer = SimulatedTimer(self.move)
+        self.windsensor = SimulatedWindSensor()
+        self.compass = SimulatedCompass()
         self.position = self.gps.position
         self.track = self.gps.track
 
