@@ -12,6 +12,7 @@ class EventName:
     check_course = "check course"
     after = "after"
     every = "every"
+    log_position = "log position"
 
 class Event:
     def __init__(self,name,waypoint = None, heading = None, seconds = 0, next_event = None):

@@ -1,22 +1,25 @@
 from nan import isNaN
 from position import Position
-from events import EventName
+from events import Event,EventName
 from bearing import moving_avg, to_360
 
 DEFAULT_ERROR = 10
 
 class Sensors():
-    def __init__(self,gps,windsensor,compass,exchange,config):
+    def __init__(self,gps,windsensor,compass,exchange,logger,config):
         self.gps = gps
         self.exchange = exchange
         self.windsensor = windsensor
         self.compass = compass
+        self.logger = logger
         position = gps.position
         self._position = Position(position.latitude,position.longitude)
         self.config = config
         self._wind_relative_avg = 0.0
         self._compass_avg = 0.0
         exchange.subscribe(EventName.tick,self.update_averages)
+        exchange.subscribe(EventName.log_position,self.log_values)
+        exchange.publish(Event(EventName.every,seconds = config['log frequency'],next_event = Event(EventName.log_position)))
 
     @property
     def hasfix(self):
@@ -76,6 +79,22 @@ class Sensors():
         compass = self.compass.bearing()
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,self.config['smoothing'])
         self._compass_avg = moving_avg(self._compass_avg,compass,self.config['smoothing'])
+
+    def log_values(self):
+        self.logger.info('{:+f},{:+f},{:+f},{:+f},{:+.2f},{:+.1f},{:+.2f},{:+.1f},|,{:+.1f},{:+.1f},{:+.1f},|,{:+.1f},{:+.1f}'.format(
+            self.gps.position.latitude,
+            self.gps.position.longitude,
+            self.gps.position.lat_error,
+            self.gps.position.long_error,
+            self.gps.speed,
+            self.gps.track,
+            self.gps.speed_error,
+            self.gps.track_error,
+            self.windsensor.angle(),
+            self.wind_direction_relative_average,
+            self.wind_direction_abs_average,
+            self.compass_heading_instant,
+            self.compass_heading_average))
 
     def _default(self,  value,default):
         return default if isNaN(value) else value

@@ -43,11 +43,12 @@ class Wiring():
         self.timer = Timer()
         self.tracker = Tracker(self._rotating_logger("track"),self.gps,self.timer)
         self.application_logger = self._rotating_logger(APPLICATION_NAME)
+        self.position_logger = self._rotating_logger("position")
         self.exchange = Exchange(self.application_logger)
         self.timeshift = TimeShift(self.exchange,self.timer.time)
         self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
 
-        self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.exchange,CONFIG['sensors'])
+        self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.exchange,self.position_logger,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.exchange,self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])

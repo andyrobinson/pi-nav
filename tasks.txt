@@ -1,6 +1,3 @@
-Epic - steering using servo based on new event design
-- Add logging to a different file to sensors
-
 Epic - power-on self test
 - Blinking red then green light
 - Note that failure in self-check does NOT stop navigation from beginning
@@ -34,4 +31,7 @@ For later
 - hardware autoreboot (n.b. problems with self-check)
 
 Done
+Epic - steering using servo based on new event design
+- Add logging to a different file to sensors
+
 - Add avg heading and abs wind direction

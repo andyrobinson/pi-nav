@@ -1,5 +1,3 @@
-
-
 from bearing import to_360,angle_between
 
 class FakeSensors:
