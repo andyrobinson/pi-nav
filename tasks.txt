@@ -1,5 +1,4 @@
 Epic - steering using servo based on new event design
-- Finish helm with turn and steady
 - Add logging to a different file to sensors
 
 Epic - power-on self test

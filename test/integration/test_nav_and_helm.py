@@ -7,6 +7,7 @@ from mock import Mock, call
 
 from bearing import angle_between,to_360
 from fake_moving_gps import FakeMovingGPS
+from fake_sensors import FakeSensors
 from navigator import Navigator
 from helm import Helm
 from course_steerer import CourseSteerer
@@ -22,33 +23,6 @@ from test_utils import test_logger
 
 def print_msg(msg):
     print msg
-
-
-class FakeSensors:
-
-    def __init__(self,gps,wind_direction,compass_heading):
-        self.gps = gps
-        self.time = 0
-        self.speed = 1
-        self.track_error = 1
-        self.speed_error = 0.1
-        self.wind_direction_abs_average = wind_direction
-        self.wind_direction_relative_instant = to_360(angle_between(wind_direction,compass_heading))
-        self.wind_direction_relative_average = self.wind_direction_relative_instant
-        self.compass_heading_average = compass_heading
-        self.compass_heading_instant = compass_heading
-
-    @property
-    def hasfix(self):
-        return self.gps.hasfix
-
-    @property
-    def position(self):
-        return self.gps.position
-
-    @property
-    def track(self):
-        return self.gps.track
 
 class TestNavigationAndHelm(unittest.TestCase):
 
