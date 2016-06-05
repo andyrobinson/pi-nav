@@ -90,7 +90,7 @@ class Sensors():
             self.gps.track,
             self.gps.speed_error,
             self.gps.track_error,
-            self.windsensor.angle(),
+            self.wind_direction_relative_instant,
             self.wind_direction_relative_average,
             self.wind_direction_abs_average,
             self.compass_heading_instant,
