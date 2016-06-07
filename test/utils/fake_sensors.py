@@ -24,3 +24,6 @@ class FakeSensors:
     @property
     def track(self):
         return self.gps.track
+
+    def update_averages(self,tick_event):
+        pass

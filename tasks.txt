@@ -1,6 +1,15 @@
-Epic - power-on self test
-- Blinking red then green light
-- Note that failure in self-check does NOT stop navigation from beginning
+Current test_should_provide_an_average_for_values_either_side_of_zero
+
+1. Ensure system can steer around a course_steerer
+2. Fix simulation following rewrite to events
+3. Implement a simple sailing algorithm:
+    - only navigate to (max) half-way, then reassess
+    - simple steer if not in the no-go area
+    - decide once at beginning of navigation which way to tack even if
+    a tack is not required (always choose more direct tack)
+    - bear up to wind as much as possible if tacking
+    - avoid the no-go area continuously by bearing off in the direction of the tack as needed
+    - set sails according to the wind direction
 
 Epic - field test
 - Field test tracking including compass and windsensor
@@ -10,6 +19,10 @@ Epic - simulation
 - Fix simulator
 - Add wind and tides to simulation
 - Add a bit of randomness to simulation
+
+Epic - power-on self test
+- Blinking red then green light
+- Note that failure in self-check does NOT stop navigation from beginning
 
 Epic - sailing
 Current tasks

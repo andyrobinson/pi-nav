@@ -80,7 +80,7 @@ class Sensors():
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,self.config['smoothing'])
         self._compass_avg = moving_avg(self._compass_avg,compass,self.config['smoothing'])
 
-    def log_values(self):
+    def log_values(self,unused_event):
         self.logger.info('{:+f},{:+f},{:+f},{:+f},{:+.2f},{:+.1f},{:+.2f},{:+.1f},|,{:+.1f},{:+.1f},{:+.1f},|,{:+.1f},{:+.1f}'.format(
             self.gps.position.latitude,
             self.gps.position.longitude,

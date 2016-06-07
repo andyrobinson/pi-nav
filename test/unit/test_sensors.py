@@ -124,7 +124,7 @@ class TestSensors(EventTestCase):
 
     def test_should_log_all_sensor_values(self):
         self.logger.reset_mock()
-        self.sensors.log_values()
+        self.sensors.log_values(Event(EventName.log_position))
         self.logger.info.assert_called_once_with("+53.200000,-2.300000,+0.000000,+0.000000,+7.30,+342.0,+1.00,+2.0,|,+0.0,+0.0,+0.0,|,+0.0,+0.0")
 
     def test_should_register_logging_according_to_config(self):
