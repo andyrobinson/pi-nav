@@ -13,6 +13,7 @@ from config import CONFIG
 from helm import Helm
 from course_steerer import CourseSteerer
 from events import Exchange
+from event_source import EventSource
 from timeshift import TimeShift
 
 from simulated_vehicle import SimulatedVehicle
@@ -43,18 +44,19 @@ TWENTY_METRE_HOURGLASS = [Waypoint(Position(10,10),1),
 class SimWiring():
     def __init__(self):
         self.globe = Globe()
-        self.timer = Timer()
         self.console_logger = self._console_logger()
         self.exchange = Exchange(self.console_logger)
         self.gps = SimulatedGPS(CHORLTON.position,0,0.1)
         self.vehicle = SimulatedVehicle(self.gps, self.globe,self.console_logger,True)
         self.timeshift = TimeShift(self.exchange,self.vehicle.timer.time)
+        self.event_source = EventSource(self.exchange,self.vehicle.timer,self.console_logger)
         self.sensors = Sensors(self.vehicle.gps, self.vehicle.windsensor,self.vehicle.compass,self.exchange,self.console_logger,CONFIG['sensors'])
         self.helm = Helm(self.exchange, self.sensors, self.vehicle.rudder, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
-        self.track_sensors = FakeSensors(stub_gps.StubGPS(),10,10)
-        self.tracker_simulator = Tracker(self.console_logger,self.sensors,self.timer)
+
+        self.tracking_timer = Timer()
+        self.tracker_simulator = Tracker(self.console_logger,self.sensors,self.tracking_timer)
 
     def _console_logger(self):
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
@@ -68,4 +70,4 @@ class SimWiring():
         self.gps.set_position(waypoints[0].position,0,0.8,True)
         self.vehicle.position = waypoints[0].position
         self.follower_simulator =  self._follower(waypoints)
-        self.follower_simulator.follow_route()
+        self.event_source.start()

@@ -18,3 +18,5 @@ class TestSimulatedWindSensor(unittest.TestCase):
 
         wind_sensor.set_bearing(350)
         self.assertEqual(20, wind_sensor.angle())
+
+    

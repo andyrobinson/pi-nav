@@ -9,4 +9,4 @@ CONFIG = {
     'navigator' :  {'min time to steer': 5,
                     'max time to steer': 600},
     'sensors' : {'smoothing' : 3,
-                 'log frequency': 10}}
+                 'log frequency': 1}}
