@@ -2,7 +2,7 @@ from setup_test import setup_test
 setup_test()
 from mock import Mock
 
-from simulate.simulated_vehicle import SimulatedVehicle, INITIAL_SPEED_IN_MS, TURN_FACTOR, MIN_TURN_RADIUS
+from simulate.simulated_vehicle import SimulatedVehicle, INITIAL_SPEED_IN_MS, TURN_FACTOR, MIN_TURN_RADIUS, INITIAL_WIND_DIRECTION
 from simulate.simulated_gps import SimulatedGPS
 from globe import Globe
 from position import Position
@@ -19,13 +19,14 @@ class TestSimulatedVehicle(unittest.TestCase):
         self.reliable_gps = SimulatedGPS(self.start_position,0,0.5,True)
         self.mock_logger = Mock()
 
-    def test_should_set_the_gps_speed_immediately(self):
+    def test_should_set_the_gps_speed_and_wind_direction_immediately(self):
         vehicle = SimulatedVehicle(self.reliable_gps,self.globe,self.mock_logger)
 
         self.assertEqual(vehicle.speed,vehicle.gps.speed)
+        self.assertEqual(INITIAL_WIND_DIRECTION,vehicle.windsensor.angle())
 
-    def test_should_calculate_new_position_and_track_going_straight_ahead(self):
-        bearing,time_s = 30,2
+    def test_should_calculate_new_position_track_and_wind_direction_going_straight_ahead(self):
+        bearing,time_s,wind_direction = 30,2,15
         starting_position = Position(53,-2)
         gps = SimulatedGPS(starting_position,bearing,INITIAL_SPEED_IN_MS,True)
         vehicle = SimulatedVehicle(gps,self.globe,self.mock_logger)
@@ -38,6 +39,8 @@ class TestSimulatedVehicle(unittest.TestCase):
         self.assertEqual(new_position.latitude, expected_position.latitude)
         self.assertEqual(new_position.longitude, expected_position.longitude)
         self.assertEqual(bearing, vehicle.gps.track)
+        self.assertEqual(bearing, vehicle.compass.bearing())
+        self.assertEqual(wind_direction, vehicle.windsensor.angle())
 
     def test_should_turn_a_corner_if_the_rudder_is_deflected(self):
         bearing,time_s = 30,2
@@ -56,7 +59,8 @@ class TestSimulatedVehicle(unittest.TestCase):
 
         self.assertEqual(new_position.longitude, expected_position.longitude)
         self.assertEqual(new_position.latitude, expected_position.latitude)
-        self.assertEqual(round(vehicle.gps.track,5), round(expected_track,5))
+        self.assertEqual(round(expected_track,5),round(vehicle.gps.track,5))
+        self.assertEqual(round(expected_track,5), round(vehicle.compass.bearing(),5))
 
     def test_should_turn_right_if_rudder_deflection_is_negative(self):
         bearing,time_s = 30,2

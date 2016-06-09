@@ -1,4 +1,4 @@
-from bearing import to_360
+from bearing import to_360,angle_between
 from math import sqrt,cos,radians,degrees,copysign
 import sys
 
@@ -6,6 +6,7 @@ INITIAL_SPEED_IN_MS = 0.8
 TIME_INCREMENT_IN_SEC = 5
 TURN_FACTOR = 30
 MIN_TURN_RADIUS = 1
+INITIAL_WIND_DIRECTION = 45
 
 class SimulatedCompass():
     def __init__(self):
@@ -18,14 +19,15 @@ class SimulatedCompass():
         self._bearing = new_bearing
 
 class SimulatedWindSensor():
-    def __init__(self):
-        self._angle = 0
+    def __init__(self,abs_wind):
+        self._abs_wind = abs_wind
+        self._vehicle_bearing = 0
 
     def angle(self):
-        return self._angle
+        return to_360(angle_between(self._vehicle_bearing,self._abs_wind))
 
-    def set_angle(self,new_angle):
-        self._angle = new_angle
+    def set_bearing(self,new_bearing):
+        self._vehicle_bearing = new_bearing
 
 class SimulatedRudder():
     def __init__(self):
@@ -60,7 +62,7 @@ class SimulatedVehicle():
         self.gps.speed = INITIAL_SPEED_IN_MS
         self.rudder = SimulatedRudder()
         self.timer = SimulatedTimer(self.move)
-        self.windsensor = SimulatedWindSensor()
+        self.windsensor = SimulatedWindSensor(INITIAL_WIND_DIRECTION)
         self.compass = SimulatedCompass()
         self.position = self.gps.position
         self.track = self.gps.track
@@ -99,6 +101,8 @@ class SimulatedVehicle():
             x = sys.stdin.readline()
         self.position = position
         self.track = track
+        self.compass.set_bearing(track)
+        self.windsensor.set_bearing(track)
         self.gps.set_position(position, track, self.speed)
 
     def _straightline_distance(self,radius,angle_in_deg):
