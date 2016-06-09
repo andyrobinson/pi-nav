@@ -13,5 +13,5 @@ class Tracker():
 
     def log_position(self):
         self.sensors.update_averages(None)
-        self.sensors.log_position(None)
+        self.sensors.log_values(None)
         return True

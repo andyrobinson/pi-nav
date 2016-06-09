@@ -9,23 +9,23 @@ MIN_TURN_RADIUS = 1
 
 class SimulatedCompass():
     def __init__(self):
-        self.bearing = 0
+        self._bearing = 0
 
     def bearing(self):
-        return self.bearing
+        return self._bearing
 
     def set_bearing(self,new_bearing):
-        self.bearing = new_bearing
+        self._bearing = new_bearing
 
 class SimulatedWindSensor():
     def __init__(self):
-        self.angle = 0
+        self._angle = 0
 
     def angle(self):
-        return self.angle
+        return self._angle
 
     def set_angle(self,new_angle):
-        self.angle = new_angle
+        self._angle = new_angle
 
 class SimulatedRudder():
     def __init__(self):

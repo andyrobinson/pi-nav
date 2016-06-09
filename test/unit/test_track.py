@@ -47,7 +47,7 @@ class TestTrack(unittest.TestCase):
         stub_callback.signal_time_elapsed()
         stub_callback.signal_time_elapsed()
 
-        self.assertEqual(sensors.log_position.call_count,3)
+        self.assertEqual(sensors.log_values.call_count,3)
 
     def test_log_method_should_return_true_to_ensure_logging_continues(self):
         sensors = Mock()

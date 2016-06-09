@@ -17,6 +17,7 @@ from timeshift import TimeShift
 
 from simulated_vehicle import SimulatedVehicle
 from simulated_gps import SimulatedGPS
+from fake_sensors import FakeSensors
 
 from test.utils import stub_gps
 
@@ -52,7 +53,8 @@ class SimWiring():
         self.helm = Helm(self.exchange, self.sensors, self.vehicle.rudder, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
-        self.tracker_simulator = Tracker(self.console_logger,stub_gps.StubGPS(),self.timer)
+        self.track_sensors = FakeSensors(stub_gps.StubGPS(),10,10)
+        self.tracker_simulator = Tracker(self.console_logger,self.sensors,self.timer)
 
     def _console_logger(self):
         logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
