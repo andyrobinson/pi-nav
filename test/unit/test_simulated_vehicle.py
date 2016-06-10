@@ -7,6 +7,7 @@ from simulate.simulated_gps import SimulatedGPS
 from globe import Globe
 from position import Position
 from test_utils import percentage_diff
+from bearing import to_360
 
 import unittest
 from math import sqrt,radians,cos,degrees
@@ -50,7 +51,7 @@ class TestSimulatedVehicle(unittest.TestCase):
         vehicle = SimulatedVehicle(gps,self.globe,self.mock_logger)
         turn_radius = vehicle._turn_radius(rudder_deflection)
         bearing_change = - vehicle._track_delta(INITIAL_SPEED_IN_MS*time_s,turn_radius)
-        expected_track = bearing + bearing_change
+        expected_track = to_360(bearing + bearing_change)
         expected_position = self.globe.new_position(starting_position,bearing + (0.5 * bearing_change),vehicle._straightline_distance(turn_radius,bearing_change))
 
         vehicle.rudder.set_position(rudder_deflection)
@@ -90,11 +91,11 @@ class TestSimulatedVehicle(unittest.TestCase):
     def test_turn_radius_always_positive_and_inversely_proportional_to_rudder_angle(self):
         vehicle = SimulatedVehicle(self.reliable_gps,self.globe,self.mock_logger)
 
-        self.assertEqual(vehicle._turn_radius(30),1 + MIN_TURN_RADIUS)
-        self.assertEqual(vehicle._turn_radius(-30),1 + MIN_TURN_RADIUS)
-        self.assertEqual(vehicle._turn_radius(-15),2 + MIN_TURN_RADIUS)
-        self.assertEqual(vehicle._turn_radius(-10),3 + MIN_TURN_RADIUS)
-        self.assertEqual(vehicle._turn_radius(3),10 + MIN_TURN_RADIUS)
+        self.assertEqual(vehicle._turn_radius(30),0.5 + MIN_TURN_RADIUS)
+        self.assertEqual(vehicle._turn_radius(-30),0.5 + MIN_TURN_RADIUS)
+        self.assertEqual(vehicle._turn_radius(-15),1 + MIN_TURN_RADIUS)
+        self.assertEqual(vehicle._turn_radius(-10),1.5 + MIN_TURN_RADIUS)
+        self.assertEqual(vehicle._turn_radius(3),5 + MIN_TURN_RADIUS)
 
     def test_track_delta_based_on_distance_and_radius(self):
         vehicle = SimulatedVehicle(self.reliable_gps,self.globe,self.mock_logger)
