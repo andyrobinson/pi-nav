@@ -45,7 +45,7 @@ class Helm():
         self.exchange.unsubscribe(EventName.tick,self.turn)
 
     def _check_on_course(self,heading):
-        if abs(angle_between(heading,self.requested_heading)) < self.on_course_threshold:
+        if self._on_course(heading):
             self.on_course_count += 1
             if self.on_course_count >= self.config['turn on course min count']:
                 self._stop_turning()

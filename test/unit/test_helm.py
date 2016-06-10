@@ -80,14 +80,31 @@ class TestHelm(EventTestCase):
         self.currently_tracking(120,125)
         self.exchange.publish(Event(EventName.set_course,heading=90))
 
-        self.currently_tracking(100,95)
-        self.exchange.publish(Event(EventName.tick))
         self.currently_tracking(95,85)
+        self.exchange.publish(Event(EventName.tick))
+        self.currently_tracking(85,87)
+        self.exchange.publish(Event(EventName.tick))
+        self.currently_tracking(85,87)
         self.exchange.publish(Event(EventName.tick))
         self.currently_tracking(85,87)
         self.exchange.publish(Event(EventName.tick))
 
         self.assertNotIn(self.helm.turn,self.exchange.register[EventName.tick])
+
+    def test_should_continue_turning_if_on_course_with_high_rate_of_turn(self):
+        self.currently_tracking(95,85)
+        self.exchange.publish(Event(EventName.set_course,heading=90))
+
+        self.currently_tracking(85,95)
+        self.exchange.publish(Event(EventName.tick))
+        self.currently_tracking(95,85)
+        self.exchange.publish(Event(EventName.tick))
+        self.currently_tracking(85,95)
+        self.exchange.publish(Event(EventName.tick))
+        self.currently_tracking(95,85)
+        self.exchange.publish(Event(EventName.tick))
+
+        self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
