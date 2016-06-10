@@ -1,4 +1,7 @@
-Current test_should_provide_an_average_for_values_either_side_of_zero
+current
+
+NOTE: need to reduce the rudder deflection when on course to prevent overcorrection.  The factor
+should be calculated.
 
 1. Ensure system can steer around a course_steerer
 2. Fix simulation following rewrite to events
