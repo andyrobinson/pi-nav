@@ -6,3 +6,6 @@ class Waypoint():
         self.tolerance = tolerance
         self.longitude = position.longitude
         self.latitude = position.latitude
+
+    def __repr__(self):
+        return "{:+.5f},{:+.5f}".format(self.latitude,self.longitude)

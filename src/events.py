@@ -22,6 +22,13 @@ class Event:
         self.seconds = seconds
         self.next_event = next_event
 
+    def __repr__(self):
+        next_event = self.next_event.name if self.next_event else "None"
+        representation = "Event[{}]: waypoint={}, heading={}, secs={},next_event={}".format(self.name,repr(self.waypoint),self.heading,self.seconds,next_event )
+
+        return (representation)
+
+
 class Exchange:
 
     def __init__(self, logger):
@@ -43,7 +50,7 @@ class Exchange:
             self.register[name].remove(callback)
 
     def publish(self,event):
-        self.logger.debug("publishing event " + event.name)
+        self.logger.debug("publishing event " + repr(event))
         self.events.append(event)
         if not(self.processing):
             self._process_events()
