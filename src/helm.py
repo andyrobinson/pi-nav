@@ -13,10 +13,10 @@ class Helm():
         self.requested_heading = 0
         self.on_course_count = 0
         self.exchange = exchange
+        self.config = config
         self.ignore_below = config['ignore deviation below']
         self.full_deflection = config['full deflection']
         self.on_course_threshold = config['on course threshold']
-        self.turn_on_course_min_count = config['turn on course min count']
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
         self.exchange.publish(Event(EventName.every,seconds=10,next_event=Event(EventName.check_course)))
@@ -47,7 +47,7 @@ class Helm():
     def _check_on_course(self,heading):
         if abs(angle_between(heading,self.requested_heading)) < self.on_course_threshold:
             self.on_course_count += 1
-            if self.on_course_count >= 3:
+            if self.on_course_count >= self.config['turn on course min count']:
                 self._on_course()
         else:
             self.on_course_count = 0
