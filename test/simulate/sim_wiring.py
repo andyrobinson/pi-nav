@@ -49,7 +49,7 @@ class SimWiring():
         self.gps = SimulatedGPS(CHORLTON.position,0,0.1)
         self.vehicle = SimulatedVehicle(self.gps, self.globe,self.console_logger,True)
         self.timeshift = TimeShift(self.exchange,self.vehicle.timer.time)
-        self.event_source = EventSource(self.exchange,self.vehicle.timer,self.console_logger)
+        self.event_source = EventSource(self.exchange,self.vehicle.timer,self.console_logger,CONFIG['event source'])
         self.sensors = Sensors(self.vehicle.gps, self.vehicle.windsensor,self.vehicle.compass,self.exchange,self.console_logger,CONFIG['sensors'])
         self.helm = Helm(self.exchange, self.sensors, self.vehicle.rudder, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])

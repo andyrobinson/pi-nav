@@ -3,11 +3,12 @@ from events import Event,EventName
 
 class EventSource:
 
-    def __init__(self,exchange,timer,logger):
+    def __init__(self,exchange,timer,logger,config):
         self.logger = logger
         self.timer = timer
         self.exchange = exchange
         self.ticking = True
+        self.config = config
         exchange.subscribe(EventName.end,self.finish)
 
     def start(self):
@@ -15,7 +16,7 @@ class EventSource:
 
         while self.ticking:
             self._safely(self._tick)
-            self.timer.wait_for(0.2)
+            self.timer.wait_for(self.config['tick interval'])
 
     def finish(self,event):
         self.ticking = False

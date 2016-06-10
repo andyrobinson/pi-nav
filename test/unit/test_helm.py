@@ -7,8 +7,11 @@ from config import CONFIG
 from nan import NaN
 from events import Exchange, Event,EventName
 from test_utils import EventTestCase
+from copy import deepcopy
 
 FULL_DEFLECTION = CONFIG['helm']['full deflection']
+TEST_CONFIG = deepcopy(CONFIG['helm'])
+TEST_CONFIG['turn on course min count'] = 3
 
 class TestHelm(EventTestCase):
 
@@ -17,7 +20,7 @@ class TestHelm(EventTestCase):
         self.sensors = Mock()
         self.servo = Mock()
         self.logger = Mock()
-        self.helm = Helm(self.exchange, self.sensors,self.servo,self.logger, CONFIG['helm'])
+        self.helm = Helm(self.exchange, self.sensors,self.servo,self.logger, TEST_CONFIG)
         self.helm.previous_heading = 180
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
@@ -108,7 +111,7 @@ class TestHelm(EventTestCase):
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
-        helm = Helm(self.exchange, self.sensors,self.servo,self.logger, CONFIG['helm'])
+        helm = Helm(self.exchange, self.sensors,self.servo,self.logger, TEST_CONFIG)
 
         self.assertEqual(len(self.events[EventName.every]),1)
 

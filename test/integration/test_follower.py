@@ -29,7 +29,7 @@ class TestFollower(unittest.TestCase):
         self.exchange = Exchange(self.mock_logger)
         self.timer = StubTimer()
         self.timeshift = TimeShift(self.exchange, self.timer.time)
-        self.event_source = EventSource(self.exchange,self.timer,self.mock_logger)
+        self.event_source = EventSource(self.exchange,self.timer,self.mock_logger,{'tick interval':0.2})
     	gps = FakeMovingGPS([Position(10,10),Position(11,11),Position(12,12),Position(13,13)])
         self.navigator = Navigator(gps,Globe(),self.exchange,self.mock_logger, {'min time to steer': 5,'max time to steer': 20})
 

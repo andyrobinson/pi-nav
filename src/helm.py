@@ -19,7 +19,7 @@ class Helm():
         self.on_course_threshold = config['on course threshold']
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
-        self.exchange.publish(Event(EventName.every,seconds=10,next_event=Event(EventName.check_course)))
+        self.exchange.publish(Event(EventName.every,seconds=config['on course check interval'],next_event=Event(EventName.check_course)))
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading

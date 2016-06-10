@@ -46,7 +46,7 @@ class Wiring():
         self.position_logger = self._rotating_logger("position")
         self.exchange = Exchange(self.application_logger)
         self.timeshift = TimeShift(self.exchange,self.timer.time)
-        self.event_source = EventSource(self.exchange,self.timer,self.application_logger)
+        self.event_source = EventSource(self.exchange,self.timer,self.application_logger,CONFIG['event source'])
 
         self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.exchange,self.position_logger,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)

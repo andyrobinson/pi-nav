@@ -6,6 +6,8 @@ from mock import Mock, call
 from event_source import EventSource
 from events import Exchange,Event,EventName
 
+CONFIG = {'tick interval':0.2}
+
 class TestEventSource(unittest.TestCase):
 
     def setUp(self):
@@ -43,7 +45,7 @@ class TestEventSource(unittest.TestCase):
         self.listen(EventName.start)
         self.timer.wait_for = Mock(side_effect=self.finish)
 
-        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger,CONFIG)
         event_source.start()
 
         self.assertEqual(self.last_listened_event.name,EventName.start)
@@ -52,7 +54,7 @@ class TestEventSource(unittest.TestCase):
         self.listen(EventName.tick)
         self.timer.wait_for = Mock(side_effect=self.finish)
 
-        event_source = EventSource(self.exchange, self.timer, self.mock_logger)
+        event_source = EventSource(self.exchange, self.timer, self.mock_logger, CONFIG)
         event_source.start()
 
         self.assertEqual(self.last_listened_event.name,EventName.tick)
@@ -62,7 +64,7 @@ class TestEventSource(unittest.TestCase):
         self.after(5,EventName.end)
         self.timer.wait_for = Mock(side_effect=self.count_down_ticks)
 
-        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger,CONFIG)
         event_source.start()
 
         self.assertEqual(self.event_count,5)
@@ -75,7 +77,7 @@ class TestEventSource(unittest.TestCase):
         self.exchange.original_publish = self.exchange.publish
         self.exchange.publish = self.intercept_publish
 
-        event_source = EventSource(self.exchange,self.timer, self.mock_logger)
+        event_source = EventSource(self.exchange,self.timer, self.mock_logger,CONFIG)
         event_source.start()
 
         self.mock_logger.error.assert_has_calls([call('EventSource, RuntimeError: oops')])
@@ -92,7 +94,7 @@ class TestEventSource(unittest.TestCase):
         self.exchange.original_publish = self.exchange.publish
         self.exchange.publish = self.intercept_publish
 
-        event_source = EventSource(self.exchange,self.timer, failing_logger)
+        event_source = EventSource(self.exchange,self.timer, failing_logger,CONFIG)
         event_source.start()
 
         failing_logger.error.assert_has_calls([call('EventSource, RuntimeError: oops')])
