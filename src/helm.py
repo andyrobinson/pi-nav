@@ -61,7 +61,12 @@ class Helm():
         rate_of_turn = angle_between(self.previous_heading,current_heading)
 
         if abs(deviation) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
-            self._correct_steering(rate_of_turn, self.requested_heading, current_heading, deviation)
+            new_rudder_angle = self._calculate_rudder_angle(deviation, rate_of_turn)
+            self.logger.debug(
+                'Helm, steering {:.1f}, heading {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
+                .format(self.requested_heading, current_heading, rate_of_turn, self.rudder_angle, new_rudder_angle))
+            self._set_rudder_angle(new_rudder_angle)
+            self.previous_heading = current_heading
 
     def _calculate_rudder_angle(self,deviation,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (deviation - rate_of_turn)
@@ -71,11 +76,3 @@ class Helm():
     def _set_rudder_angle(self,angle):
         self.rudder_angle = angle
         self.rudder_servo.set_position(angle)
-
-    def _correct_steering(self, rate_of_turn, requested_heading, heading, deviation):
-        new_rudder_angle = self._calculate_rudder_angle(deviation, rate_of_turn)
-        self.logger.debug(
-            'Helm, steering {:.1f}, heading {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
-            .format(requested_heading, heading, rate_of_turn, self.rudder_angle, new_rudder_angle))
-        self._set_rudder_angle(new_rudder_angle)
-        self.previous_heading = heading
