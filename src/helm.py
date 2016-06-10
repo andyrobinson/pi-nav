@@ -52,24 +52,30 @@ class Helm():
         else:
             self.on_course_count = 0
 
-    def _steer(self,current_heading):
-        if isNaN(current_heading):
+    def _rate_of_turn(self,heading):
+        return angle_between(self.previous_heading,heading)
+
+    def _deviation(self,heading):
+        return angle_between(heading,self.requested_heading)
+
+    def _on_course(self,heading):
+        return abs(self._deviation(heading)) < self.ignore_below and abs(self._rate_of_turn(heading)) < self.ignore_below
+
+    def _steer(self,heading):
+        if isNaN(heading):
             self._set_rudder_angle(0)
             return
 
-        deviation = angle_between(current_heading,self.requested_heading)
-        rate_of_turn = angle_between(self.previous_heading,current_heading)
-
-        if abs(deviation) > self.ignore_below or abs(rate_of_turn) > self.ignore_below:
-            new_rudder_angle = self._calculate_rudder_angle(deviation, rate_of_turn)
+        if not self._on_course(heading):
+            new_rudder_angle = self._calculate_rudder_angle(heading)
             self.logger.debug(
                 'Helm, steering {:.1f}, heading {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
-                .format(self.requested_heading, current_heading, rate_of_turn, self.rudder_angle, new_rudder_angle))
+                .format(self.requested_heading, heading, self._rate_of_turn(heading), self.rudder_angle, new_rudder_angle))
             self._set_rudder_angle(new_rudder_angle)
-            self.previous_heading = current_heading
+            self.previous_heading = heading
 
-    def _calculate_rudder_angle(self,deviation,rate_of_turn):
-        rate_adjusted_turn_angle = self.rudder_angle - (deviation - rate_of_turn)
+    def _calculate_rudder_angle(self,heading):
+        rate_adjusted_turn_angle = self.rudder_angle - (self._deviation(heading) - self._rate_of_turn(heading))
         unsigned_rudder_angle = min(self.full_deflection,abs(rate_adjusted_turn_angle))
         return copysign(unsigned_rudder_angle,rate_adjusted_turn_angle)
 
