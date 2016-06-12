@@ -7,6 +7,8 @@ class FakeSensors:
         self.speed = 1
         self.track_error = 1
         self.speed_error = 0.1
+        self.rate_of_turn = 1
+        self.rate_of_turn_average = 1
         self.wind_direction_abs_average = wind_direction
         self.wind_direction_relative_instant = to_360(angle_between(wind_direction,compass_heading))
         self.wind_direction_relative_average = self.wind_direction_relative_instant

@@ -27,6 +27,8 @@ class TestHelm(EventTestCase):
         self.helm.rudder_angle = rudder_angle
         self.sensors.compass_heading_instant = current_track
         self.sensors.compass_heading_average = NaN
+        self.sensors.rate_of_turn = current_track - previous_heading
+        self.sensors.rate_of_turn_average = self.sensors.rate_of_turn
         self.helm.previous_heading = previous_heading
         self.servo.set_position.reset_mock()
 
@@ -34,16 +36,18 @@ class TestHelm(EventTestCase):
         self.helm.rudder_angle = 0
         self.sensors.compass_heading_average = current_track
         self.sensors.compass_heading_instant = NaN
+        self.sensors.rate_of_turn = 0
+        self.sensors.rate_of_turn_average = current_track - previous_heading
         self.helm.previous_heading = previous_heading
         self.servo.set_position.reset_mock()
 
-    def test_should_review_and_change_steering_based_on_instant_heading_when_turning(self):
+    def test_should_review_and_change_steering_based_on_instant_heading_and_rate_of_turn_when_turning(self):
         self.currently_tracking(204,200)
         self.exchange.publish(Event(EventName.set_course,heading=196))
         self.assertFalse(self.servo.set_position.called)
 
         self.sensors.track = 200
-        self.helm.previous_heading = 220
+        self.sensors.rate_of_turn = -20
         self.exchange.publish(Event(EventName.tick))
         self.servo.set_position.assert_called_with(-16)
 
