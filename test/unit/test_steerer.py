@@ -11,11 +11,6 @@ FULL_DEFLECTION = CONFIG['helm']['full deflection']
 
 class TestSteerer(unittest.TestCase):
 
-    # def on_course(self,requested_heading,heading,rate_of_turn):
-    #     return abs(self._deviation(requested_heading,heading)) < self.ignore_below and abs(rate_of_turn) < self.ignore_below
-    #
-    # def steer(self,requested_heading,heading,rate_of_turn):
-
     def setUp(self):
         self.servo = Mock()
         self.logger = Mock()
@@ -23,6 +18,8 @@ class TestSteerer(unittest.TestCase):
 
     @unittest.skip("to do - course")
     def test_on_course_if_heading_and_rate_of_turn_below_threshold(self):
+    # def on_course(self,requested_heading,heading,rate_of_turn):
+    #     return abs(self._deviation(requested_heading,heading)) < self.ignore_below and abs(rate_of_turn) < self.ignore_below
         pass
 
     @unittest.skip("to do - course")
