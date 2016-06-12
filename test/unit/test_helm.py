@@ -8,6 +8,7 @@ from nan import NaN
 from events import Exchange, Event,EventName
 from test_utils import EventTestCase
 from copy import deepcopy
+from steerer import Steerer
 
 FULL_DEFLECTION = CONFIG['helm']['full deflection']
 TEST_CONFIG = deepcopy(CONFIG['helm'])
@@ -20,7 +21,8 @@ class TestHelm(EventTestCase):
         self.sensors = Mock()
         self.servo = Mock()
         self.logger = Mock()
-        self.helm = Helm(self.exchange, self.sensors,self.servo,self.logger, TEST_CONFIG)
+        self.steerer = Steerer(self.servo,self.logger, TEST_CONFIG)
+        self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
         self.helm.previous_heading = 180
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):

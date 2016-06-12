@@ -11,7 +11,8 @@ from navigator import Navigator
 from follower import Follower
 from utils.stub_gps import StubGPS
 from config import CONFIG
-from helm import Helm,Steerer
+from helm import Helm
+from steerer import Steerer
 from event_source import EventSource
 from events import Exchange
 
@@ -57,7 +58,7 @@ class TestWiring(unittest.TestCase):
         self.assertEqual(helm.steerer.rudder_servo,self.wiring.rudder_servo)
 
     def test_should_return_steerer_with_all_dependencies(self):
-        steerer = self.wiring.helm.steerer
+        steerer = self.wiring.steerer
         self.assertTrue(isinstance(steerer,Steerer))
         self.assertEqual(steerer.full_deflection,CONFIG['helm']['full deflection'])
         self.assertEqual(steerer.rudder_servo,self.wiring.rudder_servo)

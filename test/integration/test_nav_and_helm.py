@@ -10,6 +10,7 @@ from fake_moving_gps import FakeMovingGPS
 from fake_sensors import FakeSensors
 from navigator import Navigator
 from helm import Helm
+from steerer import Steerer
 from course_steerer import CourseSteerer
 from waypoint import Waypoint
 from position import Position
@@ -77,7 +78,8 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.0003,10.0003),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         sensors = FakeSensors(gps,1,45)
-        helm = Helm(self.exchange,sensors,self.servo,logger, CONFIG['helm'])
+        steerer = Steerer(self.servo,logger, CONFIG['helm'])
+        helm = Helm(self.exchange,sensors,steerer,logger, CONFIG['helm'])
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
@@ -98,5 +100,6 @@ class TestNavigationAndHelm(unittest.TestCase):
              call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
              call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
              call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0')])
+
 if __name__ == "__main__":
     unittest.main()

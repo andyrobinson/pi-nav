@@ -10,6 +10,7 @@ from globe import Globe
 from timer import Timer
 from track import Tracker
 from config import CONFIG
+from steerer import Steerer
 from helm import Helm
 from course_steerer import CourseSteerer
 from events import Exchange
@@ -51,6 +52,7 @@ class SimWiring():
         self.timeshift = TimeShift(self.exchange,self.vehicle.timer.time)
         self.event_source = EventSource(self.exchange,self.vehicle.timer,self.console_logger,CONFIG['event source'])
         self.sensors = Sensors(self.vehicle.gps, self.vehicle.windsensor,self.vehicle.compass,self.vehicle.timer.time,self.exchange,self.console_logger,CONFIG['sensors'])
+        self.steerer = Steerer(self.vehicle.rudder,self.console_logger,CONFIG['helm'])
         self.helm = Helm(self.exchange, self.sensors, self.vehicle.rudder, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
