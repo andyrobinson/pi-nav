@@ -34,7 +34,7 @@ class TestSimWiring(unittest.TestCase):
     def test_helm_should_use_fake_servo(self):
         helm = self.wiring.helm
         vehicle = self.wiring.vehicle
-        self.assertEqual(helm.rudder_servo,vehicle.rudder)
+        self.assertEqual(helm.steerer.rudder_servo,vehicle.rudder)
 
     def test_course_steerer_should_use_vehicle_timer(self):
         vehicle = self.wiring.vehicle
