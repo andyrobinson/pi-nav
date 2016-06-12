@@ -41,7 +41,7 @@ class TestHelm(EventTestCase):
         self.sensors.rate_of_turn_average = current_track - previous_heading
         self.servo.set_position.reset_mock()
 
-    def test_should_review_and_change_steering_based_on_instant_heading_and_rate_of_turnwhen_turning(self):
+    def test_should_review_and_change_steering_based_on_instant_heading_and_rate_of_turn_when_turning(self):
         self.currently_tracking(204,200)
         self.exchange.publish(Event(EventName.set_course,heading=196))
         self.assertFalse(self.servo.set_position.called)
@@ -118,74 +118,3 @@ class TestHelm(EventTestCase):
         helm = Helm(self.exchange, self.sensors,self.servo,self.logger, TEST_CONFIG)
 
         self.assertEqual(len(self.events[EventName.every]),1)
-
-    def test_should_not_change_direction_if_within_five_degrees_of_right_course_and_rate_of_turn_less_that_five_degrees(self):
-        self.currently_tracking(204,200)
-        self.exchange.publish(Event(EventName.set_course,heading=196))
-        self.assertEqual(self.servo.set_position.call_count,0)
-
-    def test_should_move_rudder_right_by_difference_between_heading_and_course_if_no_rate_of_turn(self):
-        self.currently_tracking(200,200)
-        self.exchange.publish(Event(EventName.set_course,heading=209))
-        self.servo.set_position.assert_called_with(-9)
-
-    def test_should_move_rudder_right_by_difference_between_heading_and_course_subtracting_rate_of_turn(self):
-        self.currently_tracking(195,200)
-        self.exchange.publish(Event(EventName.set_course,heading=209))
-        self.servo.set_position.assert_called_with(-4)
-
-    def test_should_move_rudder_left_by_difference_between_heading_and_course_subtracting_larger_rate_of_turn(self):
-        self.currently_tracking(190,205)
-        self.exchange.publish(Event(EventName.set_course,heading=209))
-        self.servo.set_position.assert_called_with(11)
-
-    def test_should_move_rudder_left_by_difference_between_heading_and_course_subtracting_rate_of_turn(self):
-        self.currently_tracking(20,10)
-        self.exchange.publish(Event(EventName.set_course,heading=355))
-        self.servo.set_position.assert_called_with(5)
-
-    def test_rudder_movements_should_be_relative_to_current_rudder_position(self):
-        self.currently_tracking(20,10,5)
-        self.exchange.publish(Event(EventName.set_course,heading=355))
-        self.servo.set_position.assert_called_with(10)
-
-    def test_rudder_movements_should_be_limited_to_full_deflection_left(self):
-        self.currently_tracking(20,10,5)
-        self.exchange.publish(Event(EventName.set_course,heading=330))
-        self.servo.set_position.assert_called_with(FULL_DEFLECTION)
-
-    def test_rudder_movements_should_be_limited_to_full_deflection_right(self):
-        self.currently_tracking(355,355,-20)
-        self.exchange.publish(Event(EventName.set_course,heading=20))
-        self.servo.set_position.assert_called_with(-FULL_DEFLECTION)
-
-    def test_should_steer_left_if_difference_is_less_than_180(self):
-        self.currently_tracking(200,200)
-        self.exchange.publish(Event(EventName.set_course,heading=45))
-        self.servo.set_position.assert_called_with(FULL_DEFLECTION)
-
-    def test_should_steer_right_if_difference_is_less_than_180(self):
-        self.currently_tracking(200,200)
-        self.exchange.publish(Event(EventName.set_course,heading=10))
-        self.servo.set_position.assert_called_with(-FULL_DEFLECTION)
-
-    def test_should_steer_right_if_difference_is_exactly_180(self):
-        self.currently_tracking(200,200)
-        self.exchange.publish(Event(EventName.set_course,heading=20))
-        self.servo.set_position.assert_called_with(-FULL_DEFLECTION)
-
-    def test_should_work_with_fractional_parts(self):
-        self.currently_tracking(0.9,0.9)
-        self.exchange.publish(Event(EventName.set_course,heading=29.4))
-        self.servo.set_position.assert_called_with(-28.5)
-
-    def test_should_centralise_rudder_if_sensor_returns_NaN(self):
-        self.sensors.compass_heading_instant = NaN
-        self.exchange.publish(Event(EventName.set_course,heading=57.23))
-        self.servo.set_position.assert_called_with(0)
-
-    def test_should_log_steering_calculation_and_status_to_debug(self):
-        self.currently_tracking(20,10)
-        self.exchange.publish(Event(EventName.set_course,heading=355))
-        self.logger.debug.assert_called_with("Helm, steering 355.0, heading 10.0, rate of turn -10.0, rudder +0.0, new rudder +5.0")
-        self.servo.set_position.assert_called_with(5)

@@ -1,4 +1,4 @@
-current
+NOTE: Need to separate helm and steerer config
 
 NOTE: need to reduce the rudder deflection when on course to prevent overcorrection.  The factor
 should be calculated.
