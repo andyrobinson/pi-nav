@@ -1,12 +1,12 @@
 from nan import isNaN
 from position import Position
 from events import Event,EventName
-from bearing import moving_avg, to_360
+from bearing import moving_avg,to_360,angle_between
 
 DEFAULT_ERROR = 10
 
 class Sensors():
-    def __init__(self,gps,windsensor,compass,exchange,logger,config):
+    def __init__(self,gps,windsensor,compass,time_fn,exchange,logger,config):
         self.gps = gps
         self.exchange = exchange
         self.windsensor = windsensor
@@ -17,6 +17,11 @@ class Sensors():
         self.config = config
         self._wind_relative_avg = 0.0
         self._compass_avg = 0.0
+        self.system_time = time_fn
+        self._previous_bearing = 0
+        self._previous_time = self.system_time()-1
+        self._rate_of_turn = 0
+        self._rate_of_turn_average = 0
         exchange.subscribe(EventName.tick,self.update_averages)
         exchange.subscribe(EventName.log_position,self.log_values)
         exchange.publish(Event(EventName.every,seconds = config['log frequency'],next_event = Event(EventName.log_position)))
@@ -74,11 +79,32 @@ class Sensors():
     def compass_heading_average(self):
         return round(self._compass_avg,0)
 
+    @property
+    def rate_of_turn(self):
+        return self._rate_of_turn
+
+    @property
+    def rate_of_turn_average(self):
+        return self._rate_of_turn_average
+
     def update_averages(self,tick_event):
         wind = self.windsensor.angle()
         compass = self.compass.bearing()
-        self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,self.config['smoothing'])
-        self._compass_avg = moving_avg(self._compass_avg,compass,self.config['smoothing'])
+        smoothing = self.config['smoothing']
+        self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,smoothing)
+        self._compass_avg = moving_avg(self._compass_avg,compass,smoothing)
+        self._calculate_rate_of_turn(compass)
+        rate_of_turn_diff = self._rate_of_turn-self._rate_of_turn_average
+        self._rate_of_turn_average += rate_of_turn_diff/smoothing
+
+    def _calculate_rate_of_turn(self,bearing):
+        time_now = self.system_time()
+        if time_now <= self._previous_time:
+            self._rate_of_turn = 0
+        else:
+            self._rate_of_turn = angle_between(self._previous_bearing,bearing)/(time_now - self._previous_time)
+        self._previous_bearing = bearing
+        self._previous_time = time_now
 
     def log_values(self,unused_event):
         self.logger.info('{:+f},{:+f},{:+f},{:+f},{:+.2f},{:+.1f},{:+.2f},{:+.1f},|,{:+.1f},{:+.1f},{:+.1f},|,{:+.1f},{:+.1f}'.format(

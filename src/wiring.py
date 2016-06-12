@@ -48,7 +48,7 @@ class Wiring():
         self.timeshift = TimeShift(self.exchange,self.timer.time)
         self.event_source = EventSource(self.exchange,self.timer,self.application_logger,CONFIG['event source'])
 
-        self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.exchange,self.position_logger,CONFIG['sensors'])
+        self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.timer.time,self.exchange,self.position_logger,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
         self.helm = Helm(self.exchange,self.sensors,self.rudder_servo,self.application_logger,CONFIG['helm'])

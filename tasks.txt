@@ -14,6 +14,9 @@ should be calculated.
     - avoid the no-go area continuously by bearing off in the direction of the tack as needed
     - set sails according to the wind direction
 
+Time
+Sort out GPS vs system time - ideally system should take it's time from gps - what happens if not there???
+
 Epic - field test
 - Field test tracking including compass and windsensor
 - field test steering without sailing
