@@ -46,7 +46,7 @@ class TestNavigationAndHelm(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.02,10.02),Position(10.03,10.03)])
         sensors = FakeSensors(gps,1,45)
         steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
-        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG['helm'])
+        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG)
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
@@ -63,7 +63,7 @@ class TestNavigationAndHelm(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         sensors = FakeSensors(gps,1,45)
         steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
-        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG['helm'])
+        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG)
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
@@ -81,27 +81,27 @@ class TestNavigationAndHelm(unittest.TestCase):
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         sensors = FakeSensors(gps,1,45)
         steerer = Steerer(self.servo,logger, CONFIG['steerer'])
-        helm = Helm(self.exchange,sensors,steerer,logger, CONFIG['helm'])
+        helm = Helm(self.exchange,sensors,steerer,logger, CONFIG)
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
         self.ticks(number = 10,duration=20)
 
         logger.debug.assert_has_calls(
-            [call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +9.6'),
-             call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +9.6, new rudder +19.1'),
-             call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +19.1, new rudder +28.7'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder +28.7, new rudder +11.6'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder +11.6, new rudder -5.5'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -5.5, new rudder -22.6'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -22.6, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0')])
+            [call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +8.7'),
+             call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +8.7, new rudder +17.3'),
+             call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder +1.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder +1.0, new rudder -16.9'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -16.9, new rudder -30.0'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -1.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -1.2, new rudder -19.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -19.2, new rudder -1.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -1.2, new rudder -19.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -19.2, new rudder -1.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -1.2, new rudder -19.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -19.2, new rudder -1.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -1.2, new rudder -19.2'),
+             call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -19.2, new rudder -1.2')])
 
 if __name__ == "__main__":
     unittest.main()

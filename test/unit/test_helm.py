@@ -10,8 +10,8 @@ from test_utils import EventTestCase
 from copy import deepcopy
 from steerer import Steerer
 
-TEST_CONFIG = deepcopy(CONFIG['helm'])
-TEST_CONFIG['turn on course min count'] = 3
+TEST_CONFIG = deepcopy(CONFIG)
+TEST_CONFIG['helm']['turn on course min count'] = 3
 
 class TestHelm(EventTestCase):
 
@@ -22,6 +22,9 @@ class TestHelm(EventTestCase):
         self.steerer = Mock()
         self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
         self.helm.previous_heading = 180
+
+    def reduction_factor(self):
+        return CONFIG['event source']['tick interval']/CONFIG['helm']['on course check interval']
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
         self.sensors.compass_heading_instant = current_track
@@ -52,12 +55,12 @@ class TestHelm(EventTestCase):
 
         self.steerer.steer.assert_called_with(5,350,10)
 
-    def test_should_use_average_heading_when_checking_course(self):
+    def test_should_use_average_heading_and_reduction_factor_when_checking_course(self):
         self.helm.requested_heading = 5
         self.averagely_tracking(335,350)
         self.helm.check_course(Event(EventName.tick))
 
-        self.steerer.steer.assert_called_with(5,350,15)
+        self.steerer.steer.assert_called_with(5,350,15,self.reduction_factor())
 
     def test_should_trigger_turning_if_off_course_by_more_than_configured_20_degrees(self):
         self.exchange.unsubscribe(EventName.tick,self.helm.turn)
@@ -65,7 +68,7 @@ class TestHelm(EventTestCase):
         self.averagely_tracking(50,60)
         self.helm.check_course(Event(EventName.tick))
 
-        self.steerer.steer.assert_called_with(90,60,10)
+        self.steerer.steer.assert_called_with(90,60,10,self.reduction_factor())
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
 
     def test_should_immediately_change_to_turning_when_course_is_set(self):

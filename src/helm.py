@@ -10,13 +10,15 @@ class Helm():
         self.requested_heading = 0
         self.on_course_count = 0
         self.exchange = exchange
-        self.on_course_count_threshold = config['turn on course min count']
-        self.on_course_threshold = config['on course threshold']
         self.steerer = steerer
-        # self.steerer = Steerer(rudder_servo,logger,config)
+        helm_config = config['helm']
+        self.on_course_count_threshold = helm_config['turn on course min count']
+        self.on_course_threshold = helm_config['on course threshold']
+        self.reduction_factor = config['event source']['tick interval']/helm_config['on course check interval']
+
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
-        self.exchange.publish(Event(EventName.every,seconds=config['on course check interval'],next_event=Event(EventName.check_course)))
+        self.exchange.publish(Event(EventName.every,seconds=helm_config['on course check interval'],next_event=Event(EventName.check_course)))
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading
@@ -34,7 +36,7 @@ class Helm():
         rate_of_turn = self.sensors.rate_of_turn_average
         if abs(angle_between(heading,self.requested_heading)) > self.on_course_threshold:
             self._start_turning()
-        self.steerer.steer(self.requested_heading,heading,rate_of_turn)
+        self.steerer.steer(self.requested_heading,heading,rate_of_turn,self.reduction_factor)
 
     def _start_turning(self):
         self.exchange.subscribe(EventName.tick,self.turn)
