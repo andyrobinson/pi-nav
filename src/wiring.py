@@ -52,7 +52,7 @@ class Wiring():
         self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.timer.time,self.exchange,self.position_logger,CONFIG['sensors'])
         self.gps_console_writer = GpsConsoleWriter(self.gps)
         self.rudder_servo = Servo(serial.Serial(servo_port),RUDDER_SERVO_CHANNEL,RUDDER_MIN_PULSE,RUDDER_MIN_ANGLE,RUDDER_MAX_PULSE,RUDDER_MAX_ANGLE)
-        self.steerer = Steerer(self.rudder_servo,self.application_logger,CONFIG['helm'])
+        self.steerer = Steerer(self.rudder_servo,self.application_logger,CONFIG['steerer'])
         self.helm = Helm(self.exchange,self.sensors,self.steerer,self.application_logger,CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.navigator = Navigator(self.sensors,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])

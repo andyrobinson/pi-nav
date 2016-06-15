@@ -7,14 +7,14 @@ from nan import NaN
 from copy import deepcopy
 from steerer import Steerer
 
-FULL_DEFLECTION = CONFIG['helm']['full deflection']
+FULL_DEFLECTION = CONFIG['steerer']['full rudder deflection']
 
 class TestSteerer(unittest.TestCase):
 
     def setUp(self):
         self.servo = Mock()
         self.logger = Mock()
-        self.steerer = Steerer(self.servo,self.logger, CONFIG['helm'])
+        self.steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
 
     @unittest.skip("to do - course")
     def test_on_course_if_heading_and_rate_of_turn_below_threshold(self):

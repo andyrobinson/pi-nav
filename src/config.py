@@ -1,9 +1,10 @@
 CONFIG = {
-    'helm' :          {'full deflection': 30,
-                       'ignore deviation below': 5,
-                       'on course threshold': 20,
+    'helm' :          {'on course threshold': 20,
                        'turn on course min count': 5,
                        'on course check interval': 5},
+    'steerer':        {'full rudder deflection': 30,
+                       'ignore deviation below': 5,
+                       'ignore rate of turn below': 10},
     'sailing helm':   {'no go angle': 45,
                        'min tack duration': 5},
     'course steerer': {'sleep time' : 1},

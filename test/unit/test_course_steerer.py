@@ -5,7 +5,7 @@ from mock import Mock, call
 from course_steerer import CourseSteerer
 from config import CONFIG
 
-FULL_DEFLECTION = CONFIG['helm']['full deflection']
+FULL_DEFLECTION = CONFIG['steerer']['full rudder deflection']
 
 class TestCourseSteerer(unittest.TestCase):
 

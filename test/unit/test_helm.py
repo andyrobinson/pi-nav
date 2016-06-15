@@ -10,7 +10,6 @@ from test_utils import EventTestCase
 from copy import deepcopy
 from steerer import Steerer
 
-FULL_DEFLECTION = CONFIG['helm']['full deflection']
 TEST_CONFIG = deepcopy(CONFIG['helm'])
 TEST_CONFIG['turn on course min count'] = 3
 
@@ -19,51 +18,46 @@ class TestHelm(EventTestCase):
     def setUp(self):
         super(TestHelm, self).setUp()
         self.sensors = Mock()
-        self.servo = Mock()
         self.logger = Mock()
-        self.steerer = Steerer(self.servo,self.logger, TEST_CONFIG)
+        self.steerer = Mock()
         self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
         self.helm.previous_heading = 180
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
-        self.helm.steerer.rudder_angle = rudder_angle
         self.sensors.compass_heading_instant = current_track
         self.sensors.compass_heading_average = NaN
         self.sensors.rate_of_turn = current_track - previous_heading
         self.sensors.rate_of_turn_average = self.sensors.rate_of_turn
-        self.servo.set_position.reset_mock()
 
     def averagely_tracking(self,previous_heading, current_track):
-        self.helm.steerer.rudder_angle = 0
         self.sensors.compass_heading_average = current_track
         self.sensors.compass_heading_instant = NaN
         self.sensors.rate_of_turn = 0
         self.sensors.rate_of_turn_average = current_track - previous_heading
-        self.servo.set_position.reset_mock()
 
-    def test_should_review_and_change_steering_based_on_instant_heading_and_rate_of_turn_when_turning(self):
+    def test_should_steer_following_set_course_event(self):
         self.currently_tracking(204,200)
         self.exchange.publish(Event(EventName.set_course,heading=196))
-        self.assertFalse(self.servo.set_position.called)
+        self.steerer.steer.assert_called_with(196,200,-4)
 
-        self.sensors.track = 200
+        self.sensors.track = 202
         self.sensors.rate_of_turn = -20
         self.exchange.publish(Event(EventName.tick))
-        self.servo.set_position.assert_called_with(-16)
+        self.steerer.steer.assert_called_with(196,200,-20)
 
     def test_should_use_instant_heading_when_turning(self):
         self.helm.requested_heading = 5
         self.currently_tracking(340,350)
         self.helm.turn(Event(EventName.tick))
 
-        self.servo.set_position.assert_called_with(-5)
+        self.steerer.steer.assert_called_with(5,350,10)
 
     def test_should_use_average_heading_when_checking_course(self):
         self.helm.requested_heading = 5
-        self.averagely_tracking(340,350)
+        self.averagely_tracking(335,350)
         self.helm.check_course(Event(EventName.tick))
 
-        self.servo.set_position.assert_called_with(-5)
+        self.steerer.steer.assert_called_with(5,350,15)
 
     def test_should_trigger_turning_if_off_course_by_more_than_configured_20_degrees(self):
         self.exchange.unsubscribe(EventName.tick,self.helm.turn)
@@ -71,7 +65,7 @@ class TestHelm(EventTestCase):
         self.averagely_tracking(50,60)
         self.helm.check_course(Event(EventName.tick))
 
-        self.servo.set_position.assert_called_with(-20)
+        self.steerer.steer.assert_called_with(90,60,10)
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
 
     def test_should_immediately_change_to_turning_when_course_is_set(self):
@@ -80,7 +74,7 @@ class TestHelm(EventTestCase):
 
         self.exchange.publish(Event(EventName.set_course,heading=90))
 
-        self.servo.set_position.assert_called_with(-20)
+        self.steerer.steer.assert_called_with(90,60,10)
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
 
     def test_should_unsubscribe_turn_to_tick_event_when_on_course_after_configured_three_checks(self):
@@ -101,6 +95,7 @@ class TestHelm(EventTestCase):
     def test_should_continue_turning_if_on_course_with_high_rate_of_turn(self):
         self.currently_tracking(95,85)
         self.exchange.publish(Event(EventName.set_course,heading=90))
+        self.steerer.on_course.side_effect = [False,False,False,False]
 
         self.currently_tracking(85,95)
         self.exchange.publish(Event(EventName.tick))
@@ -115,6 +110,6 @@ class TestHelm(EventTestCase):
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
-        helm = Helm(self.exchange, self.sensors,self.servo,self.logger, TEST_CONFIG)
+        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
 
         self.assertEqual(len(self.events[EventName.every]),1)

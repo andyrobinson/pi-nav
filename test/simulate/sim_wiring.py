@@ -48,11 +48,11 @@ class SimWiring():
         self.console_logger = self._console_logger()
         self.exchange = Exchange(self.console_logger)
         self.gps = SimulatedGPS(CHORLTON.position,0,0.1)
-        self.vehicle = SimulatedVehicle(self.gps, self.globe,self.console_logger,False)
+        self.vehicle = SimulatedVehicle(self.gps, self.globe,self.console_logger,single_step=True)
         self.timeshift = TimeShift(self.exchange,self.vehicle.timer.time)
         self.event_source = EventSource(self.exchange,self.vehicle.timer,self.console_logger,CONFIG['event source'])
         self.sensors = Sensors(self.vehicle.gps, self.vehicle.windsensor,self.vehicle.compass,self.vehicle.timer.time,self.exchange,self.console_logger,CONFIG['sensors'])
-        self.steerer = Steerer(self.vehicle.rudder,self.console_logger,CONFIG['helm'])
+        self.steerer = Steerer(self.vehicle.rudder,self.console_logger,CONFIG['steerer'])
         self.helm = Helm(self.exchange, self.sensors, self.steerer, self.console_logger, CONFIG['helm'])
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.vehicle.timer, CONFIG['course steerer'])
         self.navigator_simulator = Navigator(self.sensors,self.globe,self.exchange,self.console_logger,CONFIG['navigator'])
@@ -61,7 +61,7 @@ class SimWiring():
         self.tracker_simulator = Tracker(self.console_logger,self.sensors,self.tracking_timer)
 
     def _console_logger(self):
-        logging.basicConfig(format=LOGGING_FORMAT, level=logging.INFO)
+        logging.basicConfig(format=LOGGING_FORMAT, level=logging.DEBUG)
         return logging.getLogger("simulate")
 
     def _follower(self,waypoints):

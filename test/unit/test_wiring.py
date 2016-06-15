@@ -52,7 +52,6 @@ class TestWiring(unittest.TestCase):
     def test_should_return_helm_with_all_dependencies(self):
         helm = self.wiring.helm
         self.assertTrue(isinstance(helm,Helm))
-        self.assertEqual(helm.steerer.full_deflection,CONFIG['helm']['full deflection'])
         self.assertEqual(helm.logger,self.wiring.application_logger)
         self.assertEqual(helm.sensors,self.wiring.sensors)
         self.assertEqual(helm.steerer.rudder_servo,self.wiring.rudder_servo)
@@ -60,7 +59,7 @@ class TestWiring(unittest.TestCase):
     def test_should_return_steerer_with_all_dependencies(self):
         steerer = self.wiring.steerer
         self.assertTrue(isinstance(steerer,Steerer))
-        self.assertEqual(steerer.full_deflection,CONFIG['helm']['full deflection'])
+        self.assertEqual(steerer.full_rudder_deflection,CONFIG['steerer']['full rudder deflection'])
         self.assertEqual(steerer.rudder_servo,self.wiring.rudder_servo)
 
     def test_should_return_navigator(self):

@@ -45,7 +45,8 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.02,10.02),Position(10.03,10.03)])
         sensors = FakeSensors(gps,1,45)
-        helm = Helm(self.exchange,sensors,self.servo,self.logger, CONFIG['helm'])
+        steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
+        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG['helm'])
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
@@ -61,7 +62,8 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         sensors = FakeSensors(gps,1,45)
-        helm = Helm(self.exchange,sensors,self.servo,self.logger, CONFIG['helm'])
+        steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
+        helm = Helm(self.exchange,sensors,steerer,self.logger, CONFIG['helm'])
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
@@ -78,7 +80,7 @@ class TestNavigationAndHelm(unittest.TestCase):
         destination = Waypoint(Position(10.0003,10.0003),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.0001,10.00015),Position(10.00025,10.0002),Position(10.0003,10.0003)])
         sensors = FakeSensors(gps,1,45)
-        steerer = Steerer(self.servo,logger, CONFIG['helm'])
+        steerer = Steerer(self.servo,logger, CONFIG['steerer'])
         helm = Helm(self.exchange,sensors,steerer,logger, CONFIG['helm'])
         navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
 

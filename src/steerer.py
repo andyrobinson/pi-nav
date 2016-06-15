@@ -8,11 +8,13 @@ class Steerer():
         self.rudder_angle = 0
         self.rudder_servo = rudder_servo
         self.logger = logger
-        self.ignore_below = config['ignore deviation below']
-        self.full_deflection = config['full deflection']
+        self.full_rudder_deflection = config['full rudder deflection']
+        self.ignore_course_deviation_below = config['ignore deviation below']
+        self.ignore_rate_of_turn_below = config['ignore rate of turn below']
 
     def on_course(self,requested_heading,heading,rate_of_turn):
-        return abs(self._deviation(requested_heading,heading)) < self.ignore_below and abs(rate_of_turn) < self.ignore_below
+        return (abs(self._deviation(requested_heading,heading)) < self.ignore_course_deviation_below
+                and abs(rate_of_turn) < self.ignore_rate_of_turn_below)
 
     def steer(self,requested_heading,heading,rate_of_turn):
         if isNaN(heading):
@@ -31,7 +33,7 @@ class Steerer():
 
     def _calculate_rudder_angle(self,requested_heading,heading,rate_of_turn):
         rate_adjusted_turn_angle = self.rudder_angle - (self._deviation(requested_heading,heading) - rate_of_turn)
-        unsigned_rudder_angle = min(self.full_deflection,abs(rate_adjusted_turn_angle))
+        unsigned_rudder_angle = min(self.full_rudder_deflection,abs(rate_adjusted_turn_angle))
         return copysign(unsigned_rudder_angle,rate_adjusted_turn_angle)
 
     def _set_rudder_angle(self,angle):
