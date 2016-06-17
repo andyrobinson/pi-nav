@@ -17,5 +17,5 @@ class TestWindSensor(unittest.TestCase):
 
     def test_should_read_direction_between_0_and_360(self):
         wind_direction = self.sensor.angle
-        self.assertGreater(angle,-0.01)
-        self.assertLess(angle,360.0)
+        self.assertGreater(wind_direction,-0.01)
+        self.assertLess(wind_direction,360.0)
