@@ -36,7 +36,7 @@ ACCELEROMETER_I2C_ADDRESS = 0x19
 
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
-        self.injected_gps = gps
+        self._gps = gps
         self.windsensor = WindSensor(I2C(WINDSENSOR_I2C_ADDRESS))
         self.compass = Compass(I2C(COMPASS_I2C_ADDRESS),I2C(ACCELEROMETER_I2C_ADDRESS))
 
@@ -67,11 +67,11 @@ class Wiring():
 
     @property
     def gps(self):
-        if not self.injected_gps:
+        if not self._gps:
             self._gps = GpsReader()
             self._gps.setDaemon(True)
             self._gps.start()
-        return self.injected_gps
+        return self._gps
 
     def showgps(self):
         try:
