@@ -42,7 +42,6 @@ class Wiring():
 
         self.globe = Globe()
         self.timer = Timer()
-        self.tracker = Tracker(self._rotating_logger("track"),self.gps,self.timer)
         self.application_logger = self._rotating_logger(APPLICATION_NAME)
         self.position_logger = self._rotating_logger("position")
         self.exchange = Exchange(self.application_logger)
@@ -56,6 +55,8 @@ class Wiring():
         self.helm = Helm(self.exchange,self.sensors,self.steerer,self.application_logger,CONFIG)
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.navigator = Navigator(self.sensors,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])
+
+        self.tracker = Tracker(self._rotating_logger("track"),self.sensors,self.timer)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)

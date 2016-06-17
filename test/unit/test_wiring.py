@@ -15,6 +15,8 @@ from helm import Helm
 from steerer import Steerer
 from event_source import EventSource
 from events import Exchange
+from track import Tracker
+from timer import Timer
 
 class TestWiring(unittest.TestCase):
 
@@ -73,3 +75,10 @@ class TestWiring(unittest.TestCase):
     def test_should_return_event_source(self):
         event_source = self.wiring.event_source
         self.assertTrue(isinstance(event_source,EventSource))
+
+    def test_should_return_tracker_with_correct_depedencies(self):
+        tracker = self.wiring.tracker
+        self.assertTrue(isinstance(tracker,Tracker))
+        self.assertTrue(isinstance(tracker.sensors,Sensors))
+        self.assertTrue(isinstance(tracker.timer,Timer))
+        self.assertTrue(isinstance(tracker.logger,logging.Logger))
