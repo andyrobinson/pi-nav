@@ -7,6 +7,7 @@ except ImportError, e:
 class I2C:
     def __init__(self,address):
         self.address = address
+        self._bus = None
 
     def read8(self,register):
         return self.bus.read_byte_data(self.address, register)
