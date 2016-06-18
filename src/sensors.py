@@ -73,7 +73,7 @@ class Sensors():
 
     @property
     def compass_heading_instant(self):
-        return self.compass.bearing()
+        return self.compass.bearing
 
     @property
     def compass_heading_average(self):
@@ -89,7 +89,7 @@ class Sensors():
 
     def update_averages(self,tick_event):
         wind = self.windsensor.angle
-        compass = self.compass.bearing()
+        compass = self.compass.bearing
         smoothing = self.config['smoothing']
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,smoothing)
         self._compass_avg = moving_avg(self._compass_avg,compass,smoothing)

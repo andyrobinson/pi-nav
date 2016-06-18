@@ -20,7 +20,7 @@ class Compass:
         self.accel.write8(0x23,0b00001000) # High res (12 bit) mode, LSB at lower address, default serial interface
         self.initialised = True
 
-    # @property
+    @property
     def bearing(self):
         self._initialise()
         x_acc = self.accel.read12_2s_comp(0x28)
