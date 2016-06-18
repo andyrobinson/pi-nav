@@ -61,7 +61,7 @@ class Sensors():
 
     @property
     def wind_direction_relative_instant(self):
-        return self.windsensor.angle()
+        return self.windsensor.angle
 
     @property
     def wind_direction_relative_average(self):
@@ -88,7 +88,7 @@ class Sensors():
         return self._rate_of_turn_average
 
     def update_averages(self,tick_event):
-        wind = self.windsensor.angle()
+        wind = self.windsensor.angle
         compass = self.compass.bearing()
         smoothing = self.config['smoothing']
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,smoothing)

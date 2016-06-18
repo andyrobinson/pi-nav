@@ -3,7 +3,7 @@ from setup_test import setup_test
 setup_test()
 
 import unittest
-from mock import Mock
+from mock import Mock,PropertyMock
 
 from utils.stub_gps import StubGPS
 from sensors import Sensors
@@ -12,8 +12,6 @@ from events import Exchange,EventName,Event
 from test_utils import EventTestCase
 
 DEFAULT_CONFIG = {'smoothing' : 2, 'log frequency': 15}
-
-
 
 class TestSensors(EventTestCase):
     def mock_time(self):
@@ -24,6 +22,7 @@ class TestSensors(EventTestCase):
         return Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
 
     def setUp(self):
+        mock_angle = PropertyMock(return_value=3.0)
         super(TestSensors, self).setUp()
         self.time = 0
         self.gps = StubGPS()
@@ -31,7 +30,7 @@ class TestSensors(EventTestCase):
         self.compass = Mock()
         self.logger = Mock()
         self.compass.bearing = Mock(return_value = 0.0)
-        self.windsensor.angle = Mock(return_value = 0.0)
+        type(self.windsensor).angle = mock_angle
 
     def test_should_pass_through_gps_values(self):
         self.assertEqual(self.sensors.hasfix, self.gps.hasfix)
@@ -64,26 +63,28 @@ class TestSensors(EventTestCase):
         self.assertEqual(sensors.track_error, 10)
 
     def test_should_pass_through_wind_drection(self):
+        mock_angle = PropertyMock(return_value=10.0)
         windsensor = Mock()
-        windsensor.angle.side_effect = [10.0,20.0]
+        type(windsensor).angle = mock_angle
         sensors = Sensors(StubGPS(),windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
         self.assertEqual(sensors.wind_direction_relative_instant, 10.0)
-        self.assertEqual(sensors.wind_direction_relative_instant, 20.0)
 
     def test_should_return_wind_relative_as_zero_initially(self):
         self.assertEqual(self.sensors.wind_direction_relative_average, 0.0)
 
     def test_should_return_wind_relative_average_after_several_ticks(self):
+        mock_angle = PropertyMock(side_effect=[10.0,20.0])
         windsensor = Mock()
-        windsensor.angle.side_effect = [10.0,20.0]
+        type(windsensor).angle = mock_angle
         sensors = Sensors(StubGPS(),windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
         self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.tick))
         self.assertEqual(sensors.wind_direction_relative_average, round(((0.0 + 10)/2 + 20)/2),0)
 
     def test_should_provide_a_rounded_average_for_values_either_side_of_zero(self):
+        mock_angle = PropertyMock(side_effect=[350.0,0.0,10.0])
         windsensor = Mock()
-        windsensor.angle.side_effect = [350.0,0.0,10.0]
+        type(windsensor).angle = mock_angle
         sensors = Sensors(StubGPS(),windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
         self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.tick))
@@ -108,8 +109,9 @@ class TestSensors(EventTestCase):
     def test_should_return_absolute_wind_direction_based_on_rounded_averages(self):
         mock_compass = Mock()
         mock_compass.bearing.side_effect = [10.0,30.0,50.0]
+        mock_angle = PropertyMock(side_effect=[0.0,340.0,320.0])
         mock_windsensor = Mock()
-        mock_windsensor.angle.side_effect = [0.0,340.0,320.0]
+        type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
         self.exchange.publish(Event(EventName.tick))
@@ -121,8 +123,9 @@ class TestSensors(EventTestCase):
     def test_should_return_absolute_wind_direction_based_on_rounded_averages_around_zero(self):
         mock_compass = Mock()
         mock_compass.bearing.side_effect = [345,5.0,20.0]
+        mock_angle = PropertyMock(side_effect=[10.0,355.0,335.0])
         mock_windsensor = Mock()
-        mock_windsensor.angle.side_effect = [10.0,355.0,335.0]
+        type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
         self.exchange.publish(Event(EventName.tick))
@@ -134,7 +137,7 @@ class TestSensors(EventTestCase):
     def test_should_log_all_sensor_values(self):
         self.logger.reset_mock()
         self.sensors.log_values(Event(EventName.log_position))
-        self.logger.info.assert_called_once_with("+53.200000,-2.300000,+0.000000,+0.000000,+7.30,+342.0,+1.00,+2.0,|,+0.0,+0.0,+0.0,|,+0.0,+0.0")
+        self.logger.info.assert_called_once_with("+53.200000,-2.300000,+0.000000,+0.000000,+7.30,+342.0,+1.00,+2.0,|,+3.0,+0.0,+0.0,|,+0.0,+0.0")
 
     def test_should_register_logging_according_to_config(self):
         self.listen(EventName.every)

@@ -20,6 +20,7 @@ class Compass:
         self.accel.write8(0x23,0b00001000) # High res (12 bit) mode, LSB at lower address, default serial interface
         self.initialised = True
 
+    # @property
     def bearing(self):
         self._initialise()
         x_acc = self.accel.read12_2s_comp(0x28)
@@ -40,5 +41,5 @@ class Compass:
         x_final = x_m*cos_pitch + y_m*sin_roll*sin_pitch+z_m*cos_roll*sin_pitch
         y_final = y_m*cos_roll-z_m*sin_roll
         bearing = round(math.degrees(math.atan2(y_final,x_final)),0)
-        
+
         return to_360(bearing)
