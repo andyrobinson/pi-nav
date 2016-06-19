@@ -1,11 +1,8 @@
-NOTE: Need to separate helm and steerer config
+NEXT:
+Need to a rudder command, to confirm that the rudder works as expected, then adjust the physical servo accordingly
 
-NOTE: need to reduce the rudder deflection when on course to prevent overcorrection.  The factor
-should be calculated.
-
-1. Ensure system can steer around a course_steerer
-2. Fix simulation following rewrite to events
-3. Implement a simple sailing algorithm:
+1. Ensure system can steer around a course
+2. Implement a simple sailing algorithm:
     - only navigate to (max) half-way, then reassess
     - simple steer if not in the no-go area
     - decide once at beginning of navigation which way to tack even if
@@ -22,7 +19,6 @@ Epic - field test
 - field test steering without sailing
 
 Epic - simulation
-- Fix simulator
 - Add wind and tides to simulation
 - Add a bit of randomness to simulation
 
