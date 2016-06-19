@@ -64,17 +64,17 @@ class Exchange:
             self.logger.warn("Event({}) published but no subscribers".format(event.name))
 
     def _safely_callback(self,callback,event):
-        try:
-            callback(event)
-        except(KeyboardInterrupt):
-            quit()
-        except:
-            try:
-                etype,e,traceback = sys.exc_info()
-                self.logger.error('Exchange, {0}: {1}'.format(etype.__name__,', '.join(str(x) for x in e.args)))
-                self.logger.error('Caused by event {0}, callback {1}'.format(event.name,str(callback)))
-            except:
-                pass
+        # try:
+        callback(event)
+        # except(KeyboardInterrupt):
+        #     quit()
+        # except:
+        #     try:
+        #         etype,e,traceback = sys.exc_info()
+        #         self.logger.error('Exchange, {0}: {1}'.format(etype.__name__,', '.join(str(x) for x in e.args)))
+        #         self.logger.error('Caused by event {0}, callback {1}'.format(event.name,str(callback)))
+        #     except:
+        #         pass
 
     def _process_events(self):
         self.processing = True

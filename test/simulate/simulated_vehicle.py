@@ -12,6 +12,7 @@ class SimulatedCompass():
     def __init__(self):
         self._bearing = 0
 
+    @property
     def bearing(self):
         return self._bearing
 
@@ -23,6 +24,7 @@ class SimulatedWindSensor():
         self._abs_wind = abs_wind
         self._vehicle_bearing = 0
 
+    @property
     def angle(self):
         return to_360(angle_between(self._vehicle_bearing,self._abs_wind))
 

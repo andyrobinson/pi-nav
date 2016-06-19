@@ -89,11 +89,11 @@ class Sensors():
 
     def update_averages(self,tick_event):
         wind = self.windsensor.angle
-        compass = self.compass.bearing
+        bearing = self.compass.bearing
         smoothing = self.config['smoothing']
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,smoothing)
-        self._compass_avg = moving_avg(self._compass_avg,compass,smoothing)
-        self._calculate_rate_of_turn(compass)
+        self._compass_avg = moving_avg(self._compass_avg,bearing,smoothing)
+        self._calculate_rate_of_turn(bearing)
         rate_of_turn_diff = self._rate_of_turn-self._rate_of_turn_average
         self._rate_of_turn_average += rate_of_turn_diff/smoothing
 
