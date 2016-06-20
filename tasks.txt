@@ -1,3 +1,7 @@
+To run as a service under systemd:
+
+http://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/
+
 NEXT:
 Need to a rudder command, to confirm that the rudder works as expected, then adjust the physical servo accordingly
 
