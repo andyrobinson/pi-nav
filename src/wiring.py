@@ -1,5 +1,6 @@
 import logging
 import serial
+import os
 
 from logging.handlers import TimedRotatingFileHandler
 from track import Tracker
@@ -21,6 +22,7 @@ from timeshift import TimeShift
 from i2c import I2C
 from windsensor import WindSensor
 from compass import Compass
+from gpio_writer import GpioWriter
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -39,6 +41,8 @@ class Wiring():
         self._gps = gps
         self.windsensor = WindSensor(I2C(WINDSENSOR_I2C_ADDRESS))
         self.compass = Compass(I2C(COMPASS_I2C_ADDRESS),I2C(ACCELEROMETER_I2C_ADDRESS))
+        self.red_led = GpioWriter(17,os)
+        self.green_led = GpioWriter(18,os)
 
         self.globe = Globe()
         self.timer = Timer()
