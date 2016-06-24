@@ -9,7 +9,7 @@ class TestSelfTest(unittest.TestCase):
 
     def setUp(self):
         self.red_led,self.green_led,self.timer,self.rudder = Mock(),Mock(),Mock(),Mock()
-        self.self_test = SelfTest(self.red_led,self.green_led,self.timer,self.rudder)
+        self.self_test = SelfTest(self.red_led,self.green_led,self.timer,self.rudder,RUDDER_MIN_ANGLE,RUDDER_MAX_ANGLE)
 
     def test_should_blink_red(self):
         self.self_test.run()

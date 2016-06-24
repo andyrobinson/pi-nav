@@ -23,6 +23,7 @@ from i2c import I2C
 from windsensor import WindSensor
 from compass import Compass
 from gpio_writer import GpioWriter
+from self_test import SelfTest
 
 LOGGING_FORMAT = '%(asctime)s,%(levelname)s,%(message)s'
 APPLICATION_NAME = 'waypoint_follower'
@@ -59,6 +60,7 @@ class Wiring():
         self.helm = Helm(self.exchange,self.sensors,self.steerer,self.application_logger,CONFIG)
         self.course_steerer = CourseSteerer(self.sensors,self.helm,self.timer,CONFIG['course steerer'])
         self.navigator = Navigator(self.sensors,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])
+        self.self_test = SelfTest(self.red_led,self.green_led,self.timer,self.rudder_servo,RUDDER_MIN_ANGLE,RUDDER_MAX_ANGLE)
 
         self.tracker = Tracker(self._rotating_logger("track"),self.sensors,self.timer)
 
@@ -86,6 +88,7 @@ class Wiring():
             self.gps.join()
 
     def follow(self,waypoints):
+        self.self_test.run()
         self.rudder_servo.set_position(0)
         self.follower = Follower(self.exchange,waypoints,self.application_logger)
         self.event_source.start()
