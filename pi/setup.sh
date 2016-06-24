@@ -16,10 +16,17 @@ sed -e 's/T0/#T0/;s/##/#/' -i.bak /etc/inittab
 # setup GPSD and make it start on reboot
 mv /etc/default/gpsd /etc/default/gpsd__$(date +"%Y%m%d").bak
 cp -f ./etc/default/gpsd /etc/default/gpsd
-update-rc.d /etc/init.d/gpsd defaults 
+update-rc.d /etc/init.d/gpsd defaults
 
 # Make the application run on startup
-mv /etc/rc.local /etc/rclocal__$(date +"%Y%m%d").bak
-cp -f ./etc/rc.local /etc
+# Old Wheezy script
+# mv /etc/rc.local /etc/rclocal__$(date +"%Y%m%d").bak
+# cp -f ./etc/rc.local /etc
+
+# Systemd
+cp -f ./lib/systemd/system/pi-nav.service /lib/systemd/system
+sudo chmod 644 /lib/systemd/system/pi-nav.service
+sudo systemctl daemon-reload
+sudo systemctl enable pi-nav.service
 
 echo 'if there were no errors, reboot to finish set up'

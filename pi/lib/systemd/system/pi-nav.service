@@ -1,0 +1,10 @@
+[Unit]
+Description=Pi Navigation
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /home/pi/pi-nav/run track
+
+[Install]
+WantedBy=multi-user.target
