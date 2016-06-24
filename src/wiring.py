@@ -67,7 +67,7 @@ class Wiring():
         # Tracking
         self.tracking_logger = self._rotating_logger("track")
         self.tracking_sensors = Sensors(self.gps,self.windsensor,self.compass,self.timer.time,self.exchange,self.tracking_logger,CONFIG['sensors'])
-        self.tracker = Tracker(self.tracking_logger,self.sensors,self.timer)
+        self.tracker = Tracker(self.tracking_logger,self.tracking_sensors,self.timer)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
