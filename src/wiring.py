@@ -39,12 +39,14 @@ ACCELEROMETER_I2C_ADDRESS = 0x19
 
 class Wiring():
     def __init__(self,gps=False,servo_port=SERVO_PORT):
+        # devices
         self._gps = gps
         self.windsensor = WindSensor(I2C(WINDSENSOR_I2C_ADDRESS))
         self.compass = Compass(I2C(COMPASS_I2C_ADDRESS),I2C(ACCELEROMETER_I2C_ADDRESS))
         self.red_led = GpioWriter(17,os)
         self.green_led = GpioWriter(18,os)
 
+        # Navigation
         self.globe = Globe()
         self.timer = Timer()
         self.application_logger = self._rotating_logger(APPLICATION_NAME)
@@ -62,7 +64,10 @@ class Wiring():
         self.navigator = Navigator(self.sensors,self.globe,self.exchange,self.application_logger,CONFIG['navigator'])
         self.self_test = SelfTest(self.red_led,self.green_led,self.timer,self.rudder_servo,RUDDER_MIN_ANGLE,RUDDER_MAX_ANGLE)
 
-        self.tracker = Tracker(self._rotating_logger("track"),self.sensors,self.timer)
+        # Tracking
+        self.tracking_logger = self._rotating_logger("track")
+        self.tracking_sensors = Sensors(self.gps,self.windsensor,self.compass,self.timer.time,self.exchange,self.tracking_logger,CONFIG['sensors'])
+        self.tracker = Tracker(self.tracking_logger,self.sensors,self.timer)
 
     def _rotating_logger(self,appname):
         logHandler = TimedRotatingFileHandler("/var/log/pi-nav/" + appname,when="midnight",backupCount=30)
