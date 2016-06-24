@@ -95,4 +95,4 @@ class Wiring():
 
     def track(self):
         self.self_test.run()
-        self.tracker.track(30)
+        self.tracker.track(10)

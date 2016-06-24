@@ -29,3 +29,4 @@ class TestSelfTest(unittest.TestCase):
 
         self.assertEqual(1,self.green_led.high.call_count)
         self.assertEqual(1,self.green_led.low.call_count)
+        self.timer.wait_for.assert_any_call(5)

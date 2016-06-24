@@ -10,22 +10,22 @@ class SelfTest():
         self.rudder_max_angle = rudder_max_angle
 
     def run(self):
-        self.with_led_blink(self.red_led,self.rudder_test)
+        self.with_led_blink(self.red_led,self.rudder_test,0.5)
         self.test_complete()
 
     def rudder_test(self):
         self.rudder.set_position(self.rudder_min_angle)
-        self.timer.wait_for(0.2)
+        self.timer.wait_for(1)
         self.rudder.set_position(self.rudder_max_angle)
-        self.timer.wait_for(0.2)
+        self.timer.wait_for(1)
         self.rudder.set_position(0)
 
-    def with_led_blink(self,led,method):
+    def with_led_blink(self,led,method,duration):
         led.high()
-        self.timer.wait_for(0.5)
+        self.timer.wait_for(duration)
         method()
         led.low()
-        self.timer.wait_for(0.5)
+        self.timer.wait_for(duration)
 
     def test_complete(self):
-        self.with_led_blink(self.green_led,lambda:None)
+        self.with_led_blink(self.green_led,lambda:None,5)
