@@ -28,7 +28,7 @@ if __name__ == '__main__':
         subprocess.call([sys.executable, '-m', 'unittest', 'discover', '-s','hw_integration_test'])
 
     if command == 'track':
-        wiring_inst().tracker.track(30)
+        wiring_inst().track()
 
     if command == 'showgps':
         wiring_inst().showgps()

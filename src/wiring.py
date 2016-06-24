@@ -92,3 +92,7 @@ class Wiring():
         self.rudder_servo.set_position(0)
         self.follower = Follower(self.exchange,waypoints,self.application_logger)
         self.event_source.start()
+
+    def track(self):
+        self.self_test.run()
+        self.tracker.track(30)
