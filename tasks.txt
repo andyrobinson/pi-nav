@@ -1,8 +1,6 @@
-To run as a service under systemd:
-
-http://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/
-
 NEXT:
+- GPS did not work on last track test, probably pi config messed up - need to check all the
+settings and make sure that PI can talk to GPS.
 - Trap and log errors during self test, to prevent failure at this point
 - Need to a rudder command, to confirm that the rudder works as expected, then adjust the physical servo accordingly
 
@@ -55,3 +53,7 @@ Epic - steering using servo based on new event design
 - Add logging to a different file to sensors
 
 - Add avg heading and abs wind direction
+
+To run as a service under systemd:
+
+http://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/

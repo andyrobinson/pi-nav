@@ -24,7 +24,7 @@ update-rc.d /etc/init.d/gpsd defaults
 # cp -f ./etc/rc.local /etc
 
 # Systemd
-cp -f ./lib/systemd/system/pi-nav.service /lib/systemd/system
+sudo cp -f ./lib/systemd/system/pi-nav.service /lib/systemd/system
 sudo chmod 644 /lib/systemd/system/pi-nav.service
 sudo systemctl daemon-reload
 sudo systemctl enable pi-nav.service
