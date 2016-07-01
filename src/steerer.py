@@ -19,13 +19,14 @@ class Steerer():
 
     def steer(self,requested_heading,heading,rate_of_turn,rudder_deflection_factor = 1):
         if isNaN(heading):
+            self.logger.debug('Steerer, no valid heading, centralising rudder')
             self._set_rudder_angle(0)
             return
 
         if not self.on_course(requested_heading,heading,rate_of_turn):
             new_rudder_angle = self._calculate_rudder_angle(requested_heading,heading,rate_of_turn,rudder_deflection_factor)
             self.logger.debug(
-                'Helm, steering {:.1f}, heading {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
+                'Steerer, steering {:.1f}, heading {:.1f}, rate of turn {:+.1f}, rudder {:+.1f}, new rudder {:+.1f}'
                 .format(requested_heading, heading, rate_of_turn, self.rudder_angle, new_rudder_angle))
             self._set_rudder_angle(new_rudder_angle)
 

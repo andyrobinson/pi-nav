@@ -87,7 +87,7 @@ class TestSteerer(unittest.TestCase):
 
     def test_should_log_steering_calculation_and_status_to_debug(self):
         self.steerer.steer(requested_heading=355,heading=10,rate_of_turn=-100)
-        self.logger.debug.assert_called_with("Helm, steering 355.0, heading 10.0, rate of turn -100.0, rudder +0.0, new rudder +5.0")
+        self.logger.debug.assert_called_with("Steerer, steering 355.0, heading 10.0, rate of turn -100.0, rudder +0.0, new rudder +5.0")
         self.servo.set_position.assert_called_with(5)
 
     def test_should_use_reduction_factor_for_deflection_to_allow_minor_long_term_corrections(self):

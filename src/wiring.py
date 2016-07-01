@@ -74,7 +74,7 @@ class Wiring():
         logHandler.setFormatter(logging.Formatter(LOGGING_FORMAT))
         logger = logging.getLogger(appname)
         logger.addHandler( logHandler )
-        logger.setLevel( logging.INFO )
+        logger.setLevel( logging.DEBUG )
         return logger
 
     @property

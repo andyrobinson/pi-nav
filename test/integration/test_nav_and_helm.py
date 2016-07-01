@@ -88,14 +88,14 @@ class TestNavigationAndHelm(unittest.TestCase):
         self.ticks(number = 10,duration=20)
 
         logger.debug.assert_has_calls(
-            [call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +8.7'),
-            call('Helm, steering 36.4, heading 45.0, rate of turn +1.0, rudder +8.7, new rudder +17.3'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder -0.7'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -18.7, new rudder -30.0'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-            call('Helm, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0')])
+            [call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +8.7'),
+            call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +8.7, new rudder +17.3'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder -0.7'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -18.7, new rudder -30.0'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
+            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0')])
 
 if __name__ == "__main__":
     unittest.main()
