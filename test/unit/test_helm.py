@@ -70,6 +70,7 @@ class TestHelm(EventTestCase):
 
         self.steerer.steer.assert_called_with(90,60,10,self.reduction_factor())
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertTrue(self.helm.turning)
 
     def test_should_immediately_change_to_turning_when_course_is_set(self):
         self.exchange.unsubscribe(EventName.tick,self.helm.turn)
@@ -79,6 +80,7 @@ class TestHelm(EventTestCase):
 
         self.steerer.steer.assert_called_with(90,60,10)
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertTrue(self.helm.turning)
 
     def test_should_unsubscribe_turn_to_tick_event_when_on_course_after_configured_three_checks(self):
         self.currently_tracking(120,125)
@@ -94,6 +96,7 @@ class TestHelm(EventTestCase):
         self.exchange.publish(Event(EventName.tick))
 
         self.assertNotIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertFalse(self.helm.turning)
 
     def test_should_continue_turning_if_on_course_with_high_rate_of_turn(self):
         self.currently_tracking(95,85)
@@ -110,9 +113,17 @@ class TestHelm(EventTestCase):
         self.exchange.publish(Event(EventName.tick))
 
         self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertTrue(self.helm.turning)
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
         helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
 
         self.assertEqual(len(self.events[EventName.every]),1)
+
+    def test_check_course_should_not_steer_if_we_are_turning(self):
+        self.helm.turning = True
+
+        self.helm.check_course(Event(EventName.tick))
+
+        self.assertEqual(self.steerer.steer.call_count,0)

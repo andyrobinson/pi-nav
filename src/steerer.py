@@ -19,7 +19,6 @@ class Steerer():
 
     def steer(self,requested_heading,heading,rate_of_turn,rudder_deflection_factor = 1):
         if isNaN(heading):
-            self.logger.info('heading NaN, centralising rudder: ' + str(heading))
             self._set_rudder_angle(0)
             return
 

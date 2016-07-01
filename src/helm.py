@@ -11,6 +11,7 @@ class Helm():
         self.on_course_count = 0
         self.exchange = exchange
         self.steerer = steerer
+        self.turning = False
         helm_config = config['helm']
         self.on_course_count_threshold = helm_config['turn on course min count']
         self.on_course_threshold = helm_config['on course threshold']
@@ -32,6 +33,8 @@ class Helm():
         self.steerer.steer(self.requested_heading,heading,rate_of_turn)
 
     def check_course(self,check_course_event):
+        if self.turning:
+            return
         heading = self.sensors.compass_heading_average
         rate_of_turn = self.sensors.rate_of_turn_average
         if abs(angle_between(heading,self.requested_heading)) > self.on_course_threshold:
@@ -39,10 +42,12 @@ class Helm():
         self.steerer.steer(self.requested_heading,heading,rate_of_turn,self.reduction_factor)
 
     def _start_turning(self):
+        self.turning = True
         self.exchange.subscribe(EventName.tick,self.turn)
         self.on_course_count = 0
 
     def _stop_turning(self):
+        self.turning = False
         self.exchange.unsubscribe(EventName.tick,self.turn)
 
     def _check_on_course(self,heading,rate_of_turn):
