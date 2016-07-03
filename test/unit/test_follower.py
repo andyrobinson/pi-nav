@@ -56,6 +56,8 @@ class TestFollower(EventTestCase):
         self.exchange.publish(Event(EventName.arrived,waypoint2))
 
         self.mock_logger.info.assert_has_calls(
-            [call('Follower, next waypoint {:+f},{:+f}'.format(waypoint1.longitude, waypoint1.latitude)),
-             call('Follower, next waypoint {:+f},{:+f}'.format(waypoint2.longitude, waypoint2.latitude)),
-             call('Follower, all waypoints reached, navigation complete')])
+            [call('Follower, next waypoint +1.000000,+1.000000'),
+             call('Follower, next waypoint +2.000000,+2.000000'),
+             call('**************************************************************'),
+             call('Follower, all waypoints reached, navigation complete'),
+             call('**************************************************************')])

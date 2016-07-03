@@ -19,7 +19,7 @@ class TestTrack(unittest.TestCase):
 
         Tracker(mock_logger, mock_sensors, StubTimer()).track(300)
 
-        mock_logger.info.assert_has_calls([call('Pi-Nav starting ' + now.strftime("%Y-%m-%d")),
+        mock_logger.info.assert_has_calls([call('Pi-Nav starting tracking ' + now.strftime("%Y-%m-%d")),
             call('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track, |, wind, avg wind, abs wind, |, comp, avg comp')])
 
     def test_should_pass_interval_to_callback_timer(self):

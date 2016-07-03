@@ -13,7 +13,9 @@ class Follower():
         if self.waypoints:
             self._navigate_to_next_waypoint()
         else:
+            self.logger.info('**************************************************************')
             self.logger.info('Follower, all waypoints reached, navigation complete')
+            self.logger.info('**************************************************************')
             self.exchange.publish(Event(EventName.end))
 
     def _navigate_to_next_waypoint(self):

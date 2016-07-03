@@ -1,9 +1,13 @@
 CURRENTLY WORKING ON:
 
-- Steering around a course.  Theories around poor performance:
-  - Compass is too jittery, needs low pass filter for regular steering (check through debug messages)
-  - Influence of compass on rudder deflection is too great - need to add config to reduce (check through debug)
-  - Course is too strict in terms of error radius - add debug and relax the course a little (added debugging here)
+- Steering around a course.  Investigation:
+  - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
+  sampling every 0.2s rate of turn is magnified - could be as much as 720 degrees/sec in theory
+  - Compass varies between readings by up to 10 degrees
+  - Adding a low pass filter for the compass will reduce both variation and rate of turn
+  - Need to reduce influence of rate of turn on rudder deflection (configurable)
+  - Need to reduce influence of deviation from course, probably by 50%
+  - Should probably try each one in turn, starting with a low pass filter on the compass
 
 NEXT:
 
@@ -11,8 +15,8 @@ NEXT:
 2. Implement a simple sailing algorithm:
     - only navigate to (max) half-way, then reassess
     - simple steer if not in the no-go area
-    - decide once at beginning of navigation which way to tack even if
-    a tack is not required (always choose more direct tack)
+    - decide once at beginning of navigation which way to tack even if a tack is not
+    required (always choose more direct tack)
     - bear up to wind as much as possible if tacking
     - avoid the no-go area continuously by bearing off in the direction of the tack as needed
     - set sails according to the wind direction

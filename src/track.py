@@ -7,7 +7,7 @@ class Tracker():
         self.timer = timer
 
     def track(self, seconds_between_entries):
-        self.logger.info('Pi-Nav starting ' + datetime.datetime.now().strftime("%Y-%m-%d"))
+        self.logger.info('Pi-Nav starting tracking ' + datetime.datetime.now().strftime("%Y-%m-%d"))
         self.logger.info('latitude, longitute, +-lat, +-long, speed, track, +-speed, +-track, |, wind, avg wind, abs wind, |, comp, avg comp')
         self.timer.call(self.log_position).every(seconds_between_entries)
 

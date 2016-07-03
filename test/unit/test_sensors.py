@@ -11,7 +11,7 @@ from nan import NaN
 from events import Exchange,EventName,Event
 from test_utils import EventTestCase
 
-DEFAULT_CONFIG = {'smoothing' : 2, 'log frequency': 15}
+DEFAULT_CONFIG = {'smoothing' : 2, 'log interval': 15}
 
 class TestSensors(EventTestCase):
     def mock_time(self):
@@ -147,7 +147,7 @@ class TestSensors(EventTestCase):
     def test_should_register_logging_according_to_config(self):
         self.listen(EventName.every)
 
-        sensors = Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,{'smoothing' : 2, 'log frequency': 15})
+        sensors = Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,{'smoothing' : 2, 'log interval': 15})
 
         self.assertEqual(self.event_count(EventName.every),1)
         every_event = self.events[EventName.every][0]

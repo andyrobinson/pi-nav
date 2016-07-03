@@ -24,7 +24,7 @@ class Sensors():
         self._rate_of_turn_average = 0
         exchange.subscribe(EventName.tick,self.update_averages)
         exchange.subscribe(EventName.log_position,self.log_values)
-        exchange.publish(Event(EventName.every,seconds = config['log frequency'],next_event = Event(EventName.log_position)))
+        exchange.publish(Event(EventName.every,seconds = config['log interval'],next_event = Event(EventName.log_position)))
 
     @property
     def hasfix(self):
