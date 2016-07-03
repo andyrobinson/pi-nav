@@ -3,7 +3,7 @@ CURRENTLY WORKING ON:
 - Steering around a course.  Theories around poor performance:
   - Compass is too jittery, needs low pass filter for regular steering (check through debug messages)
   - Influence of compass on rudder deflection is too great - need to add config to reduce (check through debug)
-  - Course is too strict in terms of error radius - add debug and relax the course a little
+  - Course is too strict in terms of error radius - add debug and relax the course a little (added debugging here)
 
 NEXT:
 
