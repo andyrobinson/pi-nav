@@ -42,11 +42,13 @@ class Helm():
         self.steerer.steer(self.requested_heading,heading,rate_of_turn,self.reduction_factor)
 
     def _start_turning(self):
+        self.logger.debug("Helm: starting turn")
         self.turning = True
         self.exchange.subscribe(EventName.tick,self.turn)
         self.on_course_count = 0
 
     def _stop_turning(self):
+        self.logger.debug("Helm: on course, stopping turn")
         self.turning = False
         self.exchange.unsubscribe(EventName.tick,self.turn)
 

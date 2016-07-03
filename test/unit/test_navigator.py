@@ -73,8 +73,11 @@ class TestNavigator(EventTestCase):
 
         self.assertEqual(self.event_count(EventName.set_course),1,"expected set course event following navigate")
         self.assertEqual(self.last_event.heading,expected_bearing)
-        self.mock_logger.info.assert_any_call('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
-            .format(waypoint.latitude,waypoint.longitude,expected_bearing,expected_distance))
+        # self.mock_logger.info.assert_any_call('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m, review after 600s'
+        #     .format(waypoint.latitude,waypoint.longitude,expected_bearing,expected_distance))
+        self.mock_logger.info.assert_has_calls([call('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m, review after 32394s'
+            .format(waypoint.latitude,waypoint.longitude,expected_bearing,expected_distance))])
+
 
     def test_should_steer_to_waypoint_if_outside_tolerance(self):
         self.listen(EventName.set_course)

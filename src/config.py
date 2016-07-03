@@ -1,3 +1,11 @@
+
+LOGGING_CRITICAL = 50
+LOGGING_ERROR = 40
+LOGGING_WARNING = 30
+LOGGING_INFO = 20
+LOGGING_DEBUG = 10
+LOGGING_NOTSET = 0
+
 CONFIG = {
     'helm' :          {'on course threshold': 20,
                        'turn on course min count': 5,
@@ -13,4 +21,6 @@ CONFIG = {
                        'max time to steer': 600},
     'sensors' :       {'smoothing' : 3,
                        'log frequency': 10},
-    'event source' :  {'tick interval':0.2}}
+    'event source' :  {'tick interval':0.2},
+    'wiring' :        {'logging level': LOGGING_DEBUG}
+    }

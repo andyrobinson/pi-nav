@@ -32,8 +32,9 @@ class Navigator():
             if isNaN(bearing):
                 self.logger.warn('Navigator, no information from sensors, continuing on current course')
             else:
-                self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m'
-                    .format(self.destination_waypoint.latitude,self.destination_waypoint.longitude, bearing, self._distance(current_position,self.destination_waypoint)))
+                self.logger.info('Navigator, steering to {:+f},{:+f}, bearing {:5.1f}, distance {:.1f}m, review after {:.0f}s'
+                    .format(self.destination_waypoint.latitude,self.destination_waypoint.longitude, bearing,
+                    self._distance(current_position,self.destination_waypoint),time_to_next_review))
                 self.exchange.publish(Event(EventName.set_course,heading=bearing))
 
             self.exchange.publish(Event(EventName.after,seconds=time_to_next_review,next_event=Event(EventName.navigate_review)))
@@ -51,7 +52,9 @@ class Navigator():
 
     def _arrived(self,position,destination_waypoint):
         tolerance = self._error_radius(position) + float(destination_waypoint.tolerance)
-        return self._distance(position,destination_waypoint) <= tolerance
+        distance_from_waypoint = self._distance(position,destination_waypoint)
+        self.logger.debug("Navigator, distance from waypoint {:+f}, combined tolerance {:+f}".format(distance_from_waypoint,tolerance))
+        return distance_from_waypoint <= tolerance
 
     def _distance(self,position,destination_waypoint):
         return self.globe.distance_between(position, destination_waypoint.position)

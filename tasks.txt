@@ -1,8 +1,11 @@
+CURRENTLY WORKING ON:
+
+- Steering around a course.  Theories around poor performance:
+  - Compass is too jittery, needs low pass filter for regular steering (check through debug messages)
+  - Influence of compass on rudder deflection is too great - need to add config to reduce (check through debug)
+  - Course is too strict in terms of error radius - add debug and relax the course a little
+
 NEXT:
-
-
-- Trap and log errors during self test, to prevent failure at this point
-- Need to a rudder command, to confirm that the rudder works as expected, then adjust the physical servo accordingly
 
 1. Ensure system can steer around a course
 2. Implement a simple sailing algorithm:
@@ -26,6 +29,7 @@ Epic - simulation
 - Add a bit of randomness to simulation
 
 Epic - power-on self test
+- Trap and log errors during self test, to prevent failure at this point
 - Wait for GPS to have signal - probably at least 5 mins
 - Note that failure in self-check does NOT stop navigation from beginning - need try ... catch around everything
 

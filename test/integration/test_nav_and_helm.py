@@ -53,12 +53,12 @@ class TestNavigationAndHelm(unittest.TestCase):
         self.ticks(number = 14,duration=200)
 
         self.logger.info.assert_has_calls(
-            [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m'),
-            call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 3121.2m'),
-            call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 1560.6m'),
-            call('Navigator, arrived at +10.030000,+10.030000')])
+            [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m, review after 600s'),
+             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 3121.2m, review after 600s'),
+             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 1560.6m, review after 600s'),
+             call('Navigator, arrived at +10.030000,+10.030000')])
 
-    def test_should_steer_to_next_waypoint_with_kink_in_route(self):
+    def test_should_navigate_to_next_waypoint_with_kink_in_route(self):
         destination = Waypoint(Position(10.03,10.03),10)
         gps = FakeMovingGPS([Position(10,10),Position(10.01,10.01),Position(10.025,10.015),Position(10.03,10.03)])
         sensors = FakeSensors(gps,1,45)
@@ -70,10 +70,10 @@ class TestNavigationAndHelm(unittest.TestCase):
         self.ticks(number = 14,duration=200)
 
         self.logger.info.assert_has_calls(
-            [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m'),
-            call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 3121.2m'),
-            call('Navigator, steering to +10.030000,+10.030000, bearing  71.3, distance 1734.0m'),
-            call('Navigator, arrived at +10.030000,+10.030000')])
+            [call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 4681.8m, review after 600s'),
+             call('Navigator, steering to +10.030000,+10.030000, bearing  44.6, distance 3121.2m, review after 600s'),
+             call('Navigator, steering to +10.030000,+10.030000, bearing  71.3, distance 1734.0m, review after 600s'),
+             call('Navigator, arrived at +10.030000,+10.030000')])
 
     def test_should_steer_repeatedly_during_navigation(self):
         logger = Mock()
@@ -82,20 +82,31 @@ class TestNavigationAndHelm(unittest.TestCase):
         sensors = FakeSensors(gps,1,45)
         steerer = Steerer(self.servo,logger, CONFIG['steerer'])
         helm = Helm(self.exchange,sensors,steerer,logger, CONFIG)
-        navigator = Navigator(sensors,Globe(),self.exchange,self.logger, CONFIG['navigator'])
+        navigator = Navigator(sensors,Globe(),self.exchange,logger, CONFIG['navigator'])
 
         self.exchange.publish(Event(EventName.navigate,waypoint = destination))
-        self.ticks(number = 10,duration=20)
+        self.ticks(number = 7,duration=20)
 
         logger.debug.assert_has_calls(
-            [call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +8.7'),
-            call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +8.7, new rudder +17.3'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder -0.7'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -18.7, new rudder -30.0'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0'),
-            call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -30.0, new rudder -30.0')])
+            [call('Navigator, distance from waypoint +46.819018, combined tolerance +10.000000'),
+             call('Helm: starting turn'),
+             call('Navigator, distance from waypoint +27.647432, combined tolerance +10.000000'),
+             call('Helm: starting turn'),
+             call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +0.0, new rudder +8.7'),
+             call('Steerer, steering 36.4, heading 45.0, rate of turn +1.0, rudder +8.7, new rudder +17.3'),
+             call('Navigator, distance from waypoint +12.281099, combined tolerance +10.000000'),
+             call('Helm: starting turn'),
+             call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder -0.7'),
+             call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
+             call('Navigator, distance from waypoint +0.000000, combined tolerance +10.000000'),
+             call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -18.7, new rudder -30.0')])
+
+        logger.info.assert_has_calls(
+            [call('Navigator, steering to +10.000300,+10.000300, bearing  44.6, distance 46.8m, review after 23s'),
+             call('Navigator, steering to +10.000300,+10.000300, bearing  36.4, distance 27.6m, review after 13s'),
+             call('Navigator, steering to +10.000300,+10.000300, bearing  63.1, distance 12.3m, review after 6s'),
+             call('Navigator, arrived at +10.000300,+10.000300')])
+
 
 if __name__ == "__main__":
     unittest.main()
