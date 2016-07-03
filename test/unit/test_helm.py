@@ -12,6 +12,7 @@ from steerer import Steerer
 
 TEST_CONFIG = deepcopy(CONFIG)
 TEST_CONFIG['helm']['turn on course min count'] = 3
+TEST_CONFIG['helm']['turn steer interval'] = 3
 
 class TestHelm(EventTestCase):
 
@@ -24,7 +25,8 @@ class TestHelm(EventTestCase):
         self.helm.previous_heading = 180
 
     def reduction_factor(self):
-        return CONFIG['event source']['tick interval']/CONFIG['helm']['on course check interval']
+        factor = float(TEST_CONFIG['helm']['turn steer interval'])/(TEST_CONFIG['helm']['on course check interval'])
+        return factor
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
         self.sensors.compass_heading_instant = current_track
@@ -45,57 +47,57 @@ class TestHelm(EventTestCase):
 
         self.sensors.track = 202
         self.sensors.rate_of_turn = -20
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.steerer.steer.assert_called_with(196,200,-20)
 
     def test_should_use_instant_heading_when_turning(self):
         self.helm.requested_heading = 5
         self.currently_tracking(340,350)
-        self.helm.turn(Event(EventName.tick))
+        self.helm.turn(Event(EventName.steer))
 
         self.steerer.steer.assert_called_with(5,350,10)
 
     def test_should_use_average_heading_and_reduction_factor_when_checking_course(self):
         self.helm.requested_heading = 5
         self.averagely_tracking(335,350)
-        self.helm.check_course(Event(EventName.tick))
+        self.helm.check_course(Event(EventName.steer))
 
         self.steerer.steer.assert_called_with(5,350,15,self.reduction_factor())
 
     def test_should_trigger_turning_if_off_course_by_more_than_configured_20_degrees(self):
-        self.exchange.unsubscribe(EventName.tick,self.helm.turn)
+        self.exchange.unsubscribe(EventName.steer,self.helm.turn)
         self.helm.requested_heading = 90
         self.averagely_tracking(50,60)
-        self.helm.check_course(Event(EventName.tick))
+        self.helm.check_course(Event(EventName.steer))
 
         self.steerer.steer.assert_called_with(90,60,10,self.reduction_factor())
-        self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertIn(self.helm.turn,self.exchange.register[EventName.steer])
         self.assertTrue(self.helm.turning)
 
     def test_should_immediately_change_to_turning_when_course_is_set(self):
-        self.exchange.unsubscribe(EventName.tick,self.helm.turn)
+        self.exchange.unsubscribe(EventName.steer,self.helm.turn)
         self.currently_tracking(50,60)
 
         self.exchange.publish(Event(EventName.set_course,heading=90))
 
         self.steerer.steer.assert_called_with(90,60,10)
-        self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertIn(self.helm.turn,self.exchange.register[EventName.steer])
         self.assertTrue(self.helm.turning)
 
-    def test_should_unsubscribe_turn_to_tick_event_when_on_course_after_configured_three_checks(self):
+    def test_should_unsubscribe_turn_to_steer_event_when_on_course_after_configured_three_checks(self):
         self.currently_tracking(120,125)
         self.exchange.publish(Event(EventName.set_course,heading=90))
 
         self.currently_tracking(95,85)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(85,87)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(85,87)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(85,87)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
 
-        self.assertNotIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertNotIn(self.helm.turn,self.exchange.register[EventName.steer])
         self.assertFalse(self.helm.turning)
 
     def test_should_continue_turning_if_on_course_with_high_rate_of_turn(self):
@@ -104,26 +106,34 @@ class TestHelm(EventTestCase):
         self.steerer.on_course.side_effect = [False,False,False,False]
 
         self.currently_tracking(85,95)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(95,85)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(85,95)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
         self.currently_tracking(95,85)
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.steer))
 
-        self.assertIn(self.helm.turn,self.exchange.register[EventName.tick])
+        self.assertIn(self.helm.turn,self.exchange.register[EventName.steer])
         self.assertTrue(self.helm.turning)
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
         helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
 
-        self.assertEqual(len(self.events[EventName.every]),1)
+        self.assertEqual(self.events[EventName.every][0].next_event.name,EventName.check_course)
+
+    def test_should_generate_repeating_steer_event_according_to_config(self):
+        self.listen(EventName.every)
+        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
+
+        repeating_steer_event = self.events[EventName.every][1]
+        self.assertEqual(repeating_steer_event.next_event.name,EventName.steer)
+        self.assertEqual(repeating_steer_event.seconds,3)
 
     def test_check_course_should_not_steer_if_we_are_turning(self):
         self.helm.turning = True
 
-        self.helm.check_course(Event(EventName.tick))
+        self.helm.check_course(Event(EventName.steer))
 
         self.assertEqual(self.steerer.steer.call_count,0)

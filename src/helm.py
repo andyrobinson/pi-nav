@@ -15,24 +15,25 @@ class Helm():
         helm_config = config['helm']
         self.on_course_count_threshold = helm_config['turn on course min count']
         self.on_course_threshold = helm_config['on course threshold']
-        self.reduction_factor = config['event source']['tick interval']/helm_config['on course check interval']
+        self.reduction_factor = float(helm_config['turn steer interval'])/helm_config['on course check interval']
 
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
         self.exchange.publish(Event(EventName.every,seconds=helm_config['on course check interval'],next_event=Event(EventName.check_course)))
+        self.exchange.publish(Event(EventName.every,seconds=helm_config['turn steer interval'],next_event=Event(EventName.steer)))
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading
         self._start_turning()
-        self.turn(Event(EventName.tick))
+        self.turn(Event(EventName.steer))
 
-    def turn(self,tick_event):
+    def turn(self,unused_steer_event):
         heading = self.sensors.compass_heading_instant
         rate_of_turn = self.sensors.rate_of_turn
         self._check_on_course(heading,rate_of_turn)
         self.steerer.steer(self.requested_heading,heading,rate_of_turn)
 
-    def check_course(self,check_course_event):
+    def check_course(self,unused_check_course_event):
         if self.turning:
             return
         heading = self.sensors.compass_heading_average
@@ -44,13 +45,13 @@ class Helm():
     def _start_turning(self):
         self.logger.debug("Helm: starting turn")
         self.turning = True
-        self.exchange.subscribe(EventName.tick,self.turn)
+        self.exchange.subscribe(EventName.steer,self.turn)
         self.on_course_count = 0
 
     def _stop_turning(self):
         self.logger.debug("Helm: on course, stopping turn")
         self.turning = False
-        self.exchange.unsubscribe(EventName.tick,self.turn)
+        self.exchange.unsubscribe(EventName.steer,self.turn)
 
     def _check_on_course(self,heading,rate_of_turn):
         if self.steerer.on_course(self.requested_heading,heading,rate_of_turn):

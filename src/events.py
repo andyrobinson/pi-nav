@@ -8,7 +8,7 @@ class EventName:
     navigate_review = "navigate review"
     arrived = "arrived"
     set_course = "set course"
-    turn = "turn"
+    steer = "steer"
     check_course = "check course"
     after = "after"
     every = "every"

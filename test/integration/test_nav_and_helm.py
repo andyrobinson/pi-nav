@@ -97,8 +97,8 @@ class TestNavigationAndHelm(unittest.TestCase):
              call('Navigator, distance from waypoint +12.281099, combined tolerance +10.000000'),
              call('Helm: starting turn'),
              call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder +17.3, new rudder -0.7'),
-             call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
              call('Navigator, distance from waypoint +0.000000, combined tolerance +10.000000'),
+             call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -0.7, new rudder -18.7'),
              call('Steerer, steering 63.1, heading 45.0, rate of turn +1.0, rudder -18.7, new rudder -30.0')])
 
         logger.info.assert_has_calls(
