@@ -1,5 +1,9 @@
 CURRENTLY WORKING ON:
 
+- Moved steer to it's own event
+- Need to add low pass filter for compass, separate from calculating averages, which needs it's own event
+
+
 - Steering around a course.  Investigation:
   - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
   sampling every 0.2s rate of turn is magnified - could be as much as 720 degrees/sec in theory
