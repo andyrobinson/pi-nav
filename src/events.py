@@ -12,6 +12,7 @@ class EventName:
     check_course = "check course"
     after = "after"
     every = "every"
+    update_averages = "update averages"
     log_position = "log position"
 
 class Event:

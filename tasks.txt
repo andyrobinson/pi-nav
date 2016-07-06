@@ -1,7 +1,7 @@
 CURRENTLY WORKING ON:
 
-- Moved steer to it's own event
-- Need to add low pass filter for compass, separate from calculating averages, which needs it's own event
+- Moved update averages to it's own event
+- Still need to add low pass filter for compass based on tick event, now 0.1s
 
 
 - Steering around a course.  Investigation:

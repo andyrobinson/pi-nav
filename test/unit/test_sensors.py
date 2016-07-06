@@ -11,7 +11,7 @@ from nan import NaN
 from events import Exchange,EventName,Event
 from test_utils import EventTestCase
 
-DEFAULT_CONFIG = {'smoothing' : 2, 'log interval': 15}
+DEFAULT_CONFIG = {'smoothing' : 2, 'log interval': 15, 'update averages interval': 0.2}
 
 class TestSensors(EventTestCase):
     def mock_time(self):
@@ -63,6 +63,14 @@ class TestSensors(EventTestCase):
         self.assertEqual(sensors.speed_error, 10)
         self.assertEqual(sensors.track_error, 10)
 
+    def test_should_register_the_update_averages_event_according_to_config(self):
+        self.listen(EventName.every)
+        sensors = self.sensors
+
+        update_averages_event = self.events[EventName.every][1]
+        self.assertEqual(update_averages_event.next_event.name,EventName.update_averages)
+        self.assertEqual(update_averages_event.seconds,DEFAULT_CONFIG['update averages interval'])
+
     def test_should_pass_through_wind_drection(self):
         mock_angle = PropertyMock(return_value=10.0)
         windsensor = Mock()
@@ -73,13 +81,13 @@ class TestSensors(EventTestCase):
     def test_should_return_wind_relative_as_zero_initially(self):
         self.assertEqual(self.sensors.wind_direction_relative_average, 0.0)
 
-    def test_should_return_wind_relative_average_after_several_ticks(self):
+    def test_should_return_wind_relative_average_after_several_update_averages_events(self):
         mock_angle = PropertyMock(side_effect=[10.0,20.0])
         windsensor = Mock()
         type(windsensor).angle = mock_angle
         sensors = Sensors(StubGPS(),windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
         self.assertEqual(sensors.wind_direction_relative_average, round(((0.0 + 10)/2 + 20)/2),0)
 
     def test_should_provide_a_rounded_average_for_values_either_side_of_zero(self):
@@ -87,9 +95,9 @@ class TestSensors(EventTestCase):
         windsensor = Mock()
         type(windsensor).angle = mock_angle
         sensors = Sensors(StubGPS(),windsensor,self.compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
         self.assertEqual(sensors.wind_direction_relative_average, 4.0)
 
     def test_should_pass_though_compass_bearing(self):
@@ -105,8 +113,8 @@ class TestSensors(EventTestCase):
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
         self.assertEqual(sensors.compass_heading_average, round(((0.0 + 10)/2 + 20)/2),0)
 
     def test_should_return_absolute_wind_direction_based_on_rounded_averages(self):
@@ -118,9 +126,9 @@ class TestSensors(EventTestCase):
         type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(sensors.wind_direction_abs_average, 9.0)
 
@@ -133,9 +141,9 @@ class TestSensors(EventTestCase):
         type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(sensors.wind_direction_abs_average, 357.0)
 
@@ -146,10 +154,11 @@ class TestSensors(EventTestCase):
 
     def test_should_register_logging_according_to_config(self):
         self.listen(EventName.every)
+        config = DEFAULT_CONFIG
+        config['log interval'] = 15
 
-        sensors = Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,{'smoothing' : 2, 'log interval': 15})
+        sensors = Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,config)
 
-        self.assertEqual(self.event_count(EventName.every),1)
         every_event = self.events[EventName.every][0]
         self.assertEqual(every_event.seconds,15)
         self.assertEqual(every_event.next_event.name,EventName.log_position)
@@ -163,9 +172,9 @@ class TestSensors(EventTestCase):
         sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
 
         self.time = 1.2
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
         self.time = 1.2 + time_between_bearing_samples
-        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(5/time_between_bearing_samples,sensors.rate_of_turn)
 
@@ -179,7 +188,7 @@ class TestSensors(EventTestCase):
 
         for i in range(1,5):
             self.time += time_between_bearing_samples
-            self.exchange.publish(Event(EventName.tick))
+            self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(2.6875,sensors.rate_of_turn_average)
         self.assertEqual(3,sensors.rate_of_turn)
@@ -194,7 +203,7 @@ class TestSensors(EventTestCase):
 
         for i in range(1,5):
             self.time += time_between_bearing_samples
-            self.exchange.publish(Event(EventName.tick))
+            self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(-2.71875,sensors.rate_of_turn_average)
         self.assertEqual(-3,sensors.rate_of_turn)
