@@ -1,12 +1,7 @@
 CURRENTLY WORKING ON:
 
-<<<<<<< 94df90f45b4be94a054d92b5fbdcbd6e40a8bead
 - Moved update averages to it's own event
 - Still need to add low pass filter for compass based on tick event, now 0.1s
-=======
-(Field test and tune)
-- Need to add low pass filter for compass, separate from calculating averages, which needs it's own event
->>>>>>> updating tasks
 
 - Steering around a course.  Investigation:
   - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are

@@ -24,6 +24,7 @@ class Sensors():
         self._rate_of_turn_average = 0
         exchange.subscribe(EventName.update_averages,self.update_averages)
         exchange.subscribe(EventName.log_position,self.log_values)
+        exchange.subscribe(EventName.tick,self.update_compass_bearing)
         exchange.publish(Event(EventName.every,seconds = config['log interval'],next_event = Event(EventName.log_position)))
         exchange.publish(Event(EventName.every,seconds = config['update averages interval'],next_event = Event(EventName.update_averages)))
 
@@ -88,7 +89,7 @@ class Sensors():
     def rate_of_turn_average(self):
         return self._rate_of_turn_average
 
-    def update_averages(self,tick_event):
+    def update_averages(self,unused_event):
         wind = self.windsensor.angle
         bearing = self.compass.bearing
         smoothing = self.config['smoothing']
@@ -97,6 +98,9 @@ class Sensors():
         self._calculate_rate_of_turn(bearing)
         rate_of_turn_diff = self._rate_of_turn-self._rate_of_turn_average
         self._rate_of_turn_average += rate_of_turn_diff/smoothing
+
+    def update_compass_bearing(self,unused_event):
+        pass
 
     def _calculate_rate_of_turn(self,bearing):
         time_now = self.system_time()

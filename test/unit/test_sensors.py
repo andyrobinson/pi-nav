@@ -207,3 +207,8 @@ class TestSensors(EventTestCase):
 
         self.assertEqual(-2.71875,sensors.rate_of_turn_average)
         self.assertEqual(-3,sensors.rate_of_turn)
+
+    def test_should_register_the_update_compass_bearing_to_tick(self):
+        sensors = self.sensors
+
+        self.assertIn(sensors.update_compass_bearing,self.exchange.register[EventName.tick])
