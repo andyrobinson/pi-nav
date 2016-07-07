@@ -1,8 +1,12 @@
 CURRENTLY WORKING ON:
 
+<<<<<<< 94df90f45b4be94a054d92b5fbdcbd6e40a8bead
 - Moved update averages to it's own event
 - Still need to add low pass filter for compass based on tick event, now 0.1s
-
+=======
+(Field test and tune)
+- Need to add low pass filter for compass, separate from calculating averages, which needs it's own event
+>>>>>>> updating tasks
 
 - Steering around a course.  Investigation:
   - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
@@ -15,7 +19,6 @@ CURRENTLY WORKING ON:
 
 NEXT:
 
-1. Ensure system can steer around a course
 2. Implement a simple sailing algorithm:
     - only navigate to (max) half-way, then reassess
     - simple steer if not in the no-go area
@@ -28,13 +31,9 @@ NEXT:
 Time
 Sort out GPS vs system time - ideally system should take it's time from gps - what happens if not there???
 
-Epic - field test
-- Field test tracking including compass and windsensor
-- field test steering without sailing
-
 Epic - simulation
-- Add wind and tides to simulation
 - Add a bit of randomness to simulation
+- Add wind and tides to simulation
 
 Epic - power-on self test
 - Trap and log errors during self test, to prevent failure at this point
@@ -63,6 +62,15 @@ For later
 =====================================================================================
 
 Done
+
+Epic - field test
+- Field test tracking including compass and windsensor
+- field test steering without sailing
+
+Epic - field test and tune steering so that it works in practice
+- Moved steer to it's own event
+
+
 Epic - steering using servo based on new event design
 - Add logging to a different file to sensors
 - Add avg heading and abs wind direction
