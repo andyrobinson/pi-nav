@@ -11,7 +11,7 @@ from nan import NaN
 from events import Exchange,EventName,Event
 from test_utils import EventTestCase
 
-DEFAULT_CONFIG = {'smoothing' : 2, 'log interval': 15, 'update averages interval': 0.2}
+DEFAULT_CONFIG = {'smoothing' : 2,'compass smoothing': 2,'log interval': 15, 'update averages interval': 0.2}
 
 class TestSensors(EventTestCase):
     def mock_time(self):
@@ -100,25 +100,24 @@ class TestSensors(EventTestCase):
         self.exchange.publish(Event(EventName.update_averages))
         self.assertEqual(sensors.wind_direction_relative_average, 4.0)
 
-    def test_should_pass_though_compass_bearing(self):
-        mock_bearing = PropertyMock(return_value=57.0)
-        compass = Mock()
-        type(compass).bearing = mock_bearing
-        sensors = Sensors(StubGPS(),self.windsensor,compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-
-        self.assertEqual(sensors.compass_heading_instant,57.0)
-
-    def test_should_return_compass_average_after_several_ticks(self):
+    def test_should_return_compass_average_with_double_smoothing(self):
         mock_bearing = PropertyMock(side_effect=[10.0,20.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.update_averages))
-        self.exchange.publish(Event(EventName.update_averages))
-        self.assertEqual(sensors.compass_heading_average, round(((0.0 + 10)/2 + 20)/2),0)
+
+        for i in range(0,2):
+            self.exchange.publish(Event(EventName.tick))
+            self.exchange.publish(Event(EventName.update_averages))
+
+        smoothed_compass = (0  + 10.0)/2
+        avg_compass = (0 + smoothed_compass)/2
+        second_smoothed_compass = (smoothed_compass + 20.0)/2
+        second_avg_compass = (avg_compass + second_smoothed_compass)/2
+        self.assertEqual(sensors.compass_heading_average, round(second_avg_compass,0))
 
     def test_should_return_absolute_wind_direction_based_on_rounded_averages(self):
-        mock_bearing = PropertyMock(side_effect=[10.0,30.0,50.0])
+        mock_bearing = PropertyMock(side_effect=[20.0,50.0,70.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         mock_angle = PropertyMock(side_effect=[0.0,340.0,320.0])
@@ -126,14 +125,14 @@ class TestSensors(EventTestCase):
         type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.update_averages))
-        self.exchange.publish(Event(EventName.update_averages))
-        self.exchange.publish(Event(EventName.update_averages))
+        for i in range(0,3):
+            self.exchange.publish(Event(EventName.tick))
+            self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(sensors.wind_direction_abs_average, 9.0)
 
     def test_should_return_absolute_wind_direction_based_on_rounded_averages_around_zero(self):
-        mock_bearing = PropertyMock(side_effect=[345,5.0,20.0])
+        mock_bearing = PropertyMock(side_effect=[330,20.0,40.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         mock_angle = PropertyMock(side_effect=[10.0,355.0,335.0])
@@ -141,9 +140,9 @@ class TestSensors(EventTestCase):
         type(mock_windsensor).angle = mock_angle
 
         sensors = Sensors(StubGPS(),mock_windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        self.exchange.publish(Event(EventName.update_averages))
-        self.exchange.publish(Event(EventName.update_averages))
-        self.exchange.publish(Event(EventName.update_averages))
+        for i in range(0,3):
+            self.exchange.publish(Event(EventName.tick))
+            self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(sensors.wind_direction_abs_average, 357.0)
 
@@ -164,7 +163,7 @@ class TestSensors(EventTestCase):
         self.assertEqual(every_event.next_event.name,EventName.log_position)
 
     def test_should_return_the_rate_of_turn(self):
-        mock_bearing = PropertyMock(side_effect=[5.0,10.0,15.0])
+        mock_bearing = PropertyMock(side_effect=[10.0,15.0,20.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         time_between_bearing_samples = 0.5
@@ -172,14 +171,16 @@ class TestSensors(EventTestCase):
         sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
 
         self.time = 1.2
+        self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.update_averages))
         self.time = 1.2 + time_between_bearing_samples
+        self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(5/time_between_bearing_samples,sensors.rate_of_turn)
 
     def test_should_return_the_average_rate_of_turn(self):
-        mock_bearing = PropertyMock(side_effect=[2.0,5.0,8.0,11.0])
+        mock_bearing = PropertyMock(side_effect=[4.0,8.0,11.0,14.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         time_between_bearing_samples = 1
@@ -188,13 +189,14 @@ class TestSensors(EventTestCase):
 
         for i in range(1,5):
             self.time += time_between_bearing_samples
+            self.exchange.publish(Event(EventName.tick))
             self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(2.6875,sensors.rate_of_turn_average)
         self.assertEqual(3,sensors.rate_of_turn)
 
     def test_should_return_the_average_rate_of_turn_anticlockwise_as_negative(self):
-        mock_bearing = PropertyMock(side_effect=[357.0,354.0,351.0,348.0])
+        mock_bearing = PropertyMock(side_effect=[354.0,351.0,348.0,345.0])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         time_between_bearing_samples = 1
@@ -203,6 +205,7 @@ class TestSensors(EventTestCase):
 
         for i in range(1,5):
             self.time += time_between_bearing_samples
+            self.exchange.publish(Event(EventName.tick))
             self.exchange.publish(Event(EventName.update_averages))
 
         self.assertEqual(-2.71875,sensors.rate_of_turn_average)
@@ -212,3 +215,15 @@ class TestSensors(EventTestCase):
         sensors = self.sensors
 
         self.assertIn(sensors.update_compass_bearing,self.exchange.register[EventName.tick])
+
+    def test_should_smooth_the_compass_bearing(self):
+        mock_bearing = PropertyMock(side_effect=[185.0,180])
+        mock_compass = Mock()
+        type(mock_compass).bearing = mock_bearing
+        sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
+        sensors._bearing = 190
+
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.tick))
+
+        self.assertEqual(sensors.compass_heading_instant,((190.0 + 185.0)/2 + 180.0)/2)

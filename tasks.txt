@@ -1,8 +1,5 @@
 CURRENTLY WORKING ON:
 
-- Moved update averages to it's own event
-- Still need to add low pass filter for compass based on tick event, now 0.1s
-
 - Steering around a course.  Investigation:
   - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
   sampling every 0.2s rate of turn is magnified - could be as much as 720 degrees/sec in theory
@@ -55,8 +52,9 @@ For later
 - hardware autoreboot (n.b. problems with self-check)
 
 =====================================================================================
-
-Done
+________
+| Done |
+--------
 
 Epic - field test
 - Field test tracking including compass and windsensor
@@ -64,7 +62,7 @@ Epic - field test
 
 Epic - field test and tune steering so that it works in practice
 - Moved steer to it's own event
-
+- Added low pass filter for compass based on tick event, now 0.1s
 
 Epic - steering using servo based on new event design
 - Add logging to a different file to sensors
@@ -83,3 +81,4 @@ https://www.raspberrypi.org/forums/viewtopic.php?f=45&t=53644
 _______
 
 Epic - power on self-test
+- Simple rudder deflection and check value from wind sensor
