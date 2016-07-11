@@ -93,9 +93,9 @@ class Wiring():
             self.gps.join()
 
     def follow(self,waypoints):
-        self.logger.info('**************************************************************')
-        self.logger.info('*** Pi-Nav starting navigation: ' + datetime.datetime.now().strftime("%Y-%m-%d"))
-        self.logger.info('**************************************************************')
+        self.application_logger.info('**************************************************************')
+        self.application_logger.info('*** Pi-Nav starting navigation: ' + datetime.datetime.now().strftime("%Y-%m-%d"))
+        self.application_logger.info('**************************************************************')
         self.self_test.run()
         self.rudder_servo.set_position(0)
         self.follower = Follower(self.exchange,waypoints,self.application_logger)
