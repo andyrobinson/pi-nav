@@ -7,16 +7,22 @@ from nan import NaN
 from copy import deepcopy
 from steerer import Steerer
 
-FULL_DEFLECTION = CONFIG['steerer']['full rudder deflection']
-MAX_RATE_OF_TURN = CONFIG['steerer']['ignore rate of turn below']
-MAX_DEVIATION = CONFIG['steerer']['ignore deviation below']
+TEST_CONFIG = {'full rudder deflection': 30,
+               'ignore deviation below': 5,
+               'ignore rate of turn below': 10,
+               'rate of turn factor': 0.1,
+               'deviation factor': 0.5}
+
+FULL_DEFLECTION = TEST_CONFIG['full rudder deflection']
+MAX_RATE_OF_TURN = TEST_CONFIG['ignore rate of turn below']
+MAX_DEVIATION = TEST_CONFIG['ignore deviation below']
 
 class TestSteerer(unittest.TestCase):
 
     def setUp(self):
         self.servo = Mock()
         self.logger = Mock()
-        self.steerer = Steerer(self.servo,self.logger, CONFIG['steerer'])
+        self.steerer = Steerer(self.servo,self.logger, TEST_CONFIG)
 
     def test_on_course_if_heading_and_rate_of_turn_below_threshold(self):
         course = 277
