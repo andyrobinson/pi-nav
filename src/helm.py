@@ -12,15 +12,14 @@ class Helm():
         self.exchange = exchange
         self.steerer = steerer
         self.turning = False
-        helm_config = config['helm']
-        self.on_course_count_threshold = helm_config['turn on course min count']
-        self.on_course_threshold = helm_config['on course threshold']
-        self.reduction_factor = float(helm_config['turn steer interval'])/helm_config['on course check interval']
+        self.on_course_count_threshold = config['turn on course min count']
+        self.on_course_threshold = config['on course threshold']
+        self.reduction_factor = float(config['turn steer interval'])/config['on course check interval']
 
         self.exchange.subscribe(EventName.set_course,self.set_course)
         self.exchange.subscribe(EventName.check_course,self.check_course)
-        self.exchange.publish(Event(EventName.every,seconds=helm_config['on course check interval'],next_event=Event(EventName.check_course)))
-        self.exchange.publish(Event(EventName.every,seconds=helm_config['turn steer interval'],next_event=Event(EventName.steer)))
+        self.exchange.publish(Event(EventName.every,seconds=config['on course check interval'],next_event=Event(EventName.check_course)))
+        self.exchange.publish(Event(EventName.every,seconds=config['turn steer interval'],next_event=Event(EventName.steer)))
 
     def set_course(self,set_course_event):
         self.requested_heading = set_course_event.heading

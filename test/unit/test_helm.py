@@ -11,8 +11,9 @@ from copy import deepcopy
 from steerer import Steerer
 
 TEST_CONFIG = deepcopy(CONFIG)
-TEST_CONFIG['helm']['turn on course min count'] = 3
-TEST_CONFIG['helm']['turn steer interval'] = 3
+HELM_CONFIG = TEST_CONFIG['helm']
+HELM_CONFIG['turn on course min count'] = 3
+HELM_CONFIG['turn steer interval'] = 3
 
 class TestHelm(EventTestCase):
 
@@ -21,11 +22,11 @@ class TestHelm(EventTestCase):
         self.sensors = Mock()
         self.logger = Mock()
         self.steerer = Mock()
-        self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
+        self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, HELM_CONFIG)
         self.helm.previous_heading = 180
 
     def reduction_factor(self):
-        factor = float(TEST_CONFIG['helm']['turn steer interval'])/(TEST_CONFIG['helm']['on course check interval'])
+        factor = float(HELM_CONFIG['turn steer interval'])/(HELM_CONFIG['on course check interval'])
         return factor
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
@@ -119,13 +120,13 @@ class TestHelm(EventTestCase):
 
     def test_should_subscribe_check_course_every_10_seconds(self):
         self.listen(EventName.every)
-        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
+        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, HELM_CONFIG)
 
         self.assertEqual(self.events[EventName.every][0].next_event.name,EventName.check_course)
 
     def test_should_generate_repeating_steer_event_according_to_config(self):
         self.listen(EventName.every)
-        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, TEST_CONFIG)
+        helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, HELM_CONFIG)
 
         repeating_steer_event = self.events[EventName.every][1]
         self.assertEqual(repeating_steer_event.next_event.name,EventName.steer)
