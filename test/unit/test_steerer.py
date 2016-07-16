@@ -16,6 +16,7 @@ TEST_CONFIG = {'full rudder deflection': 30,
 FULL_DEFLECTION = TEST_CONFIG['full rudder deflection']
 MAX_RATE_OF_TURN = TEST_CONFIG['ignore rate of turn below']
 MAX_DEVIATION = TEST_CONFIG['ignore deviation below']
+DEVIATION_FACTOR = TEST_CONFIG['deviation factor']
 
 class TestSteerer(unittest.TestCase):
 
@@ -40,30 +41,30 @@ class TestSteerer(unittest.TestCase):
         self.steerer.steer(requested_heading=196,heading=200,rate_of_turn=4)
         self.assertEqual(self.servo.set_position.call_count,0)
 
-    def test_should_move_rudder_right_by_difference_between_heading_and_course_if_no_rate_of_turn(self):
+    def test_should_move_rudder_right_by_difference_between_heading_and_course_with_factor_if_no_rate_of_turn(self):
         self.steerer.steer(requested_heading=209,heading=200,rate_of_turn=0)
-        self.servo.set_position.assert_called_with(-9)
+        self.servo.set_position.assert_called_with(-9 * DEVIATION_FACTOR)
 
-    def test_should_move_rudder_right_by_difference_between_heading_and_course_subtracting_rate_of_turn(self):
+    def test_should_move_rudder_right_by_difference_between_heading_and_course_with_factor_subtracting_rate_of_turn(self):
         self.steerer.steer(requested_heading=209,heading=200,rate_of_turn=50)
-        self.servo.set_position.assert_called_with(-4)
+        self.servo.set_position.assert_called_with(50 * 0.1 - 9 * DEVIATION_FACTOR)
 
-    def test_should_move_rudder_left_by_difference_between_heading_and_course_subtracting_larger_rate_of_turn(self):
+    def test_should_move_rudder_left_by_difference_between_heading_and_course_with_factor_subtracting_larger_rate_of_turn(self):
         self.steerer.steer(requested_heading=209,heading=205,rate_of_turn=150)
-        self.servo.set_position.assert_called_with(11)
+        self.servo.set_position.assert_called_with(150 * 0.1 - (209 - 205) * DEVIATION_FACTOR )
 
     def test_should_move_rudder_left_by_difference_between_heading_and_course_subtracting_rate_of_turn(self):
         self.steerer.steer(requested_heading=355,heading=10,rate_of_turn=-100)
-        self.servo.set_position.assert_called_with(5)
+        self.servo.set_position.assert_called_with(-100 * 0.1 - (-15 * DEVIATION_FACTOR))
 
     def test_rudder_movements_should_be_relative_to_current_rudder_position(self):
         self.steerer.rudder_angle = 5
         self.steerer.steer(requested_heading=355,heading=10,rate_of_turn=-100)
-        self.servo.set_position.assert_called_with(10)
+        self.servo.set_position.assert_called_with(5 + 15*0.5 - 100*0.1)
 
     def test_rudder_movements_should_be_limited_to_full_deflection_left(self):
         self.steerer.rudder_angle = 5
-        self.steerer.steer(requested_heading=330,heading=10,rate_of_turn=-100)
+        self.steerer.steer(requested_heading=330,heading=50,rate_of_turn=-100)
         self.servo.set_position.assert_called_with(FULL_DEFLECTION)
 
     def test_rudder_movements_should_be_limited_to_full_deflection_right(self):
@@ -85,7 +86,7 @@ class TestSteerer(unittest.TestCase):
 
     def test_should_work_with_fractional_parts(self):
         self.steerer.steer(requested_heading=29.4,heading=0.9,rate_of_turn=0)
-        self.servo.set_position.assert_called_with(-28.5)
+        self.servo.set_position.assert_called_with(-28.5 * DEVIATION_FACTOR)
 
     def test_should_centralise_rudder_if_sensor_returns_NaN(self):
         self.steerer.steer(requested_heading=57.23,heading=NaN,rate_of_turn=0)
@@ -93,9 +94,9 @@ class TestSteerer(unittest.TestCase):
 
     def test_should_log_steering_calculation_and_status_to_debug(self):
         self.steerer.steer(requested_heading=355,heading=10,rate_of_turn=-100)
-        self.logger.debug.assert_called_with("Steerer, steering 355.0, heading 10.0, rate of turn -100.0, rudder +0.0, new rudder +5.0")
-        self.servo.set_position.assert_called_with(5)
+        self.logger.debug.assert_called_with("Steerer, steering 355.0, heading 10.0, rate of turn -100.0, rudder +0.0, new rudder -2.5")
+        self.servo.set_position.assert_called_with(-2.5)
 
     def test_should_use_reduction_factor_for_deflection_to_allow_minor_long_term_corrections(self):
         self.steerer.steer(requested_heading=209,heading=200,rate_of_turn=50,rudder_deflection_factor = 0.1)
-        self.servo.set_position.assert_called_with(-0.4)
+        self.servo.set_position.assert_called_with(0.1 * (50 * 0.1 - 9 * DEVIATION_FACTOR))
