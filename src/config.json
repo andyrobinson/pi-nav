@@ -18,5 +18,5 @@
                        "log interval": 10,
                        "update averages interval": 0.2},
     "event source" :  {"tick interval":0.1},
-    "wiring" :        {"logging level": "DEBUG"}
+    "wiring" :        {"logging level": "INFO"}
 }

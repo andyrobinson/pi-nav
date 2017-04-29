@@ -2,8 +2,10 @@ from nan import isNaN
 from position import Position
 from events import Event,EventName
 from bearing import moving_avg,to_360,angle_between
+from math import copysign
 
 DEFAULT_ERROR = 10
+MAX_RATE_OF_TURN = 180
 
 class Sensors():
     def __init__(self,gps,windsensor,compass,time_fn,exchange,logger,config):
@@ -18,14 +20,14 @@ class Sensors():
         self._wind_relative_avg = 0.0
         self._compass_avg = 0.0
         self.system_time = time_fn
-        self._bearing = 0
-        self._previous_bearing = 0
+        self._compass_smoothed = 0
+        self._previous_compass_smoothed = 0
         self._previous_time = self.system_time()-1
         self._rate_of_turn = 0
         self._rate_of_turn_average = 0
         exchange.subscribe(EventName.update_averages,self.update_averages)
         exchange.subscribe(EventName.log_position,self.log_values)
-        exchange.subscribe(EventName.tick,self.update_compass_bearing)
+        exchange.subscribe(EventName.tick, self.update_compass_smoothed)
         exchange.publish(Event(EventName.every,seconds = config['log interval'],next_event = Event(EventName.log_position)))
         exchange.publish(Event(EventName.every,seconds = config['update averages interval'],next_event = Event(EventName.update_averages)))
 
@@ -75,8 +77,8 @@ class Sensors():
         return round(to_360(self._compass_avg + self._wind_relative_avg),0)
 
     @property
-    def compass_heading_instant(self):
-        return self._bearing
+    def compass_heading_smoothed(self):
+        return self._compass_smoothed
 
     @property
     def compass_heading_average(self):
@@ -94,21 +96,22 @@ class Sensors():
         wind = self.windsensor.angle
         smoothing = self.config['smoothing']
         self._wind_relative_avg = moving_avg(self._wind_relative_avg,wind,smoothing)
-        self._compass_avg = moving_avg(self._compass_avg,self._bearing,smoothing)
-        self._calculate_rate_of_turn(self._bearing)
+        self._compass_avg = moving_avg(self._compass_avg, self._compass_smoothed, smoothing)
+        self._calculate_rate_of_turn(self._compass_smoothed)
         rate_of_turn_diff = self._rate_of_turn-self._rate_of_turn_average
         self._rate_of_turn_average += rate_of_turn_diff/smoothing
 
-    def update_compass_bearing(self,unused_event):
-        self._bearing = moving_avg(self._bearing,self.compass.bearing,self.config['compass smoothing'])
+    def update_compass_smoothed(self, unused_event):
+        self._compass_smoothed = moving_avg(self._compass_smoothed, self.compass.bearing, self.config['compass smoothing'])
 
     def _calculate_rate_of_turn(self,bearing):
         time_now = self.system_time()
         if time_now <= self._previous_time:
             self._rate_of_turn = 0
         else:
-            self._rate_of_turn = angle_between(self._previous_bearing,bearing)/(time_now - self._previous_time)
-        self._previous_bearing = bearing
+            rate_of_turn = angle_between(self._previous_compass_smoothed, bearing) / (time_now - self._previous_time)
+            self._rate_of_turn = copysign(min(MAX_RATE_OF_TURN,abs(rate_of_turn)),rate_of_turn)
+        self._previous_compass_smoothed = bearing
         self._previous_time = time_now
 
     def log_values(self,unused_event):
@@ -124,7 +127,7 @@ class Sensors():
             self.wind_direction_relative_instant,
             self.wind_direction_relative_average,
             self.wind_direction_abs_average,
-            self.compass_heading_instant,
+            self.compass_heading_smoothed,
             self.compass_heading_average))
 
     def _default(self,  value,default):

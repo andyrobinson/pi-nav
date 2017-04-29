@@ -10,9 +10,13 @@ CURRENTLY WORKING ON:
   - Should probably try each one in turn, starting with a low pass filter on the compass
 
 NEXT:
-
+1. Simplify the general steering code:
+    - cap rate of turn at 180 degrees
+    - remove all special code for handling Turns
+    - change configuration to reduce influence of rate of turn and deviation
 2. Implement a simple sailing algorithm:
-    - only navigate to (max) half-way, then reassess
+    - look on the Internet for examples, formula for calculating sail angle
+    - only tack to (max) half-way, then reassess
     - simple steer if not in the no-go area
     - decide once at beginning of navigation which way to tack even if a tack is not
     required (always choose more direct tack)
@@ -55,6 +59,10 @@ For later
 ________
 | Done |
 --------
+
+Epic -  Simplify the general steering code:
+    - introduce a low pass filter for the compass
+
 
 Epic - field test
 - Field test tracking including compass and windsensor

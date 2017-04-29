@@ -13,7 +13,7 @@ class FakeSensors:
         self.wind_direction_relative_instant = to_360(angle_between(wind_direction,compass_heading))
         self.wind_direction_relative_average = self.wind_direction_relative_instant
         self.compass_heading_average = compass_heading
-        self.compass_heading_instant = compass_heading
+        self.compass_heading_smoothed = compass_heading
 
     @property
     def hasfix(self):

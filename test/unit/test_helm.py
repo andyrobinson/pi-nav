@@ -30,14 +30,14 @@ class TestHelm(EventTestCase):
         return factor
 
     def currently_tracking(self,previous_heading, current_track, rudder_angle=0):
-        self.sensors.compass_heading_instant = current_track
+        self.sensors.compass_heading_smoothed = current_track
         self.sensors.compass_heading_average = NaN
         self.sensors.rate_of_turn = current_track - previous_heading
         self.sensors.rate_of_turn_average = self.sensors.rate_of_turn
 
     def averagely_tracking(self,previous_heading, current_track):
         self.sensors.compass_heading_average = current_track
-        self.sensors.compass_heading_instant = NaN
+        self.sensors.compass_heading_smoothed = NaN
         self.sensors.rate_of_turn = 0
         self.sensors.rate_of_turn_average = current_track - previous_heading
 

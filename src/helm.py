@@ -27,7 +27,7 @@ class Helm():
         self.turn(Event(EventName.steer))
 
     def turn(self,unused_steer_event):
-        heading = self.sensors.compass_heading_instant
+        heading = self.sensors.compass_heading_smoothed
         rate_of_turn = self.sensors.rate_of_turn
         self._check_on_course(heading,rate_of_turn)
         self.steerer.steer(self.requested_heading,heading,rate_of_turn)

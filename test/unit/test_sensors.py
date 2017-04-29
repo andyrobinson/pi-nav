@@ -214,16 +214,33 @@ class TestSensors(EventTestCase):
     def test_should_register_the_update_compass_bearing_to_tick(self):
         sensors = self.sensors
 
-        self.assertIn(sensors.update_compass_bearing,self.exchange.register[EventName.tick])
+        self.assertIn(sensors.update_compass_smoothed, self.exchange.register[EventName.tick])
 
     def test_should_smooth_the_compass_bearing(self):
         mock_bearing = PropertyMock(side_effect=[185.0,180])
         mock_compass = Mock()
         type(mock_compass).bearing = mock_bearing
         sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
-        sensors._bearing = 190
+        sensors._compass_smoothed = 190
 
         self.exchange.publish(Event(EventName.tick))
         self.exchange.publish(Event(EventName.tick))
 
-        self.assertEqual(sensors.compass_heading_instant,((190.0 + 185.0)/2 + 180.0)/2)
+        self.assertEqual(sensors.compass_heading_smoothed, ((190.0 + 185.0) / 2 + 180.0) / 2)
+
+    def test_should_limit_the_rate_of_turn_even_if_time_difference_is_small(self):
+        mock_bearing = PropertyMock(side_effect=[10.0,15.0,20.0])
+        mock_compass = Mock()
+        type(mock_compass).bearing = mock_bearing
+        time_between_bearing_samples = 0.01
+
+        sensors = Sensors(StubGPS(),self.windsensor,mock_compass,self.mock_time,self.exchange,self.logger,DEFAULT_CONFIG)
+
+        self.time = 1.2
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+        self.time = 1.2 + time_between_bearing_samples
+        self.exchange.publish(Event(EventName.tick))
+        self.exchange.publish(Event(EventName.update_averages))
+
+        self.assertEqual(180,sensors.rate_of_turn)
