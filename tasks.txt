@@ -11,9 +11,8 @@ CURRENTLY WORKING ON:
 
 NEXT:
 1. Simplify the general steering code:
-    - cap rate of turn at 180 degrees
-    - remove all special code for handling Turns
     - change configuration to reduce influence of rate of turn and deviation
+    - remove all special code for handling Turns
 2. Implement a simple sailing algorithm:
     - look on the Internet for examples, formula for calculating sail angle
     - only tack to (max) half-way, then reassess
@@ -62,6 +61,7 @@ ________
 
 Epic -  Simplify the general steering code:
     - introduce a low pass filter for the compass
+    - cap rate of turn at 180 degrees
 
 
 Epic - field test
