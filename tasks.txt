@@ -1,18 +1,6 @@
 CURRENTLY WORKING ON:
 
-- Steering around a course.  Investigation:
-  - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
-  sampling every 0.2s rate of turn is magnified - could be as much as 720 degrees/sec in theory
-  - Compass varies between readings by up to 10 degrees
-  - Adding a low pass filter for the compass will reduce both variation and rate of turn
-  - Need to reduce influence of rate of turn on rudder deflection (configurable)
-  - Need to reduce influence of deviation from course, probably by 50%
-  - Should probably try each one in turn, starting with a low pass filter on the compass
-
 NEXT:
-1. Simplify the general steering code:
-    - change configuration to reduce influence of rate of turn and deviation
-    - remove all special code for handling Turns
 2. Implement a simple sailing algorithm:
     - look on the Internet for examples, formula for calculating sail angle
     - only tack to (max) half-way, then reassess
@@ -22,6 +10,11 @@ NEXT:
     - bear up to wind as much as possible if tacking
     - avoid the no-go area continuously by bearing off in the direction of the tack as needed
     - set sails according to the wind direction
+
+Steering field test
+- Move JSON file to somewhere that is easily edited
+- set a course around Chorlton Park
+- practice changing config settings
 
 Time
 Sort out GPS vs system time - ideally system should take it's time from gps - what happens if not there???
@@ -59,10 +52,20 @@ ________
 | Done |
 --------
 
+- Steering around a course Investigation:
+  - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are
+  sampling every 0.2s rate of turn is magnified - could be as much as 720 degrees/sec in theory
+  - Compass varies between readings by up to 10 degrees
+  - Adding a low pass filter for the compass will reduce both variation and rate of turn
+  - Need to reduce influence of rate of turn on rudder deflection (configurable)
+  - Need to reduce influence of deviation from course, probably by 50%
+  - Should probably try each one in turn, starting with a low pass filter on the compass
+
 Epic -  Simplify the general steering code:
     - introduce a low pass filter for the compass
     - cap rate of turn at 180 degrees
-
+    - change configuration to reduce influence of rate of turn and deviation
+    - decided not to remove specific turn code - looks OK. Need further field testing
 
 Epic - field test
 - Field test tracking including compass and windsensor
