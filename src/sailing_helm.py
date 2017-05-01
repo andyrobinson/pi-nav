@@ -38,7 +38,6 @@ class SailingHelm:
         first_tack_course = to_360(requested_heading + deflection)
         second_tack_course = to_360(first_tack_course - copysign(2 * self.no_go, deflection))
         self.logger.debug('SailingHelm: starting tack on {:5.1f} for {:5.0f} seconds'.format(first_tack_course, leg1))
-        print("tacks " + str(first_tack_course) + " for " + str(leg1) + "s and then " + str(second_tack_course)) + " for " + str(leg2)
 
         if leg2 <= self.config['min tack duration']:
             self.exchange.publish(Event(EventName.tack, heading=first_tack_course))
