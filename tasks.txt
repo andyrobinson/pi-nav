@@ -1,15 +1,18 @@
 CURRENTLY WORKING ON:
 
 NEXT:
-2. Implement a simple sailing algorithm:
-    - look on the Internet for examples, formula for calculating sail angle
-    - only tack to (max) half-way, then reassess
-    - simple steer if not in the no-go area
-    - decide once at beginning of navigation which way to tack even if a tack is not
-    required (always choose more direct tack)
+Complete simple sailing algorithm:
+    - Finish off the conversion to the event driven system
+    - Remove calculation of second leg time (no longer needed, handled by the navigation review)
+    - Consider how to handle a review which happens part way through the tack.... how do we clear out an impending tack?
+
     - bear up to wind as much as possible if tacking
     - avoid the no-go area continuously by bearing off in the direction of the tack as needed
     - set sails according to the wind direction
+
+Update simulation
+    - Add a wind direction
+    - Look at how the tacking goes...
 
 Steering field test
 - Move JSON file to somewhere that is easily edited
@@ -51,6 +54,12 @@ For later
 ________
 | Done |
 --------
+2. Implement a simple sailing algorithm:
+    - look on the Internet for examples, formula for calculating sail angle
+    - only tack to (max) half-way, then reassess
+    - simple steer if not in the no-go area
+    - decide once at beginning of navigation which way to tack even if a tack is not
+    required (always choose more direct tack)
 
 - Steering around a course Investigation:
   - Instantaneous rate of turn is very high, sometimes as much as 250 degrees/sec.  Note that because we are

@@ -8,6 +8,8 @@ class EventName:
     navigate_review = "navigate review"
     arrived = "arrived"
     set_course = "set course"
+    sail_course = "sail course"
+    tack = "tack"
     steer = "steer"
     check_course = "check course"
     after = "after"
@@ -16,7 +18,7 @@ class EventName:
     log_position = "log position"
 
 class Event:
-    def __init__(self,name,waypoint = None, heading = None, seconds = 0, next_event = None):
+    def __init__(self,name, waypoint = None, heading = None, seconds = 0, next_event = None):
         self.name = name
         self.waypoint = waypoint
         self.heading = heading
@@ -25,10 +27,15 @@ class Event:
 
     def __repr__(self):
         next_event = self.next_event.name if self.next_event else "None"
-        representation = "Event[{}]: waypoint={}, heading={}, secs={},next_event={}".format(self.name,repr(self.waypoint),self.heading,self.seconds,next_event )
-
+        representation = "Event[{}]: waypoint={}, heading={}, secs={}, next_event={}".format(self.name,repr(self.waypoint),self.heading,self.seconds,next_event )
         return (representation)
 
+    def __eq__(self, other):
+        return self.name == other.name and \
+            self.waypoint == other.waypoint and \
+            self.heading == other.heading and \
+            self.seconds == other.seconds and \
+            self.next_event == other.next_event
 
 class Exchange:
 
