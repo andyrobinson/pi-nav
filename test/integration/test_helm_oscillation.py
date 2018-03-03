@@ -73,14 +73,15 @@ class TestHelmOscillation(EventTestCase):
     self.sensors.log_values(Event(EventName.log_position))
     self.exchange.publish(Event(EventName.set_course,heading=target_heading))
 
-    while (self.deviation(target_heading) > STEERER_CONFIG['ignore deviation below']):
-      if (self.rudder_servo.get_position <> 0):
-        self.rotate_boat(0.5)
-
+    while (self.deviation(target_heading) > STEERER_CONFIG['ignore deviation below'] or abs(self.rudder_servo.get_position()) > 5):
+      self.rotate_boat(0.5)
       self.sensors.log_values(Event(EventName.log_position))
       self.exchange.publish(Event(EventName.steer))
       self.assertGreater(previous_deviation, self.deviation(target_heading))
       previous_deviation = self.deviation(target_heading)
+
+    self.sensors.log_values(Event(EventName.log_position))
+    print('rudder position on completion ' + str(self.rudder_servo.get_position()))
 
   def ignore_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
     pass
