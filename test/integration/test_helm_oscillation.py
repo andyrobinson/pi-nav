@@ -2,19 +2,20 @@ from setup_test import setup_test
 setup_test()
 
 import unittest
+from random import randint
 from mock import Mock, call, PropertyMock
 from copy import deepcopy
 from test_utils import EventTestCase
 from nan import NaN
 from utils.stub_gps import StubGPS
 from events import Event, EventName
-from bearing import to_360
+from bearing import to_360,angle_between
 
 from sensors import Sensors
 from helm import Helm
 from steerer import Steerer
 
-STEERER_CONFIG = {'full rudder deflection': 30,'ignore deviation below': 5,'ignore rate of turn below': 10,'rate of turn factor': 0.1,'deviation factor': 0.5}
+STEERER_CONFIG = {'full rudder deflection': 30,'ignore deviation below': 5,'ignore rate of turn below': 10,'rate of turn factor': 0.6,'deviation factor': 0.5}
 HELM_CONFIG = {'on course threshold': 20,'turn on course min count': 3,'on course check interval': 3,'turn steer interval': 3}
 SENSOR_CONFIG = {'smoothing' : 2,'compass smoothing': 2,'log interval': 15, 'update averages interval': 0.2}
 
@@ -27,12 +28,6 @@ class RudderSimulator:
 
   def get_position(self):
     return self.angle
-
-class TestLogger:
-  def debug(self,msg):
-    print 'DEBUG ' + msg
-  def info(self,msg):
-    print 'INFO ' + msg
 
 class TestHelmOscillation(EventTestCase):
 
@@ -51,46 +46,44 @@ class TestHelmOscillation(EventTestCase):
     self.compass.bearing = 0
     type(self.windsensor).angle = mock_angle
 
-    self.logger = TestLogger()
+    self.logger = Mock()
     self.sensors = Sensors(self.gps,self.windsensor,self.compass,self.mock_time,self.exchange,self.logger,SENSOR_CONFIG)
     self.rudder_servo = RudderSimulator()
     self.steerer = Steerer(self.rudder_servo,self.logger,STEERER_CONFIG)
     self.helm = Helm(self.exchange, self.sensors,self.steerer,self.logger, HELM_CONFIG)
     self.helm.previous_heading = 0
 
-  def deviation(self,heading):
-    return abs(self.sensors.compass_heading_average-heading)
+  def deviation(self,heading,jitter):
+    return abs(abs(angle_between(self.sensors.compass_heading_smoothed,heading)) - jitter)
 
-  def rotate_boat(self,rudder_effect):
-    self.compass.bearing = to_360(self.compass.bearing - self.rudder_servo.get_position() * rudder_effect)
+  def rotate_boat(self,rudder_effect,jitter):
+    self.compass.bearing = to_360(self.compass.bearing + randint(-jitter,jitter) - self.rudder_servo.get_position() * rudder_effect)
+    self.time += 0.2
     self.exchange.publish(Event(EventName.tick)) # for compass smoothing!
     self.exchange.publish(Event(EventName.update_averages))
 
-  def test_it_should_converge_on_requested_heading(self):
-    target_heading = 90
-    previous_deviation = 90
-
-    self.sensors.log_values(Event(EventName.log_position))
+  def assert_turn_converges_with_rudder_effect(self, new_heading, rudder_effect, jitter=0):
+    deviation_list = []
+    target_heading = new_heading
+    previous_deviation = self.deviation(new_heading,0)
     self.exchange.publish(Event(EventName.set_course,heading=target_heading))
 
-    while (self.deviation(target_heading) > STEERER_CONFIG['ignore deviation below'] or abs(self.rudder_servo.get_position()) > 5):
-      self.rotate_boat(0.5)
-      self.sensors.log_values(Event(EventName.log_position))
+    while (self.deviation(target_heading,jitter) > STEERER_CONFIG['ignore deviation below'] or \
+            (abs(self.rudder_servo.get_position()) > 5) and self.sensors.rate_of_turn > STEERER_CONFIG['ignore rate of turn below']):
+      self.rotate_boat(rudder_effect,jitter)
       self.exchange.publish(Event(EventName.steer))
-      self.assertGreater(previous_deviation, self.deviation(target_heading))
-      previous_deviation = self.deviation(target_heading)
+      deviation_list.append(round(self.deviation(target_heading,jitter),1))
+      self.assertGreater(previous_deviation + jitter, self.deviation(target_heading,jitter),"WARNING: RANDOM VALUES IN TEST.  Expected deviation from course to decrease every iteration, but got list " + str(deviation_list))
+      previous_deviation = self.deviation(target_heading,0)
 
-    self.sensors.log_values(Event(EventName.log_position))
-    print('rudder position on completion ' + str(self.rudder_servo.get_position()))
+  def test_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
+    self.compass.bearing = 0
+    self.assert_turn_converges_with_rudder_effect(90, 0.8)
 
-  def ignore_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
-    pass
+  def test_it_should_converge_on_requested_heading_when_rudder_ineffective(self):
+    self.compass.bearing = 0
+    self.assert_turn_converges_with_rudder_effect(270, 0.1)
 
-  def ignore_it_should_converge_on_requested_heading_when_rudder_ineffective(self):
-    pass
-
-  def ignore_it_should_converge_on_requested_heading_with_random_jitter(self):
-    pass
-
-  def ignore_it_should_correct_course_deviations_when_originally_on_course(self):
-    pass
+  def test_it_should_converge_on_requested_heading_with_random_jitter(self):
+    self.compass.bearing = 0
+    self.assert_turn_converges_with_rudder_effect(110, 0.3, 10)
