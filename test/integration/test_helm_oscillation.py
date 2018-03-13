@@ -62,15 +62,13 @@ class TestHelmOscillation(EventTestCase):
     self.exchange.publish(Event(EventName.tick)) # for compass smoothing!
     self.exchange.publish(Event(EventName.update_averages))
 
-  def set_intial_heading(self,heading):
+  def set_initial_heading(self,heading):
     self.compass.bearing = heading
     self.sensors._compass_smoothed = heading
 
-  def assert_turn_converges_with_rudder_effect(self, new_heading, rudder_effect, jitter=0):
-    target_heading = new_heading
-    previous_deviation = self.deviation(new_heading,0)
+  def assert_course_converges(self,target_heading,rudder_effect,jitter=0):
+    previous_deviation = self.deviation(target_heading,0)
     deviation_list = [previous_deviation]
-    self.exchange.publish(Event(EventName.set_course,heading=target_heading))
 
     while (self.deviation(target_heading,jitter) > STEERER_CONFIG['ignore deviation below'] or \
             (abs(self.rudder_servo.get_position()) > 5) and self.sensors.rate_of_turn > STEERER_CONFIG['ignore rate of turn below']):
@@ -80,14 +78,26 @@ class TestHelmOscillation(EventTestCase):
       self.assertGreater(previous_deviation + jitter, self.deviation(target_heading,jitter),"WARNING: RANDOM VALUES IN TEST.  Expected deviation from course to decrease every iteration, but got list " + str(deviation_list))
       previous_deviation = self.deviation(target_heading,0)
 
+  def assert_turn_converges_with_rudder_effect(self, new_heading, rudder_effect, jitter=0):
+    self.exchange.publish(Event(EventName.set_course,heading=new_heading))
+    self.assert_course_converges(new_heading,rudder_effect,jitter)
+
   def test_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
-    self.set_intial_heading(90)
+    self.set_initial_heading(90)
     self.assert_turn_converges_with_rudder_effect(180, 0.8)
 
   def test_it_should_converge_on_requested_heading_when_rudder_ineffective(self):
-    self.set_intial_heading(300)
+    self.set_initial_heading(300)
     self.assert_turn_converges_with_rudder_effect(230, 0.1)
 
   def test_it_should_converge_on_requested_heading_with_random_jitter(self):
-    self.set_intial_heading(10)
+    self.set_initial_heading(10)
     self.assert_turn_converges_with_rudder_effect(110, 0.3, 10)
+
+  def test_it_should_converge_on_heading_after_going_off_course(self):
+    self.set_initial_heading(110)
+    self.assert_turn_converges_with_rudder_effect(110, 0.5)
+
+    self.set_initial_heading(180)
+    self.exchange.publish(Event(EventName.check_course))
+    self.assert_course_converges(180,0.5)
