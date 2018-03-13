@@ -5,7 +5,7 @@ import unittest
 from random import randint
 from mock import Mock, call, PropertyMock
 from copy import deepcopy
-from test_utils import EventTestCase
+from test_utils import EventTestCase,test_logger
 from nan import NaN
 from utils.stub_gps import StubGPS
 from events import Event, EventName
@@ -62,10 +62,14 @@ class TestHelmOscillation(EventTestCase):
     self.exchange.publish(Event(EventName.tick)) # for compass smoothing!
     self.exchange.publish(Event(EventName.update_averages))
 
+  def set_intial_heading(self,heading):
+    self.compass.bearing = heading
+    self.sensors._compass_smoothed = heading
+
   def assert_turn_converges_with_rudder_effect(self, new_heading, rudder_effect, jitter=0):
-    deviation_list = []
     target_heading = new_heading
     previous_deviation = self.deviation(new_heading,0)
+    deviation_list = [previous_deviation]
     self.exchange.publish(Event(EventName.set_course,heading=target_heading))
 
     while (self.deviation(target_heading,jitter) > STEERER_CONFIG['ignore deviation below'] or \
@@ -77,13 +81,13 @@ class TestHelmOscillation(EventTestCase):
       previous_deviation = self.deviation(target_heading,0)
 
   def test_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
-    self.compass.bearing = 0
-    self.assert_turn_converges_with_rudder_effect(90, 0.8)
+    self.set_intial_heading(90)
+    self.assert_turn_converges_with_rudder_effect(180, 0.8)
 
   def test_it_should_converge_on_requested_heading_when_rudder_ineffective(self):
-    self.compass.bearing = 0
-    self.assert_turn_converges_with_rudder_effect(270, 0.1)
+    self.set_intial_heading(300)
+    self.assert_turn_converges_with_rudder_effect(230, 0.1)
 
   def test_it_should_converge_on_requested_heading_with_random_jitter(self):
-    self.compass.bearing = 0
+    self.set_intial_heading(10)
     self.assert_turn_converges_with_rudder_effect(110, 0.3, 10)
