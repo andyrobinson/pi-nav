@@ -33,14 +33,14 @@ returns "nan" (Not a number) when values are not present.  Note these properties
 		<tr><td>track</td><td>No</td><td>numeric</td><td>Course over ground, degrees from true north.</td></tr>
 		<tr><td>speed</td><td>No</td><td>numeric</td><td>Speed over ground, meters per second.</td></tr>
 		<tr><td>climb</td><td>No</td><td>numeric</td><td>Climb (positive) or sink (negative) rate, meters per second. Not used on this project</td></tr>
-		<tr><td>epx</td><td>No</td><td>numeric</td><td>Longitude error estimate in meters, 95% confidence. Present 
-        if mode is 2 or 3 and DOPs can be calculated from the satellite 
+		<tr><td>epx</td><td>No</td><td>numeric</td><td>Longitude error estimate in meters, 95% confidence. Present
+        if mode is 2 or 3 and DOPs can be calculated from the satellite
         view.</td></tr>
-		<tr><td>epy</td><td>No</td><td>numeric</td><td>Latitude error estimate in meters, 95% confidence. Present 
-        if mode is 2 or 3 and DOPs can be calculated from the satellite 
+		<tr><td>epy</td><td>No</td><td>numeric</td><td>Latitude error estimate in meters, 95% confidence. Present
+        if mode is 2 or 3 and DOPs can be calculated from the satellite
         view.</td></tr>
-		<tr><td>epv</td><td>No</td><td>numeric</td><td>Estimated vertical error in meters, 95% confidence. Present 
-        if mode is 3 and DOPs can be calculated from the satellite 
+		<tr><td>epv</td><td>No</td><td>numeric</td><td>Estimated vertical error in meters, 95% confidence. Present
+        if mode is 3 and DOPs can be calculated from the satellite
         view.</td></tr>
 		<tr><td>ept</td><td>No</td><td>numeric</td><td>Estimated timestamp error. Present if time is present.</td></tr>
 		<tr><td>epd</td><td>No</td><td>numeric</td><td>Direction error estimate in degrees, 95% confidence.</td></tr>
@@ -49,4 +49,9 @@ returns "nan" (Not a number) when values are not present.  Note these properties
 </tbody>
 </table>
 
+## Other interesting contents
 
+* Controlling servos via the Polulu servo controller
+* Interfacing to the Adafruit combined compass accelerometer Adafruit LSM303DLHC, including tilt corrected compass
+* Using the I2C interface
+* Interfacing to a AS5048B rotatry shaft encoder via I2C, for a wind direction sensor
