@@ -10,7 +10,6 @@ class EventName:
     set_course = "set course"
     sail_course = "sail course"
     tack = "tack"
-    steer = "steer"
     check_course = "check course"
     after = "after"
     every = "every"

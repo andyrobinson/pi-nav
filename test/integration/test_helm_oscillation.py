@@ -15,8 +15,8 @@ from sensors import Sensors
 from helm import Helm
 from steerer import Steerer
 
-STEERER_CONFIG = {'full rudder deflection': 30,'ignore deviation below': 5,'ignore rate of turn below': 10,'rate of turn factor': 0.6,'deviation factor': 0.5}
-HELM_CONFIG = {'on course threshold': 20,'turn on course min count': 3,'on course check interval': 3,'turn steer interval': 3}
+STEERER_CONFIG = {'full rudder deflection': 30,'ignore deviation below': 5,'ignore rate of turn below': 10,'rate of turn factor': 0.3,'deviation factor': 0.5}
+HELM_CONFIG = {'on course threshold': 20,'on course check interval': 1}
 SENSOR_CONFIG = {'smoothing' : 2,'compass smoothing': 2,'log interval': 15, 'update averages interval': 0.2}
 
 class RudderSimulator:
@@ -65,6 +65,7 @@ class TestHelmOscillation(EventTestCase):
   def set_initial_heading(self,heading):
     self.compass.bearing = heading
     self.sensors._compass_smoothed = heading
+    self.sensors._compass_avg = heading
 
   def assert_course_converges(self,target_heading,rudder_effect,jitter=0):
     previous_deviation = self.deviation(target_heading,0)
@@ -73,7 +74,7 @@ class TestHelmOscillation(EventTestCase):
     while (self.deviation(target_heading,jitter) > STEERER_CONFIG['ignore deviation below'] or \
             (abs(self.rudder_servo.get_position()) > 5) and self.sensors.rate_of_turn > STEERER_CONFIG['ignore rate of turn below']):
       self.rotate_boat(rudder_effect,jitter)
-      self.exchange.publish(Event(EventName.steer))
+      self.exchange.publish(Event(EventName.check_course))
       deviation_list.append(round(self.deviation(target_heading,jitter),1))
       self.assertGreater(previous_deviation + jitter, self.deviation(target_heading,jitter),"WARNING: RANDOM VALUES IN TEST.  Expected deviation from course to decrease every iteration, but got list " + str(deviation_list))
       previous_deviation = self.deviation(target_heading,0)
@@ -84,7 +85,7 @@ class TestHelmOscillation(EventTestCase):
 
   def test_it_should_converge_on_requested_heading_when_rudder_highly_effective(self):
     self.set_initial_heading(90)
-    self.assert_turn_converges_with_rudder_effect(180, 0.8)
+    self.assert_turn_converges_with_rudder_effect(180, 1.5)
 
   def test_it_should_converge_on_requested_heading_when_rudder_ineffective(self):
     self.set_initial_heading(300)
